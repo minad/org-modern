@@ -130,7 +130,8 @@ Set to nil to disable the progress bar."
        :inherit variable-pitch
        :width condensed :weight regular
        :underline nil
-       :box (:line-width ,(- org-modern-line-spacing))))
+       ,@(and org-modern-line-spacing
+              `(:box (:line-width ,(- org-modern-line-spacing))))))
   "Parent face for labels.")
 
 (defface org-modern-block-keyword
