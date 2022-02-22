@@ -36,8 +36,11 @@ is [[https://protesilaos.com/emacs/modus-themes][modus-operandi]].
 
 [[https://github.com/minad/org-modern/blob/screenshots/example.gif?raw=true]]
 
+The package is not yet available in a package repository, so it must be
+installed manually from this repository via =package-install-file=. Then
 =org-modern= can be enabled manually by invoking =M-x org-modern-mode=. In order to
-enable =org-mode= for all your Org buffers, add =org-modern-mode= to the Org hook list.
+enable =org-mode= for all your Org buffers, add =org-modern-mode= to the Org hook
+list.
 
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook #'org-modern-mode)
