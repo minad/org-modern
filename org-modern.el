@@ -138,19 +138,15 @@ Set to nil to disable the progress bar."
   "Face used for block keywords.")
 
 (defface org-modern-tag
-  '((((background light))
-     :inherit (secondary-selection org-modern-label)
-     :foreground "black")
-    (t :inherit (secondary-selection org-modern-label)
-       :foreground "white"))
+  '((default :inherit (secondary-selection org-modern-label))
+    (((background light)) :foreground "black")
+    (t :foreground "white"))
   "Face used for tag labels.")
 
 (defface org-modern-done
-  '((((background light))
-     :inherit org-modern-label
-     :background "gray90" :foreground "black")
-    (t :inherit org-modern-label
-       :background "gray20" :foreground "white"))
+  '((default :inherit org-modern-label)
+    (((background light)) :background "gray90" :foreground "black")
+    (t :background "gray20" :foreground "white"))
   "Face used for done labels.")
 
 (defface org-modern-todo
@@ -187,15 +183,14 @@ Set to nil to disable the progress bar."
 
 (defface org-modern-time-inactive
   '((default :inherit org-modern-label :background "gray50")
-    (((background light))
-     :foreground "gray95")
+    (((background light)) :foreground "gray95")
     (t :foreground "gray5"))
   "Face used for inactive time labels.")
 
 (defface org-modern-horizontal-rule
-  '((((background light))
-     :strike-through "gray70" :inherit org-hide)
-    (t :strike-through "gray30" :inherit org-hide))
+  '((default :inherit org-hide)
+    (((background light)) :strike-through "gray70")
+    (t :strike-through "gray30"))
   "Face used for horizontal ruler.")
 
 (defvar-local org-modern--keywords nil
