@@ -48,6 +48,10 @@
 Set to nil to disable styling the headlines."
   :type '(choice (const nil) (vector string)))
 
+(defcustom org-modern-hide-stars 'leading
+  "Make the leading stars invisible."
+  :type '(choice boolean (const leading)))
+
 (defcustom org-modern-timestamp t
   "Prettify time stamps, e.g. <2022-03-01>.
 Set to nil to disable styling the time stamps."
@@ -395,8 +399,11 @@ Set to nil to disable the progress bar."
       (when org-modern-checkbox
         '(("^[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\)[ \t]+\\(\\[[ X-]\\]\\)[ \t]"
            (0 (org-modern--checkbox)))))
-      (when org-modern-star
-        '(("^\\(\\**\\)\\(\\*\\) " (0 (org-modern--star)))))
+      (when (or org-modern-star org-modern-hide-stars)
+        `(("^\\(\\**\\)\\(\\*\\) "
+           ,@(and (not (eq org-modern-hide-stars t)) org-modern-star '((0 (org-modern--star))))
+           ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil invisible t))))
+           ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible t)))))))
       (when org-modern-horizontal-rule
         '(("^-\\{5,\\}$" 0 '(face org-modern-horizontal-rule display (space :width text)))))
       (when org-modern-table
