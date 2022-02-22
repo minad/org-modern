@@ -172,27 +172,24 @@ Set to nil to disable the progress bar."
   "Face used for active date labels.")
 
 (defface org-modern-time-active
-  '((((background light))
-     :inherit org-modern-label :weight semibold
-     :background "gray40" :foreground "white")
-    (t :inherit org-modern-label :weight semibold
-       :background "gray60" :foreground "black"))
+  '((default :inherit org-modern-label :weight semibold)
+    (((background light))
+     :background "gray35" :foreground "white")
+    (t :background "gray75" :foreground "black"))
   "Face used for active time labels.")
 
 (defface org-modern-date-inactive
-  '((((background light))
-     :inherit org-modern-label
-     :background "gray90" :foreground "gray40")
-    (t :inherit org-modern-label
-       :background "gray20" :foreground "gray60"))
+  '((default :inherit org-modern-label)
+    (((background light))
+     :background "gray90" :foreground "gray30")
+    (t :background "gray20" :foreground "gray70"))
   "Face used for inactive date labels.")
 
 (defface org-modern-time-inactive
-  '((((background light))
-     :inherit org-modern-label
-     :background "gray60" :foreground "gray90")
-    (t :inherit org-modern-label
-       :background "gray40" :foreground "gray10"))
+  '((default :inherit org-modern-label :background "gray50")
+    (((background light))
+     :foreground "gray95")
+    (t :foreground "gray5"))
   "Face used for inactive time labels.")
 
 (defface org-modern-horizontal-rule
