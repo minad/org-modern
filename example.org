@@ -1,8 +1,16 @@
 #+title: Modern Org Example
 #+author: Daniel Mendler
 
-Here we demonstrate the Org elements, which are
-styled by =org-modern=.
+This example Org file demonstrates the Org syntax elements,
+which are styled by =org-modern=.
+
+-----
+
+* Headlines
+** Second level
+*** Third level
+**** Fourth level
+***** Fifth level
 
 * Task Lists [1/3]
   - [X] Write =org-modern=
@@ -13,12 +21,6 @@ styled by =org-modern=.
   - Dash
   + Plus
   * Asterisk
-
-* Headlines
-** Second level
-*** Third level
-**** Fourth level
-***** Fifth level
 
 * Timestamps
 DEADLINE: <2022-03-01 Tue>
