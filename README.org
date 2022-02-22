@@ -10,6 +10,11 @@ source blocks. The styling is configurable, you can enable, disable or modify
 the style of each syntax element individually. Take a look at the =org-modern=
 customization group.
 
+This package is still early in its development, so expect bugs and issues in
+particular due to unfortunate interactions of the =variable-pitch= and =fixed-pitch=
+fonts. Bug reports, improvement or style proposals are welcome! Maybe some more
+Org elements deserve styling or alternative stylings should be offered?
+
 The tag style of =org-modern= is a poor Emacsien's ripoff from Nicholas Rougier's
 beautiful [[https://github.com/rougier/svg-tag-mode][svg-tag-mode]]. In contrast to =svg-tag-mode=, this package avoids images
 and uses cheap and fast Emacs box display properties. Unfortunately this
