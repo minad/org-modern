@@ -204,6 +204,9 @@ Set to nil to disable the progress bar."
 (defvar-local org-modern--keywords nil
   "List of font lock keywords.")
 
+(defvar-local org-modern--orig-line-spacing 'unset
+  "Original line spacing.")
+
 (defun org-modern--priority ()
   "Prettify headline priorities using the `org-modern-priority' character."
   (let ((beg (match-beginning 1))
@@ -368,6 +371,9 @@ Set to nil to disable the progress bar."
   "Modern looks for Org."
   :global nil
   :group 'org-modern
+  (unless (eq org-modern--orig-line-spacing 'unset)
+    (setq line-spacing org-modern--orig-line-spacing
+          org-modern--orig-line-spacing 'unset))
   (cond
    (org-modern-mode
     (when-let (width (plist-get (face-attribute 'org-modern-label :box) :line-width))
@@ -375,6 +381,7 @@ Set to nil to disable the progress bar."
        'org-modern-label nil
        :box `(:color ,(face-attribute 'default :background nil t) :line-width ,width)))
     (setq
+     org-modern--orig-line-spacing line-spacing
      line-spacing org-modern-line-spacing
      org-modern--keywords
      (append
