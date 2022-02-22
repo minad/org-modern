@@ -1,0 +1,38 @@
+#+title: Modern Org Style
+#+author: Daniel Mendler
+#+language: en
+
+#+html: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true"/></a>
+
+This package implements a modern looks for your Org buffers using font locking
+and display properties. The package styles headlines, keywords, tables and
+source blocks. The styling is configurable, you can enable, disable or modify
+the style of each syntax element individually. Take a look at the =org-modern=
+customization group.
+
+The tag style of =org-modern= is a poor Emacsien's ripoff from the style of
+Nicholas Rougier's beautiful [[https://github.com/rougier/svg-tag-mode][svg-tag-mode]]. In contrast to =svg-tag-mode=, this
+package avoids images and uses cheap and fast Emacs box display properties.
+Unfortunately this significantly restricts the flexibility in styling and may
+lead to font-dependent issues. We do our best, but for example we cannot get
+round corners. Of course a combination of =org-modern= with =svg-tag-mode= is
+possible. You can use SVG tags and use the table and block styling from
+=org-modern=. If you are interested in further tweaks, there exists also the
+=prettify-symbols-mode= which can be used for individual styling of custom
+keywords.
+
+Another very popular alternative is [[https://github.com/integral-dw/org-superstar-mode][org-superstar]], which has a more restricted
+feature set and mainly styles headlines and lists. In contrast to =org-modern=,
+which uses display properties, =org-superstar= relies on character composition,
+which is considered less future-proof.
+
+This is how the [[file:example.org][example.org]] looks with =org-modern= and the [[https://protesilaos.com/emacs/modus-themes][modus-themes]]:
+
+[[https://github.com/minad/org-modern/blob/screenshots/example.gif?raw=true]]
+
+Enable manually by invoking =org-modern-mode= or add the mode to your Org mode
+hook list.
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook #'org-modern-mode)
+#+end_src

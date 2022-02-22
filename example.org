@@ -1,0 +1,90 @@
+#+title: Modern Org Example
+#+author: Daniel Mendler
+
+Here we demonstrate the Org elements, which are
+styled by =org-modern=.
+
+* Task Lists [1/3]
+  - [X] Write =org-modern=
+  - [-] Publish =org-modern=
+  - [ ] Fix all the bugs
+
+* List Bullets
+  - Dash
+  + Plus
+  * Asterisk
+
+* Headlines
+** Second level
+*** Third level
+**** Fourth level
+***** Fifth level
+
+* Timestamps
+DEADLINE: <2022-03-01 Tue>
+SCHEDULED: <2022-02-25 10:00>
+DATE: [2022-03-01]
+TIMESTAMP: [2022-02-21 Mon 13:00]
+
+
+
+
+
+* Blocks
+
+#+begin_src emacs-lisp
+  (defun command-of-the-day ()
+    "Show the documentation for a random command."
+    (interactive)
+    (let ((commands))
+      (mapatoms (lambda (s) (when (commandp s) (push s commands))))
+      (describe-function (nth (random (length commands)) commands))))
+#+end_src
+
+#+begin_src calc
+  taylor(sin(x),x=0,3)
+#+end_src
+
+#+results:
+: pi x / 180 - 2.85779606768e-8 pi^3 x^3
+
+#+begin_src C
+  printf("a|b\nc|d\n");
+#+end_src
+
+#+results:
+| a | b |
+| c | d |
+
+
+
+
+
+
+* Todo Labels and Tags
+** DONE Write =org-modern=  :emacs:foss:coding:
+** TODO Publish =org-modern=
+** WAIT Fix all the bugs
+
+* Priorities
+** DONE [#A] Most important
+** TODO [#B] Less important
+** CANCEL [#C] Not that important
+** DONE [3/3] [#A] Everything combined :tag:test:
+  * [X] First
+  * [X] Second
+  * [X] Third
+
+* Tables
+
+| N | N^2 | N^3 | N^4 | sqrt(n) | sqrt[4](N) |
+|---+----+----+----+---------+------------|
+| 2 |  4 |  8 | 16 |  1.4142 |     1.1892 |
+| 3 |  9 | 27 | 81 |  1.7321 |     1.3161 |
+
+|---+----+----+----+---------+------------|
+| N | N^2 | N^3 | N^4 | sqrt(n) | sqrt[4](N) |
+|---+----+----+----+---------+------------|
+| 2 |  4 |  8 | 16 |  1.4142 |     1.1892 |
+| 3 |  9 | 27 | 81 |  1.7321 |     1.3161 |
+|---+----+----+----+---------+------------|
