@@ -12,7 +12,7 @@ which are styled by =org-modern=.
 **** Fourth level
 ***** Fifth level
 
-* Task Lists [1/3] [33%]
+* Task Lists [1/3]
   - [X] Write =org-modern=
   - [-] Publish =org-modern=
   - [ ] Fix all the bugs
@@ -27,9 +27,6 @@ DEADLINE: <2022-03-01 Tue>
 SCHEDULED: <2022-02-25 10:00>
 DATE: [2022-03-01]
 TIMESTAMP: [2022-02-21 Mon 13:00]
-
-
-
 
 
 * Blocks
@@ -63,6 +60,7 @@ TIMESTAMP: [2022-02-21 Mon 13:00]
 
 
 
+
 * Todo Labels and Tags
 ** DONE Write =org-modern=  :emacs:foss:coding:
 ** TODO Publish =org-modern=
@@ -72,7 +70,7 @@ TIMESTAMP: [2022-02-21 Mon 13:00]
 ** DONE [#A] Most important
 ** TODO [#B] Less important
 ** CANCEL [#C] Not that important
-** DONE [3/3] [#A] Everything combined :tag:test:
+** DONE [100%] [#A] Everything combined :tag:test:
   * [X] First
   * [X] Second
   * [X] Third
