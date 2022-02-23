@@ -271,13 +271,17 @@ Set to nil to disable the progress bar."
         (beg (match-beginning 1))
         (end (match-end 1)))
     (put-text-property
+     beg (1+ beg)
+     'display (format " %c" (char-after beg)))
+    (put-text-property
+     (1- end) end
+     'display (format "%c " (char-before end)))
+    (put-text-property
      beg end
-     'display
-     (propertize (concat " " todo " ")
-                 'face
-                 (if (member todo org-done-keywords)
-                     'org-modern-done
-                   'org-modern-todo)))))
+     'face
+     (if (member todo org-done-keywords)
+         'org-modern-done
+       'org-modern-todo))))
 
 (defun org-modern--timestamp ()
   "Prettify timestamps."
