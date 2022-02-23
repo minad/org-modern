@@ -138,10 +138,10 @@ Set to nil to disable styling checkboxes."
   "Prettify todo statistics."
   :type 'boolean)
 
-(defcustom org-modern-progress " ▁▂▃▄▅▆▇█"
-  "Add a progress bar to the todo statistics.
-Set to nil to disable the progress bar."
-  :type '(choice (const nil) string))
+(defcustom org-modern-progress ["○""◔""◐""◕""●"]
+  "Add a progress indicator to the todo statistics.
+Set to nil to disable the indicator."
+  :type '(choice (const nil) (vector string)))
 
 (defgroup org-modern-faces nil
   "Faces used by `org-modern'."
@@ -182,11 +182,6 @@ Set to nil to disable the progress bar."
 (defface org-modern-statistics
   '((t :inherit org-modern-done))
   "Face used for todo statistics labels.")
-
-(defface org-modern-progress
-  '((((background light)) :foreground "gray40")
-    (t :foreground "gray60"))
-  "Face used for todo statistics progress bar.")
 
 (defface org-modern-date-active
   '((t :inherit org-modern-done))
@@ -241,7 +236,7 @@ Set to nil to disable the progress bar."
   "Prettify headline todo statistics."
   (let ((label (propertize (match-string 1) 'face 'org-modern-statistics)))
     (when org-modern-progress
-      (let ((idx (ceiling
+      (let ((idx (floor
                   (* (1- (length org-modern-progress))
                      (if (match-beginning 2)
                          (* 0.01 (string-to-number (match-string 2)))
@@ -249,11 +244,7 @@ Set to nil to disable the progress bar."
                          (if (= q 0)
                              1.0
                            (/ (* 1.0 (string-to-number (match-string 3))) q))))))))
-        (setq label (concat
-                     (propertize (char-to-string (aref org-modern-progress idx))
-                                 'face 'org-modern-progress)
-                     " "
-                     label))))
+        (setq label (concat (aref org-modern-progress idx) " " label))))
     (setq label (concat " " label " "))
     (add-face-text-property 0 (length label)
                             'org-modern-statistics 'append label)
