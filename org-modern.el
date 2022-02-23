@@ -362,6 +362,8 @@ Set to nil to disable the indicator."
   (save-excursion
     (let* ((beg (match-beginning 0))
            (end (match-end 0))
+           (tbeg (match-beginning 1))
+           (tend (match-end 1))
            ;; Unique objects
            (sp1 (list 'space :width 1))
            (sp2 (list 'space :width 1))
@@ -390,9 +392,9 @@ Set to nil to disable the indicator."
       (goto-char beg)
       (when separator
         (when (numberp org-modern-table-horizontal)
-          (add-face-text-property beg end `(:overline ,color) 'append)
+          (add-face-text-property tbeg tend `(:overline ,color) 'append)
           (add-face-text-property beg (1+ end) `(:height ,org-modern-table-horizontal) 'append))
-        (while (re-search-forward "-+" end 'noerror)
+        (while (re-search-forward "[^|+]+" tend 'noerror)
           (let ((a (match-beginning 0))
                 (b (match-end 0)))
             ;; TODO Text scaling breaks the table formatting since the space is not scaled accordingly
@@ -453,7 +455,7 @@ Set to nil to disable the indicator."
       (when org-modern-horizontal-rule
         '(("^-\\{5,\\}$" 0 '(face org-modern-horizontal-rule display (space :width text)))))
       (when org-modern-table
-        '(("^[ \t]*|.*|[ \t]*$" (0 (org-modern--table)))))
+        '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
       (when org-modern-block
         '(("^[ \t]*#\\+begin_\\S-" (0 (org-modern--block)))
           ("^\\([ \t]*#\\+begin_\\)\\(\\S-+\\).*"
