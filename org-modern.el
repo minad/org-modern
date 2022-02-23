@@ -87,7 +87,7 @@ Set to nil to hide the vertical lines."
   :type '(choice (const nil) integer))
 
 (defcustom org-modern-table-horizontal t
-  "Prettify horizontal lines, consisting of five dashes or more."
+  "Prettify horizontal table lines."
   :type 'boolean)
 
 (defcustom org-modern-priority
