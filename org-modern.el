@@ -278,7 +278,7 @@ Set to nil to disable the progress bar."
         (end (match-end 1)))
     (put-text-property
      beg (1+ beg)
-     'display (format " %c" (char-after beg)))
+     'display (format #(" %c" 1 3 (cursor t)) (char-after beg)))
     (put-text-property
      (1- end) end
      'display (format "%c " (char-before end)))
