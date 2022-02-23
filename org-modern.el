@@ -107,9 +107,9 @@ Set to nil to disable styling list bullets."
   :type '(alist :key-type character :value-type string))
 
 (defcustom org-modern-checkbox
-  '((?X . #("□✓" 0 2 (composition ((2)))))
-    (?- . #("□-" 0 2 (composition ((2)))))
-    (?\s . #("□" 0 1 (composition ((1))))))
+  '((?X . #("▢✓" 0 2 (composition ((2)))))
+    (?- . #("▢-" 0 2 (composition ((2)))))
+    (?\s . #("▢" 0 1 (composition ((1))))))
   "List of check box replacement strings.
 Set to nil to disable styling checkboxes."
   :type '(alist :key-type character :value-type string))
