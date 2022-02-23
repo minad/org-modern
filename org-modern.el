@@ -258,10 +258,16 @@ Set to nil to disable the progress bar."
             (add-face-text-property (1- colon) colon '(:height 1) t))
           (put-text-property
            colon
+           (1+ colon)
+           'display (format #(" %c" 1 3 (cursor t)) (char-after colon)))
+          (put-text-property
+           (- (point) 2)
            (1- (point))
-           'display
-           (propertize (concat " " (buffer-substring colon (1- (point))) " ")
-                       'face 'org-modern-tag)))
+           'display (format "%c " (char-before (1- (point)))))
+          (put-text-property
+           colon
+           (1- (point))
+           'face 'org-modern-tag))
         (setq colon (point))
         (add-text-properties (1- colon) colon colon-props)))))
 
