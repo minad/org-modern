@@ -402,9 +402,12 @@ Set to nil to disable the indicator."
                     (save-excursion
                       (re-search-forward
                        "^[ \t]*#\\+end_" (line-end-position) 'noerror))))
-      (put-text-property
-       (point) (1+ (point)) 'line-prefix
-       #(" " 0 1 (display (left-fringe org-modern--line org-block-begin-line))))
+      (add-text-properties
+       (point) (line-end-position)
+       '(wrap-prefix
+         #(" " 0 1 (display (left-fringe org-modern--line org-block-begin-line)))
+         line-prefix
+         #(" " 0 1 (display (left-fringe org-modern--line org-block-begin-line)))))
       (forward-line))))
 
 ;;;###autoload
@@ -467,14 +470,14 @@ Set to nil to disable the indicator."
       ;; TODO implement better unfontify
       (with-silent-modifications
         (remove-list-of-text-properties (point-min) (point-max)
-                                        '(line-prefix display face invisible)))))
+                                        '(wrap-prefix line-prefix display face invisible)))))
   (font-lock-flush))
 
 (defun org-modern--unfontify (beg end &optional _)
   "Unfontify prettified elements between BEG and END."
   (when org-modern-mode
     ;; TODO implement better unfontify
-    (remove-list-of-text-properties beg end '(line-prefix display face invisible))))
+    (remove-list-of-text-properties beg end '(wrap-prefix line-prefix display face invisible))))
 
 (define-fringe-bitmap 'org-modern--line (make-vector 1 #x80) nil nil '(top t))
 (define-fringe-bitmap 'org-modern--top (vconcat (make-vector 20 0) [#xFF] (make-vector 107 #x80)) nil nil 'top)
