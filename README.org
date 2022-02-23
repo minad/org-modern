@@ -17,31 +17,32 @@ Org elements deserve styling or alternative stylings should be offered?
 
 The tag style of =org-modern= is a poor Emacsien's ripoff from Nicholas Rougier's
 beautiful [[https://github.com/rougier/svg-tag-mode][svg-tag-mode]]. In contrast to =svg-tag-mode=, this package avoids images
-and uses cheap and fast Emacs box text properties. Unfortunately this restricts
-the flexibility in styling and may lead to font-dependent issues. We do our
-best, but for example there is no way we can round corners. On the upside by
-only styling the text via text properties, the text stays editable and easy to
-interact with. Of course a combination of =org-modern= with =svg-tag-mode= is
-possible. You can use SVG tags and use the table and block styling from
-=org-modern=. If you are interested in further tweaks, Emacs comes with the
-builtin =prettify-symbols-mode= which can be used for individual styling of custom
-keywords.
+and uses cheap and fast Emacs box text properties. By only styling the text via
+text properties, the styled text, e.g., dates or tags stay editable and are easy
+to interact with.
 
-Another very popular alternative is [[https://github.com/integral-dw/org-superstar-mode][org-superstar]], which has a more restricted
+On the downside, this restricts our flexibility and may lead to font-dependent
+issues. We do our best, but for example there is no way we can round corners. Of
+course a combination of =org-modern= with =svg-tag-mode= is possible. You can use
+SVG tags and use the table and block styling from =org-modern=. If you are
+interested in further tweaks, Emacs comes with the builtin =prettify-symbols-mode=
+which can be used for individual styling of custom keywords.
+
+Another popular alternative is [[https://github.com/integral-dw/org-superstar-mode][org-superstar]], which has a more restricted
 feature set and mainly adjusts headlines and lists. =org-superstar= relies on
 character composition, while =org-modern= uses text properties, which are
 considered more future-proof.
 
-This is a screenshot of [[file:example.org][example.org]] with =org-modern= turned on and off. The theme
-is [[https://protesilaos.com/emacs/modus-themes][modus-operandi]].
+This is a screenshot of [[file:example.org][example.org]] with =org-modern= turned on and off. The
+elegant theme featured in the screenshot is [[https://protesilaos.com/emacs/modus-themes][modus-operandi]].
 
 [[https://github.com/minad/org-modern/blob/screenshots/example.gif?raw=true]]
 
 The package is not yet available in a package repository, so it must be
 installed manually from this repository via =package-install-file=. Then
 =org-modern= can be enabled manually by invoking =M-x org-modern-mode=. In order to
-enable =org-mode= for all your Org buffers, add =org-modern-mode= to the Org hook
-list.
+enable =org-mode= for all your Org buffers, add =org-modern-mode= to the Org mode
+hook list.
 
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook #'org-modern-mode)
