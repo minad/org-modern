@@ -5,10 +5,14 @@
 #+html: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true"/></a>
 
 This package implements a "modern" style for your Org buffers using font locking
-and text properties. The package styles headlines, keywords, tables and
-source blocks. The styling is configurable, you can enable, disable or modify
-the style of each syntax element individually. Take a look at the =org-modern=
-customization group.
+and text properties. The package styles headlines, keywords, tables and source
+blocks. The styling is configurable, you can enable, disable or modify the style
+of each syntax element individually via the =org-modern= customization group.
+
+[[https://github.com/minad/org-modern/blob/screenshots/example.gif?raw=true]]
+
+The screenshots shows [[file:example.org][example.org]] with =org-modern= turned on and off. The
+elegant theme featured in the screenshot is [[https://protesilaos.com/emacs/modus-themes][modus-operandi]].
 
 This package is still early in its development, so expect bugs and issues in
 particular due to unfortunate interactions of the =variable-pitch= and =fixed-pitch=
@@ -32,11 +36,6 @@ Another popular alternative is [[https://github.com/integral-dw/org-superstar-mo
 feature set and mainly adjusts headlines and lists. =org-superstar= relies on
 character composition, while =org-modern= uses text properties, which are
 considered more future-proof.
-
-This is a screenshot of [[file:example.org][example.org]] with =org-modern= turned on and off. The
-elegant theme featured in the screenshot is [[https://protesilaos.com/emacs/modus-themes][modus-operandi]].
-
-[[https://github.com/minad/org-modern/blob/screenshots/example.gif?raw=true]]
 
 The package is not yet available in a package repository, so it must be
 installed manually from this repository via =package-install-file=. Then
