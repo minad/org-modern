@@ -5,7 +5,7 @@
 #+html: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true"/></a>
 
 This package implements a "modern" style for your Org buffers using font locking
-and display properties. The package styles headlines, keywords, tables and
+and text properties. The package styles headlines, keywords, tables and
 source blocks. The styling is configurable, you can enable, disable or modify
 the style of each syntax element individually. Take a look at the =org-modern=
 customization group.
@@ -17,10 +17,11 @@ Org elements deserve styling or alternative stylings should be offered?
 
 The tag style of =org-modern= is a poor Emacsien's ripoff from Nicholas Rougier's
 beautiful [[https://github.com/rougier/svg-tag-mode][svg-tag-mode]]. In contrast to =svg-tag-mode=, this package avoids images
-and uses cheap and fast Emacs box display properties. Unfortunately this
-significantly restricts the flexibility in styling and may lead to
-font-dependent issues. We do our best, but for example there is no way we can
-round corners. Of course a combination of =org-modern= with =svg-tag-mode= is
+and uses cheap and fast Emacs box text properties. Unfortunately this restricts
+the flexibility in styling and may lead to font-dependent issues. We do our
+best, but for example there is no way we can round corners. On the upside by
+only styling the text via text properties, the text stays editable and easy to
+interact with. Of course a combination of =org-modern= with =svg-tag-mode= is
 possible. You can use SVG tags and use the table and block styling from
 =org-modern=. If you are interested in further tweaks, Emacs comes with the
 builtin =prettify-symbols-mode= which can be used for individual styling of custom
@@ -28,7 +29,7 @@ keywords.
 
 Another very popular alternative is [[https://github.com/integral-dw/org-superstar-mode][org-superstar]], which has a more restricted
 feature set and mainly adjusts headlines and lists. =org-superstar= relies on
-character composition, while =org-modern= uses display properties, which are
+character composition, while =org-modern= uses text properties, which are
 considered more future-proof.
 
 This is a screenshot of [[file:example.org][example.org]] with =org-modern= turned on and off. The theme

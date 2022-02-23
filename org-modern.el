@@ -281,26 +281,52 @@ Set to nil to disable the progress bar."
 
 (defun org-modern--timestamp ()
   "Prettify timestamps."
-  (let ((beg (match-beginning 0))
-        (end (match-end 0))
-        (active (eq (char-after (match-beginning 0)) ?<))
-        (date (match-string 1))
-        (time (match-string 2)))
+  (let* ((active (eq (char-after (match-beginning 0)) ?<))
+         (date-face (if active
+                        'org-modern-date-active
+                      'org-modern-date-inactive))
+         (time-face (if active
+                        'org-modern-time-active
+                      'org-modern-time-inactive)))
     (put-text-property
-     beg end
-     'display
-     (concat
-      (propertize (concat " " date " ")
-                  'face
-                  (if active
-                      'org-modern-date-active
-                    'org-modern-date-inactive))
-      (and time
-           (propertize (concat " " time " ")
-                       'face
-                       (if active
-                           'org-modern-time-active
-                         'org-modern-time-inactive)))))))
+     (match-beginning 0)
+     (1+ (match-beginning 0))
+     'display " ")
+    (put-text-property
+     (1- (match-end 0))
+     (match-end 0)
+     'display " ")
+    ;; year
+    (put-text-property
+     (match-beginning 0)
+     (match-end 1)
+     'face date-face)
+    ;; month
+    (put-text-property
+     (match-beginning 2)
+     (match-end 2)
+     'face date-face)
+    ;; day
+    (put-text-property
+     (match-beginning 3)
+     (if (match-end 4) (match-end 3) (match-end 0))
+     'face date-face)
+    (when (match-end 4)
+      (put-text-property
+       (match-beginning 4)
+       (1+ (match-beginning 4))
+       'display (format " %c"
+                        (char-after (match-beginning 4))))
+      ;; hour
+      (put-text-property
+       (match-beginning 4)
+       (match-end 4)
+       'face time-face)
+      ;; minute
+      (put-text-property
+       (match-beginning 5)
+       (match-end 0)
+       'face time-face))))
 
 (defun org-modern--star ()
   "Prettify headline stars."
@@ -421,7 +447,7 @@ Set to nil to disable the progress bar."
       (when org-modern-tag
         '(("^\\*+.*?\\( \\)\\(:.*:\\)[ \t]*$" (0 (org-modern--tag)))))
       (when org-modern-timestamp
-        '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [A-Za-z]+\\)?\\)\\(?: \\([0-9]\\{2\\}:[0-9]\\{2\\}\\)\\)?\\(?:>\\|\\]\\)"
+        '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-\\)\\([0-9]\\{2\\}-\\)\\([0-9]\\{2\\}\\(?: [A-Za-z]+\\)? ?\\)\\(?:\\([0-9]\\{2\\}:\\)\\([0-9]\\{2\\}\\)\\)?\\(?:>\\|\\]\\)"
            (0 (org-modern--timestamp)))))
       (when org-modern-statistics
         '((" \\[\\(\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\]" (0 (org-modern--statistics)))))))
