@@ -1,7 +1,7 @@
 #+title: Modern Org Example
 #+author: Daniel Mendler
 
-This example Org file demonstrates the Org syntax elements,
+This example Org file demonstrates the Org elements,
 which are styled by =org-modern=.
 
 -----
@@ -23,9 +23,9 @@ which are styled by =org-modern=.
   * Asterisk
 
 * Timestamps
-DEADLINE: <2022-03-01 Tue>
+DEADLINE:  <2022-03-01 Tue>
 SCHEDULED: <2022-02-25 10:00>
-DATE: [2022-03-01]
+DATE:      [2022-03-01]
 TIMESTAMP: [2022-02-21 Mon 13:00]
 
 
