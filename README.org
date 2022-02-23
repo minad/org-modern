@@ -46,3 +46,7 @@ hook list.
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook #'org-modern-mode)
 #+end_src
+
+Note that =org-modern-mode= tries to adjust the tag label display based on the
+value of =line-spacing=. This looks best if =line-spacing= has a value between 0.1
+and 0.4 in the Org buffer.

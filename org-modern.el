@@ -39,9 +39,29 @@
   :group 'org
   :prefix "org-modern-")
 
-(defcustom org-modern-line-spacing 7
-  "Line spacing, should approximately match the box line width."
-  :type '(choice (const nil) integer))
+(defvar org-modern-label-border)
+(defun org-modern--update-label-face ()
+  "Update border of the `org-modern-label' face."
+  (when (facep 'org-modern-label)
+    (set-face-attribute
+     'org-modern-label nil :box
+     (when org-modern-label-border
+       (let ((border (if (eq org-modern-label-border 'auto)
+                         (max 3 (cond
+                                 ((integerp line-spacing) line-spacing)
+                                 ((floatp line-spacing) (ceiling (* line-spacing (frame-char-height))))
+                                 (t (/ (frame-char-height) 10))))
+                       org-modern-label-border)))
+         `(:color ,(face-attribute 'default :background nil t) :line-width ,(- border)))))))
+
+(defcustom org-modern-label-border 'auto
+  "Line width used for tag label borders.
+If set to `auto' the border width is computed based on the `line-spacing'.
+A value between 0.1 and 0.4 of `line-spacing' is recommended."
+  :type '(choice (const nil) integer)
+  :set (lambda (sym val)
+         (set sym val)
+         (org-modern--update-label-face)))
 
 (defcustom org-modern-star ["◉""○""◈""◇""⁕"]
   "Replacement strings for headline stars for each level.
@@ -134,8 +154,8 @@ Set to nil to disable the progress bar."
        :inherit variable-pitch
        :width condensed :weight regular
        :underline nil
-       ,@(and org-modern-line-spacing
-              `(:box (:line-width ,(- org-modern-line-spacing))))))
+       ,@(and (integerp org-modern-label-border)
+              `(:box (:line-width ,(- org-modern-label-border))))))
   "Parent face for labels.")
 
 (defface org-modern-block-keyword
@@ -200,9 +220,6 @@ Set to nil to disable the progress bar."
 
 (defvar-local org-modern--keywords nil
   "List of font lock keywords.")
-
-(defvar-local org-modern--orig-line-spacing 'unset
-  "Original line spacing.")
 
 (defun org-modern--priority ()
   "Prettify headline priorities using the `org-modern-priority' character."
@@ -404,18 +421,10 @@ Set to nil to disable the progress bar."
   "Modern looks for Org."
   :global nil
   :group 'org-modern
-  (unless (eq org-modern--orig-line-spacing 'unset)
-    (setq line-spacing org-modern--orig-line-spacing
-          org-modern--orig-line-spacing 'unset))
   (cond
    (org-modern-mode
-    (when-let (width (plist-get (face-attribute 'org-modern-label :box) :line-width))
-      (set-face-attribute
-       'org-modern-label nil
-       :box `(:color ,(face-attribute 'default :background nil t) :line-width ,width)))
+    (org-modern--update-label-face)
     (setq
-     org-modern--orig-line-spacing line-spacing
-     line-spacing org-modern-line-spacing
      org-modern--keywords
      (append
       (when-let (bullet (alist-get ?+ org-modern-list))
