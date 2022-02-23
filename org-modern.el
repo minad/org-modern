@@ -33,6 +33,8 @@
 ;;; Code:
 
 (require 'org)
+(eval-when-compile
+  (require 'cl-lib))
 
 (defgroup org-modern nil
   "Modern looks for Org."
@@ -86,9 +88,9 @@ Set to nil to disable styling the time stamps."
 Set to nil to hide the vertical lines."
   :type '(choice (const nil) integer))
 
-(defcustom org-modern-table-horizontal t
+(defcustom org-modern-table-horizontal 0.1
   "Prettify horizontal table lines."
-  :type 'boolean)
+  :type '(choice (const nil) number))
 
 (defcustom org-modern-priority
   '((?A . "🅐") ;; Ⓐ
@@ -360,6 +362,7 @@ Set to nil to disable the indicator."
   (save-excursion
     (let* ((beg (match-beginning 0))
            (end (match-end 0))
+           (color (face-attribute 'org-table :foreground nil t))
            (inner (progn
                     (goto-char beg)
                     (forward-line)
@@ -379,19 +382,19 @@ Set to nil to disable the indicator."
                                  `(display (space :width (,org-modern-table-vertical))
                                            face (:inherit org-table :inverse-video t))))
            ((and org-modern-table-horizontal separator)
-            (put-text-property a b 'display `(space :width (,org-modern-table-vertical)))
-            (add-face-text-property a b '(:overline t) 'append))
+            (put-text-property a b 'display `(space :width (,org-modern-table-vertical))))
            (t (put-text-property a b 'face 'org-hide)))))
       (goto-char beg)
       (when separator
-        (add-face-text-property beg (1+ end) '(:height 1) 'append)
+        (when (numberp org-modern-table-horizontal)
+          (add-face-text-property beg end `(:overline ,color) 'append)
+          (add-face-text-property beg (1+ end) `(:height ,org-modern-table-horizontal) 'append))
         (while (re-search-forward "-+" end 'noerror)
           (let ((a (match-beginning 0))
                 (b (match-end 0)))
             ;; TODO Text scaling breaks the table formatting since the space is not scaled accordingly
-            (put-text-property a b 'display `(space :width ,(- b a)))
-            (when org-modern-table-horizontal
-              (add-face-text-property a b '(:overline t) 'append))))))))
+            (cl-loop for i from a below b do
+              (put-text-property i (1+ i) 'display (list 'space :width 1)))))))))
 
 (defun org-modern--block ()
   "Prettify blocks."
