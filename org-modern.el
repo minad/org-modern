@@ -449,14 +449,14 @@ Set to nil to disable the indicator."
         '(("^[ \t]*|.*|[ \t]*$" (0 (org-modern--table)))))
       (when org-modern-block
         '(("^[ \t]*#\\+begin_\\S-" (0 (org-modern--block)))
-          ("^\\([ \t]*#\\+begin_\\)\\(\\S-+\\)"
-           (2 'org-modern-block-keyword append)
-           (1 '(face nil display (space :width (3))
-                     line-prefix #("│" 0 1 (display (left-fringe org-modern--top org-block-begin-line))))))
-          ("^\\([ \t]*#\\+end_\\)\\(\\S-+\\)"
-           (2 'org-modern-block-keyword append)
-           (1 '(face nil display (space :width (3))
-                     line-prefix #("│" 0 1 (display (left-fringe org-modern--bottom org-block-begin-line))))))))
+          ("^\\([ \t]*#\\+begin_\\)\\(\\S-+\\).*"
+           (0 '(face nil line-prefix #("│" 0 1 (display (left-fringe org-modern--top org-block-begin-line)))))
+           (1 '(face nil display (space :width (3))))
+           (2 'org-modern-block-keyword append))
+          ("^\\([ \t]*#\\+end_\\)\\(\\S-+\\).*"
+           (0 '(face nil line-prefix #("│" 0 1 (display (left-fringe org-modern--bottom org-block-end-line)))))
+           (1 '(face nil display (space :width (3))))
+           (2 'org-modern-block-keyword append))))
       (when org-modern-tag
         '(("^\\*+.*?\\( \\)\\(:.*:\\)[ \t]*$" (0 (org-modern--tag)))))
       (when org-modern-timestamp
