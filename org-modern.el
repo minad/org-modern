@@ -362,6 +362,9 @@ Set to nil to disable the indicator."
   (save-excursion
     (let* ((beg (match-beginning 0))
            (end (match-end 0))
+           ;; Unique objects
+           (sp1 (list 'space :width 1))
+           (sp2 (list 'space :width 1))
            (color (face-attribute 'org-table :foreground nil t))
            (inner (progn
                     (goto-char beg)
@@ -394,7 +397,8 @@ Set to nil to disable the indicator."
                 (b (match-end 0)))
             ;; TODO Text scaling breaks the table formatting since the space is not scaled accordingly
             (cl-loop for i from a below b do
-              (put-text-property i (1+ i) 'display (list 'space :width 1)))))))))
+                     (put-text-property i (1+ i) 'display
+                                        (if (= 0 (mod i 2)) sp1 sp2)))))))))
 
 (defun org-modern--block ()
   "Prettify blocks."
