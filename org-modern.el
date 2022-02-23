@@ -325,7 +325,7 @@ Set to nil to disable the progress bar."
       (put-text-property
        (match-beginning 4)
        (1+ (match-beginning 4))
-       'display (format " %c"
+       'display (format #(" %c" 1 3 (cursor t))
                         (char-after (match-beginning 4))))
       ;; hour
       (put-text-property
