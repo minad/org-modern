@@ -457,12 +457,12 @@ Set to nil to disable the indicator."
       (when org-modern-table
         '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
       (when org-modern-block
-        '(("^[ \t]*#\\+begin_\\S-" (0 (org-modern--block)))
-          ("^\\([ \t]*#\\+begin_\\)\\(\\S-+\\).*"
+        '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-" (0 (org-modern--block)))
+          ("^\\([ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
            (0 '(face nil line-prefix #("│" 0 1 (display (left-fringe org-modern--top org-block-begin-line)))))
            (1 '(face nil display (space :width (3))))
            (2 'org-modern-block-keyword append))
-          ("^\\([ \t]*#\\+end_\\)\\(\\S-+\\).*"
+          ("^\\([ \t]*#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
            (0 '(face nil line-prefix #("│" 0 1 (display (left-fringe org-modern--bottom org-block-end-line)))))
            (1 '(face nil display (space :width (3))))
            (2 'org-modern-block-keyword append))))

@@ -47,9 +47,9 @@ TIMESTAMP: [2022-02-21 Mon 13:00]
 #+results:
 : pi x / 180 - 2.85779606768e-8 pi^3 x^3
 
-#+begin_src C
+#+BEGIN_SRC C
   printf("a|b\nc|d\n");
-#+end_src
+#+END_SRC
 
 #+results:
 | a | b |
