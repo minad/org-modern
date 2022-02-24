@@ -409,8 +409,9 @@ Set to nil to disable the indicator."
     (forward-line)
     (while (not (or (eobp)
                     (save-excursion
-                      (re-search-forward
-                       "^[ \t]*#\\+end_" (line-end-position) 'noerror))))
+                      (let ((case-fold-search t))
+                        (re-search-forward
+                         "^[ \t]*#\\+end_" (line-end-position) 'noerror)))))
       (add-text-properties
        (point) (min (1+ (line-end-position)) (point-max))
        '(wrap-prefix
