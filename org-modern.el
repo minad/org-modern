@@ -412,7 +412,7 @@ Set to nil to disable the indicator."
                       (re-search-forward
                        "^[ \t]*#\\+end_" (line-end-position) 'noerror))))
       (add-text-properties
-       (point) (line-end-position)
+       (point) (min (1+ (line-end-position)) (point-max))
        '(wrap-prefix
          #(" " 0 1 (display (left-fringe org-modern--line org-block-begin-line)))
          line-prefix
