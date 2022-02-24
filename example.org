@@ -25,7 +25,7 @@ which are styled by =org-modern=.
 * Timestamps
 DEADLINE:  <2022-03-01 Tue>
 SCHEDULED: <2022-02-25 10:00>
-DATE:      [2022-03-01]
+RANGE:     [2022-03-01]--[2022-04-01]
 TIMESTAMP: [2022-02-21 Mon 13:00]
 
 
