@@ -71,8 +71,11 @@ Set to nil to disable styling the headlines."
   :type '(choice (const nil) (vector string)))
 
 (defcustom org-modern-hide-stars 'leading
-  "Make the leading stars invisible."
-  :type '(choice boolean (const leading)))
+  "Make some of the headline stars invisible."
+  :type '(choice
+          (const :tag "Do not hide stars" nil)
+          (const :tag "Hide all stars" t)
+          (const :tag "Hide leading stars" leading)))
 
 (defcustom org-modern-timestamp t
   "Prettify time stamps, e.g. <2022-03-01>.
