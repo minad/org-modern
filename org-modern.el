@@ -319,15 +319,14 @@ Set to nil to disable the indicator."
     ;; year-month-day
     (put-text-property
      (match-beginning 0)
-     (if (match-end 2) (match-end 1) (match-end 0))
+     (if (eq (match-beginning 2) (match-end 2)) (match-end 0) (match-end 1))
      'face date-face)
-    (when (match-end 2)
-      ;; hour:minute
+    ;; hour:minute
+    (unless (eq (match-beginning 2) (match-end 2))
       (put-text-property
-       (match-beginning 2)
-       (1+ (match-beginning 2))
-       'display (format #(" %c" 1 3 (cursor t))
-                        (char-after (match-beginning 2))))
+       (1- (match-end 1))
+       (match-end 1)
+       'display (format "%c " (char-before (match-end 1))))
       (put-text-property
        (match-beginning 2)
        (match-end 0)
@@ -455,7 +454,7 @@ Set to nil to disable the indicator."
       (when org-modern-tag
         '(("^\\*+.*?\\( \\)\\(:.*:\\)[ \t]*$" (0 (org-modern--tag)))))
       (when org-modern-timestamp
-        '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [A-Za-z]+\\)? ?\\)\\([0-9]\\{2\\}:[0-9]\\{2\\}\\)?\\(?:>\\|\\]\\)"
+        '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [A-Za-z]+\\)?\\)\\(\\(?: [0-9]\\{2\\}:[0-9]\\{2\\}\\)?\\(?: [.+-]+[0-9]+[hdwmy]\\)?\\)\\(?:>\\|\\]\\)"
            (0 (org-modern--timestamp)))))
       (when org-modern-statistics
         '((" \\[\\(\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\]" (0 (org-modern--statistics)))))))
