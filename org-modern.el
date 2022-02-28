@@ -464,17 +464,21 @@ Set to nil to disable the indicator."
     (font-lock-add-keywords nil org-modern--keywords 'append)
     (advice-add #'org-unfontify-region :after #'org-modern--unfontify))
    (t (font-lock-remove-keywords nil org-modern--keywords)
-      ;; TODO implement better unfontify
-      (with-silent-modifications
-        (remove-list-of-text-properties (point-min) (point-max)
-                                        '(wrap-prefix line-prefix display face invisible)))))
+      (let ((org-modern-mode t))
+        (org-modern--unfontify (point-min) (point-max)))))
   (font-lock-flush))
 
 (defun org-modern--unfontify (beg end &optional _)
   "Unfontify prettified elements between BEG and END."
   (when org-modern-mode
     ;; TODO implement better unfontify
-    (remove-list-of-text-properties beg end '(wrap-prefix line-prefix display face invisible))))
+    (with-silent-modifications
+      ;; Only remove line-prefix and wrap-prefix if org-indent-mode is disabled.
+      (remove-list-of-text-properties
+       beg end
+       (if (bound-and-true-p org-indent-mode)
+           '(display face invisible)
+         '(wrap-prefix line-prefix display face invisible))))))
 
 (define-fringe-bitmap 'org-modern--line (make-vector 1 #x80) nil nil '(top t))
 (define-fringe-bitmap 'org-modern--top (vconcat (make-vector 20 0) [#xFF] (make-vector 107 #x80)) nil nil 'top)
