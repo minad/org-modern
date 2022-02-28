@@ -389,23 +389,48 @@ Set to nil to disable the indicator."
                      (put-text-property i (1+ i) 'display
                                         (if (= 0 (mod i 2)) sp1 sp2)))))))))
 
-(defun org-modern--block ()
-  "Prettify blocks."
-  (save-excursion
-    (goto-char (match-beginning 0))
-    (forward-line)
-    (while (not (or (eobp)
-                    (save-excursion
-                      (let ((case-fold-search t))
-                        (re-search-forward
-                         "^[ \t]*#\\+end_" (line-end-position) 'noerror)))))
+
+(define-fringe-bitmap 'org-modern--block-inner (make-vector 1 #x80) nil nil '(top t))
+(define-fringe-bitmap 'org-modern--block-begin (vconcat (make-vector 20 0) [#xFF] (make-vector 107 #x80)) nil nil 'top)
+(define-fringe-bitmap 'org-modern--block-end (vconcat (make-vector 107 #x80) [#xFF] (make-vector 20 0)) nil nil 'bottom)
+(defun org-modern--block-fringe ()
+  "Prettify blocks with fringe bitmaps."
+  ;; Do not add source block fringe markers if org-indent-mode is
+  ;; enabled. org-indent-mode uses line prefixes for indentation.
+  ;; Therefore we cannot have both.
+  (unless (bound-and-true-p org-indent-mode)
+    (save-excursion
+      (goto-char (match-beginning 0))
       (add-text-properties
        (point) (min (1+ (line-end-position)) (point-max))
        '(wrap-prefix
-         #(" " 0 1 (display (left-fringe org-modern--line org-block-begin-line)))
+         #(" " 0 1 (display (left-fringe org-modern--block-begin org-block-begin-line)))
          line-prefix
-         #(" " 0 1 (display (left-fringe org-modern--line org-block-begin-line)))))
-      (forward-line))))
+         #(" " 0 1 (display (left-fringe org-modern--block-begin org-block-begin-line)))))
+      (forward-line)
+      (while
+          (cond
+           ((eobp) nil)
+           ((save-excursion
+              (let ((case-fold-search t))
+                (re-search-forward
+                 "^[ \t]*#\\+end_" (line-end-position) 'noerror)))
+            (add-text-properties
+             (point) (min (1+ (line-end-position)) (point-max))
+             '(wrap-prefix
+               #(" " 0 1 (display (left-fringe org-modern--block-end org-block-begin-line)))
+               line-prefix
+               #(" " 0 1 (display (left-fringe org-modern--block-end org-block-begin-line)))))
+            nil)
+           (t
+            (add-text-properties
+             (point) (min (1+ (line-end-position)) (point-max))
+             '(wrap-prefix
+               #(" " 0 1 (display (left-fringe org-modern--block-inner org-block-begin-line)))
+               line-prefix
+               #(" " 0 1 (display (left-fringe org-modern--block-inner org-block-begin-line)))))
+            (forward-line)
+            t))))))
 
 ;;;###autoload
 (define-minor-mode org-modern-mode
@@ -445,13 +470,11 @@ Set to nil to disable the indicator."
       (when org-modern-table
         '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
       (when org-modern-block
-        '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-" (0 (org-modern--block)))
+        '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-" (0 (org-modern--block-fringe)))
           ("^\\([ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
-           (0 '(face nil line-prefix #("│" 0 1 (display (left-fringe org-modern--top org-block-begin-line)))))
            (1 '(face nil display (space :width (3))))
            (2 'org-modern-block-keyword append))
           ("^\\([ \t]*#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
-           (0 '(face nil line-prefix #("│" 0 1 (display (left-fringe org-modern--bottom org-block-end-line)))))
            (1 '(face nil display (space :width (3))))
            (2 'org-modern-block-keyword append))))
       (when org-modern-tag
@@ -479,10 +502,6 @@ Set to nil to disable the indicator."
        (if (bound-and-true-p org-indent-mode)
            '(display face invisible)
          '(wrap-prefix line-prefix display face invisible))))))
-
-(define-fringe-bitmap 'org-modern--line (make-vector 1 #x80) nil nil '(top t))
-(define-fringe-bitmap 'org-modern--top (vconcat (make-vector 20 0) [#xFF] (make-vector 107 #x80)) nil nil 'top)
-(define-fringe-bitmap 'org-modern--bottom (vconcat (make-vector 107 #x80) [#xFF] (make-vector 20 0)) nil nil 'bottom)
 
 (provide 'org-modern)
 ;;; org-modern.el ends here
