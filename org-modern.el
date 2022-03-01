@@ -105,7 +105,7 @@ Set to nil to disable styling priorities."
 
 (defcustom org-modern-list
   '((?+ . "◦")
-    (?- . "─")
+    (?- . "–")
     (?* . "•"))
   "List of bullet replacement strings.
 Set to nil to disable styling list bullets."
