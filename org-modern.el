@@ -113,7 +113,7 @@ Set to nil to disable styling list bullets."
 
 (defcustom org-modern-checkbox
   '((?X . #("▢✓" 0 2 (composition ((2)))))
-    (?- . #("▢-" 0 2 (composition ((2)))))
+    (?- . #("▢–" 0 2 (composition ((2)))))
     (?\s . #("▢" 0 1 (composition ((1))))))
   "List of check box replacement strings.
 Set to nil to disable styling checkboxes."
