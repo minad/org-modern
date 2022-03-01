@@ -136,8 +136,11 @@ Set to nil to disable styling checkboxes."
   :type 'boolean)
 
 (defcustom org-modern-keyword t
-  "Prettify keywords like #+title."
-  :type 'boolean)
+  "Prettify keywords like #+title.
+If set to a string, e.g., \"‣\", the string is used as replacement for #+."
+  :type '(choice (boolean :tag "Hide keyword prefix")
+                 (string :tag "Custom replacement")
+                 (const :tag "Triangle bullet" "‣")))
 
 (defcustom org-modern-statistics t
   "Prettify todo statistics."
@@ -456,7 +459,11 @@ Set to nil to disable the indicator."
       (when org-modern-todo
         `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t)) (0 (org-modern--todo)))))
       (when org-modern-keyword
-        `(("^[ \t]*\\(#\\+\\)\\S-" 1 '(face nil invisible t))))
+        `(("^[ \t]*\\(#\\+\\)\\S-" 1
+           '(face nil
+                  ,@(if (stringp org-modern-keyword)
+                       `(display ,org-modern-keyword)
+                     '(invisible t))))))
       (when org-modern-checkbox
         '(("^[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\)[ \t]+\\(\\[[ X-]\\]\\)[ \t]"
            (0 (org-modern--checkbox)))))
