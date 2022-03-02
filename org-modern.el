@@ -463,15 +463,15 @@ Set to nil to disable the indicator."
            '(face nil
                   ,@(if (stringp org-modern-keyword)
                        `(display ,org-modern-keyword)
-                     '(display ""))))))
+                     '(invisible t))))))
       (when org-modern-checkbox
         '(("^[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\)[ \t]+\\(\\[[ X-]\\]\\)[ \t]"
            (0 (org-modern--checkbox)))))
       (when (or org-modern-star org-modern-hide-stars)
         `(("^\\(\\**\\)\\(\\*\\) "
            ,@(and (not (eq org-modern-hide-stars t)) org-modern-star '((0 (org-modern--star))))
-           ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil display ""))))
-           ,@(and (eq org-modern-hide-stars t) '((0 '(face nil display "")))))))
+           ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil invisible t))))
+           ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible t)))))))
       (when org-modern-horizontal-rule
         '(("^-\\{5,\\}$" 0 '(face org-modern-horizontal-rule display (space :width text)))))
       (when org-modern-table
@@ -507,8 +507,8 @@ Set to nil to disable the indicator."
       (remove-list-of-text-properties
        beg end
        (if (bound-and-true-p org-indent-mode)
-           '(display face)
-         '(wrap-prefix line-prefix display face))))))
+           '(display face invisible)
+         '(wrap-prefix line-prefix display face invisible))))))
 
 (provide 'org-modern)
 ;;; org-modern.el ends here
