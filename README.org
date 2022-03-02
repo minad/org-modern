@@ -54,3 +54,41 @@ manually in an Org buffer by invoking =M-x org-modern-mode=. In order to enable
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook #'org-modern-mode)
 #+end_src
+
+Try the following minimal setup in =emacs -Q= to emulate the looks of the
+screenshot above.
+
+#+begin_src emacs-lisp
+  ;; Minimal UI
+  (package-initialize)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (modus-themes-load-operandi)
+
+  ;; Choose some fonts
+  ;; (set-face-attribute 'default nil :family "???" :height)
+  ;; (set-face-attribute 'variable-pitch nil :family "???" :height)
+
+  ;; Add frame borders and window dividers
+  (modify-all-frames-parameters
+   '((right-divider-width . 40)
+     (internal-border-width . 40)))
+  (dolist (face '(window-divider
+                  window-divider-first-pixel
+                  window-divider-last-pixel))
+    (face-spec-reset-face face)
+    (set-face-foreground face (face-attribute 'default :background)))
+  (set-face-background 'fringe (face-attribute 'default :background))
+
+  ;; Org settings
+  (setq org-hide-emphasis-markers t
+        org-pretty-entities t
+        org-ellipsis "…"
+        org-catch-invisible-edits 'show-and-error
+        org-special-ctrl-a/e t
+        org-insert-heading-respect-content t)
+
+  ;; Enable org-modern-mode
+  (add-hook 'org-mode-hook 'org-modern-mode)
+#+end_src
