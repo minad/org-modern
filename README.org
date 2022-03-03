@@ -84,6 +84,8 @@ screenshot above.
   ;; Org settings
   (setq org-hide-emphasis-markers t
         org-pretty-entities t
+        org-auto-align-tags nil
+        org-tags-column 0
         org-ellipsis "…"
         org-catch-invisible-edits 'show-and-error
         org-special-ctrl-a/e t

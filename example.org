@@ -63,7 +63,7 @@ REPEATED:  <2022-02-26 Sat .+1d>
 
 
 * Todo Labels and Tags
-** DONE Write =org-modern=  :emacs:foss:coding:
+** DONE Write =org-modern= :emacs:foss:coding:
 ** TODO Publish =org-modern=
 ** WAIT Fix all the bugs
 
