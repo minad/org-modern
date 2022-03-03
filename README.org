@@ -67,8 +67,8 @@ screenshot above.
   (modus-themes-load-operandi)
 
   ;; Choose some fonts
-  ;; (set-face-attribute 'default nil :family "???" :height)
-  ;; (set-face-attribute 'variable-pitch nil :family "???" :height)
+  ;; (set-face-attribute 'default nil :family "???")
+  ;; (set-face-attribute 'variable-pitch nil :family "???")
 
   ;; Add frame borders and window dividers
   (modify-all-frames-parameters
