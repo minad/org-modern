@@ -147,6 +147,10 @@ If set to a string, e.g., \"‣\", the string is used as replacement for #+."
 Set to nil to disable the indicator."
   :type '(choice (const nil) (vector string)))
 
+(defcustom org-modern-variable-pitch t
+  "Prefer variable pitch for modern style."
+  :type 'boolean)
+
 (defgroup org-modern-faces nil
   "Faces used by `org-modern'."
   :group 'org-modern
@@ -154,12 +158,12 @@ Set to nil to disable the indicator."
   :group 'faces)
 
 (defface org-modern-label
-  `((t :height 0.9
-       :inherit variable-pitch
-       :width condensed :weight regular
-       :underline nil
+  `((t ,@(and org-modern-variable-pitch '(:inherit variable-pitch))
        ,@(and (integerp org-modern-label-border)
-              `(:box (:line-width ,(- org-modern-label-border))))))
+              `(:box (:line-width ,(- org-modern-label-border))))
+       :height 0.9
+       :width condensed :weight regular
+       :underline nil))
   "Parent face for labels.")
 
 (defface org-modern-block-keyword
