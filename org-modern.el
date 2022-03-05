@@ -158,7 +158,7 @@ Set to nil to disable the indicator."
   :group 'faces)
 
 (defface org-modern-label
-  `((t :height 0.75
+  `((t :height 0.9
        :inherit variable-pitch
        :width condensed :weight regular
        :underline nil
@@ -167,7 +167,7 @@ Set to nil to disable the indicator."
   "Parent face for labels.")
 
 (defface org-modern-block-keyword
-  '((t :height 0.75 :weight light))
+  '((t :height 0.8 :weight light))
   "Face used for block keywords.")
 
 (defface org-modern-tag
