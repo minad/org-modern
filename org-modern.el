@@ -242,7 +242,7 @@ Set to nil to disable the indicator."
 
 (defun org-modern--statistics ()
   "Prettify headline todo statistics."
-  (let ((label (propertize (match-string 1) 'face 'org-modern-statistics)))
+  (let ((label (substring-no-properties (match-string 1))))
     (when org-modern-progress
       (let ((idx (floor
                   (* (1- (length org-modern-progress))
@@ -254,10 +254,8 @@ Set to nil to disable the indicator."
                            (/ (* 1.0 (string-to-number (match-string 3))) q))))))))
         (setq label (concat (aref org-modern-progress idx) " " label))))
     (setq label (concat " " label " "))
-    (add-face-text-property 0 (length label)
-                            'org-modern-statistics 'append label)
-    (put-text-property (1- (match-beginning 1)) (1+ (match-end 1))
-                       'display label)))
+    (add-text-properties (1- (match-beginning 1)) (1+ (match-end 1))
+                         `(display ,label face org-modern-statistics))))
 
 (defun org-modern--tag ()
   "Prettify headline tags."
