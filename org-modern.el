@@ -65,7 +65,7 @@
   "Line width used for tag label borders.
 If set to `auto' the border width is computed based on the `line-spacing'.
 A value between 0.1 and 0.4 of `line-spacing' is recommended."
-  :type '(choice (const nil) integer)
+  :type '(choice (const nil) (const auto) integer)
   :set (lambda (sym val)
          (set sym val)
          (org-modern--update-label-face)))
