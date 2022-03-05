@@ -54,7 +54,12 @@
                                  ((floatp line-spacing) (ceiling (* line-spacing (frame-char-height))))
                                  (t (/ (frame-char-height) 10))))
                        org-modern-label-border)))
-         `(:color ,(face-attribute 'default :background nil t) :line-width ,(- border)))))))
+         (list :color (face-attribute 'default :background nil t)
+               :line-width
+               ;; Emacs 28 supports different line horizontal and vertical line widths
+               (if (>= emacs-major-version 28)
+                   (cons 0 (- border))
+                 (- border))))))))
 
 (defcustom org-modern-label-border 'auto
   "Line width used for tag label borders.
@@ -159,8 +164,6 @@ Set to nil to disable the indicator."
 
 (defface org-modern-label
   `((t ,@(and org-modern-variable-pitch '(:inherit variable-pitch))
-       ,@(and (integerp org-modern-label-border)
-              `(:box (:line-width ,(- org-modern-label-border))))
        :height 0.9
        :width condensed :weight regular
        :underline nil))
@@ -266,8 +269,6 @@ Set to nil to disable the indicator."
       (goto-char beg)
       (while (search-forward ":" end 'noerror)
         (when colon
-          (when (/= beg (1- colon))
-            (add-face-text-property (1- colon) colon '(:height 1) t))
           (put-text-property
            colon
            (1+ colon)
