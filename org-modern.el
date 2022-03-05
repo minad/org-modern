@@ -95,13 +95,9 @@ Set to nil to hide the vertical lines."
   "Prettify horizontal table lines."
   :type '(choice (const nil) number))
 
-(defcustom org-modern-priority
-  '((?A . "🅐") ;; Ⓐ
-    (?B . "🅑") ;; Ⓑ
-    (?C . "🅒")) ;; Ⓒ
-  "List of priority label replacements.
-Set to nil to disable styling priorities."
-  :type '(alist :key-type character :value-type string))
+(defcustom org-modern-priority t
+  "Prettify priorities."
+  :type 'boolean)
 
 (defcustom org-modern-list
   '((?+ . "◦")
@@ -187,6 +183,11 @@ Set to nil to disable the indicator."
        :weight semibold :inverse-video t))
   "Face used for todo labels.")
 
+(defface org-modern-priority
+  '((t :inherit (org-priority org-modern-label)
+       :weight semibold :inverse-video t))
+  "Face used for priority labels.")
+
 (defface org-modern-statistics
   '((t :inherit org-modern-done))
   "Face used for todo statistics labels.")
@@ -223,13 +224,6 @@ Set to nil to disable the indicator."
 
 (defvar-local org-modern--keywords nil
   "List of font lock keywords.")
-
-(defun org-modern--priority ()
-  "Prettify headline priorities using the `org-modern-priority' character."
-  (let ((beg (match-beginning 1))
-        (end (match-end 1)))
-    (when-let (sym (alist-get (char-after (+ 2 beg)) org-modern-priority))
-      (put-text-property beg end 'display sym))))
 
 (defun org-modern--checkbox ()
   "Prettify checkboxes according to `org-modern-checkbox'."
@@ -451,9 +445,10 @@ Set to nil to disable the indicator."
       (when-let (bullet (alist-get ?* org-modern-list))
         `(("^[ \t]+\\(*\\)[ \t]" 1 '(face nil display ,bullet))))
       (when org-modern-priority
-        `((,(format "^\\*+.*? \\(\\[#[%s]\\]\\) "
-                    (apply #'string (mapcar #'car org-modern-priority)))
-           (0 (org-modern--priority)))))
+        '(("^\\*+.*? \\(\\(\\[\\)#.\\(\\]\\)\\) "
+           (1 'org-modern-priority t)
+           (2 '(face nil display " "))
+           (3 '(face nil display " ")))))
       (when org-modern-todo
         `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t)) (0 (org-modern--todo)))))
       (when org-modern-keyword
