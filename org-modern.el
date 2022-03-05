@@ -485,7 +485,10 @@ Set to nil to disable the indicator."
         '(("^\\*+.*?\\( \\)\\(:.*:\\)[ \t]*$" (0 (org-modern--tag)))))
       (when org-modern-timestamp
         '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9]+[[:word:]]\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9]+[[:word:]]\\)*\\)\\(?:>\\|\\]\\)"
-           (0 (org-modern--timestamp)))))
+           (0 (org-modern--timestamp)))
+          ("<[^>]+>\\(-\\)\\(-\\)<[^>]+>\\|\\[[^]]+\\]\\(?1:-\\)\\(?2:-\\)\\[[^]]+\\]"
+           (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
+           (2 '(face org-modern-label display #("  " 0 1 (face (:strike-through t)))) t))))
       (when org-modern-statistics
         '((" \\[\\(\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\]" (0 (org-modern--statistics)))))))
     (font-lock-add-keywords nil org-modern--keywords 'append)
