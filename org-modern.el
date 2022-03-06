@@ -42,33 +42,38 @@
   :prefix "org-modern-")
 
 (defvar org-modern-label-border)
+(defvar org-modern-variable-pitch)
 (defun org-modern--update-label-face ()
   "Update border of the `org-modern-label' face."
   (when (facep 'org-modern-label)
     (set-face-attribute
-     'org-modern-label nil :box
-     (when org-modern-label-border
-       (let ((border (if (eq org-modern-label-border 'auto)
-                         (max 3 (cond
-                                 ((integerp line-spacing) line-spacing)
-                                 ((floatp line-spacing) (ceiling (* line-spacing (frame-char-height))))
-                                 (t (/ (frame-char-height) 10))))
-                       org-modern-label-border)))
-         (list :color (face-attribute 'default :background nil t)
-               :line-width
-               ;; Emacs 28 supports different line horizontal and vertical line widths
-               (if (>= emacs-major-version 28)
-                   (cons 0 (- border))
-                 (- border))))))))
+     'org-modern-label nil
+     :inherit (and org-modern-variable-pitch 'variable-pitch)
+     :box (when org-modern-label-border
+            (let ((border (if (eq org-modern-label-border 'auto)
+                              (max 3 (cond
+                                      ((integerp line-spacing) line-spacing)
+                                      ((floatp line-spacing) (ceiling (* line-spacing (frame-char-height))))
+                                      (t (/ (frame-char-height) 10))))
+                            org-modern-label-border)))
+              (list :color (face-attribute 'default :background nil t)
+                    :line-width
+                    ;; Emacs 28 supports different line horizontal and vertical line widths
+                    (if (>= emacs-major-version 28)
+                        (cons 0 (- border))
+                      (- border))))))))
+
+(defun org-modern--setter (sym val)
+  "Set SYM to VAL and update faces."
+  (set sym val)
+  (org-modern--update-label-face))
 
 (defcustom org-modern-label-border 'auto
   "Line width used for tag label borders.
 If set to `auto' the border width is computed based on the `line-spacing'.
 A value between 0.1 and 0.4 of `line-spacing' is recommended."
   :type '(choice (const nil) (const auto) integer)
-  :set (lambda (sym val)
-         (set sym val)
-         (org-modern--update-label-face)))
+  :set #'org-modern--setter)
 
 (defcustom org-modern-star ["◉""○""◈""◇""⁕"]
   "Replacement strings for headline stars for each level.
@@ -154,7 +159,8 @@ Set to nil to disable the indicator."
 
 (defcustom org-modern-variable-pitch t
   "Prefer variable pitch for modern style."
-  :type 'boolean)
+  :type 'boolean
+  :set #'org-modern--setter)
 
 (defgroup org-modern-faces nil
   "Faces used by `org-modern'."
@@ -163,10 +169,7 @@ Set to nil to disable the indicator."
   :group 'faces)
 
 (defface org-modern-label
-  `((t ,@(and org-modern-variable-pitch '(:inherit variable-pitch))
-       :height 0.9
-       :width condensed :weight regular
-       :underline nil))
+  `((t :height 0.9 :width condensed :weight regular :underline nil))
   "Parent face for labels.")
 
 (defface org-modern-block-keyword
