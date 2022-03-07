@@ -50,10 +50,10 @@ feature set and mainly adjusts headlines and lists. =org-superstar= relies on
 character composition, while =org-modern= uses text properties, which are
 considered more future-proof.
 
-The package is available on MELPA. You can install it with =package-install= if
-you have the MELPA package repository activated. Then =org-modern= can be enabled
-manually in an Org buffer by invoking =M-x org-modern-mode=. In order to enable
-=org-modern= for all your Org buffers, add =org-modern-mode= to the Org mode hooks.
+The package is available on GNU ELPA and MELPA. You can install the package with
+=package-install=. Then =org-modern= can be enabled manually in an Org buffer by
+invoking =M-x org-modern-mode=. In order to enable =org-modern= for all your Org
+buffers, add =org-modern-mode= to the Org mode hooks.
 
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook #'org-modern-mode)
