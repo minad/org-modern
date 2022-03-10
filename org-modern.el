@@ -357,6 +357,8 @@ Set to nil to disable the indicator."
            ;; Unique objects
            (sp1 (list 'space :width 1))
            (sp2 (list 'space :width 1))
+           (sp3 (list 'space :width 0.5))
+           (sp4 (list 'space :width 0.5))
            (color (face-attribute 'org-table :foreground nil t))
            (inner (progn
                     (goto-char beg)
@@ -384,6 +386,17 @@ Set to nil to disable the indicator."
         (when (numberp org-modern-table-horizontal)
           (add-face-text-property tbeg tend `(:overline ,color) 'append)
           (add-face-text-property beg (1+ end) `(:height ,org-modern-table-horizontal) 'append))
+
+        (when mixed-pitch-mode
+          ;; Initial search for start of 'hline
+          (re-search-forward "[^|+]+" tend 'noerror)
+          (let ((a (match-beginning 0))
+                (b (match-end 0)))
+            (cl-loop for i from a below b do
+                     (message "here %s a b" i a b)
+                     (put-text-property i (1+ i) 'display
+                                        (if (= 0 (mod i 2)) sp3 sp4)))))
+
         (while (re-search-forward "[^|+]+" tend 'noerror)
           (let ((a (match-beginning 0))
                 (b (match-end 0)))
