@@ -301,8 +301,7 @@ Set to nil to disable the indicator."
     (put-text-property
      beg end
      'face
-     (if (member todo (or org-done-keywords
-                          org-done-keywords-for-agenda))
+     (if (member todo org-done-keywords)
          'org-modern-done
        'org-modern-todo))))
 
@@ -524,7 +523,8 @@ Set to nil to disable the indicator."
       (let ((re (format " %s "
                         (regexp-opt
                          (append org-todo-keywords-for-agenda
-                                 org-done-keywords-for-agenda) t))))
+                                 org-done-keywords-for-agenda) t)))
+            (org-done-keywords org-done-keywords-for-agenda))
         (while (re-search-forward re nil 'noerror)
           (org-modern--todo))))))
 

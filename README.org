@@ -92,6 +92,7 @@ screenshot above.
         org-auto-align-tags nil
         org-tags-column 0
         org-ellipsis "…"
+        org-agenda-block-separator ?─
         org-catch-invisible-edits 'show-and-error
         org-special-ctrl-a/e t
         org-insert-heading-respect-content t)
