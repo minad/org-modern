@@ -301,7 +301,8 @@ Set to nil to disable the indicator."
     (put-text-property
      beg end
      'face
-     (if (member todo org-done-keywords)
+     (if (member todo (or org-done-keywords
+                          org-done-keywords-for-agenda))
          'org-modern-done
        'org-modern-todo))))
 
@@ -513,6 +514,28 @@ Set to nil to disable the indicator."
        (if (bound-and-true-p org-indent-mode)
            '(display face invisible)
          '(wrap-prefix line-prefix display face invisible))))))
+
+;;;###autoload
+(define-minor-mode org-modern-agenda-mode
+  "Modern looks for Org agenda highlighting."
+  :global nil
+  :group 'org-modern
+  (if org-modern-agenda-mode
+      (add-hook 'org-agenda-finalize-hook #'org-modern--agenda-finalize)
+    (remove-hook 'org-agenda-finalize-hook #'org-modern--agenda-finalize)))
+
+;;;###autoload
+(defun org-modern-agenda ()
+  "Finalize Org agenda highlighting."
+  (save-excursion
+    (save-match-data
+      (goto-char (point-min))
+      (let ((re (format " %s "
+                        (regexp-opt
+                         (append org-todo-keywords-for-agenda
+                                 org-done-keywords-for-agenda) t))))
+        (while (re-search-forward re nil 'noerror)
+          (org-modern--todo))))))
 
 (provide 'org-modern)
 ;;; org-modern.el ends here
