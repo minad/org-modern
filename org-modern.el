@@ -516,15 +516,6 @@ Set to nil to disable the indicator."
          '(wrap-prefix line-prefix display face invisible))))))
 
 ;;;###autoload
-(define-minor-mode org-modern-agenda-mode
-  "Modern looks for Org agenda highlighting."
-  :global nil
-  :group 'org-modern
-  (if org-modern-agenda-mode
-      (add-hook 'org-agenda-finalize-hook #'org-modern--agenda-finalize)
-    (remove-hook 'org-agenda-finalize-hook #'org-modern--agenda-finalize)))
-
-;;;###autoload
 (defun org-modern-agenda ()
   "Finalize Org agenda highlighting."
   (save-excursion
