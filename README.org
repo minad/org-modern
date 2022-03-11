@@ -57,7 +57,7 @@ buffers, add =org-modern-mode= to the Org mode hooks.
 
 #+begin_src emacs-lisp
   (add-hook 'org-mode-hook #'org-modern-mode)
-  (add-hook 'org-agenda-finalize-hook 'org-modern-agenda)
+  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
 #+end_src
 
 Try the following minimal setup in =emacs -Q= to emulate the looks of the
@@ -97,8 +97,8 @@ screenshot above.
         org-insert-heading-respect-content t)
 
   ;; Enable org-modern-mode
-  (add-hook 'org-mode-hook 'org-modern-mode)
-  (add-hook 'org-agenda-finalize-hook 'org-modern-agenda)
+  (add-hook 'org-mode-hook #'org-modern-mode)
+  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
 #+end_src
 
 * Contributions
