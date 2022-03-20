@@ -74,6 +74,7 @@ screenshot above.
   ;; Choose some fonts
   ;; (set-face-attribute 'default nil :family "???")
   ;; (set-face-attribute 'variable-pitch nil :family "???")
+  ;; (set-face-attribute 'org-modern-symbol nil :family "Iosevka")
 
   ;; Add frame borders and window dividers
   (modify-all-frames-parameters

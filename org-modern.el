@@ -118,9 +118,9 @@ Set to nil to disable styling list bullets."
   :type '(alist :key-type character :value-type string))
 
 (defcustom org-modern-checkbox
-  '((?X . #("▢✓" 0 2 (composition ((2)))))
-    (?- . #("▢–" 0 2 (composition ((2)))))
-    (?\s . #("▢" 0 1 (composition ((1))))))
+  '((?X . "☑")
+    (?- . #("□–" 0 2 (composition ((2)))))
+    (?\s . "□"))
   "List of check box replacement strings.
 Set to nil to disable styling checkboxes."
   :type '(alist :key-type character :value-type string))
@@ -167,6 +167,11 @@ Set to nil to disable the indicator."
   :group 'org-modern
   :group 'org-faces
   :group 'faces)
+
+(defface org-modern-symbol nil
+  "Face used for stars, checkboxes and progress indicators.
+You can specify a font `:family'. The font families `Iosevka', `Hack' and
+`DejaVu Sans' give decent results.")
 
 (defface org-modern-label
   `((t :height 0.9 :width condensed :weight regular :underline nil))
@@ -241,8 +246,10 @@ Set to nil to disable the indicator."
         (end (match-end 1)))
     (put-text-property
      beg end
-     'display (alist-get (char-after (1+ beg))
-                         org-modern-checkbox))))
+     'display
+     (propertize (alist-get (char-after (1+ beg))
+                            org-modern-checkbox)
+                 'face 'org-modern-symbol))))
 
 (defun org-modern--statistics ()
   "Prettify headline todo statistics."
@@ -256,7 +263,9 @@ Set to nil to disable the indicator."
                          (if (= q 0)
                              1.0
                            (/ (* 1.0 (string-to-number (match-string 3))) q))))))))
-        (setq label (concat (aref org-modern-progress idx) " " label))))
+        (setq label (concat (propertize (aref org-modern-progress idx)
+                                        'face 'org-modern-symbol)
+                            " " label))))
     (setq label (concat " " label " "))
     (add-text-properties (1- (match-beginning 1)) (1+ (match-end 1))
                          `(display ,label face org-modern-statistics))))
@@ -345,7 +354,8 @@ Set to nil to disable the indicator."
      (match-beginning 2)
      (match-end 2)
      'display
-     (aref org-modern-star (min (1- (length org-modern-star)) level)))))
+     (propertize (aref org-modern-star (min (1- (length org-modern-star)) level))
+                 'face 'org-modern-symbol))))
 
 (defun org-modern--table ()
   "Prettify vertical table lines."
