@@ -507,10 +507,12 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         '((" \\[\\(\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\]" (0 (org-modern--statistics)))))))
     (font-lock-add-keywords nil org-modern--keywords 'append)
     (advice-add #'org-unfontify-region :after #'org-modern--unfontify))
-   (t (font-lock-remove-keywords nil org-modern--keywords)
-      (let ((org-modern-mode t))
-        (org-modern--unfontify (point-min) (point-max)))))
-  (font-lock-flush))
+   (t (font-lock-remove-keywords nil org-modern--keywords)))
+  (save-restriction
+    (widen)
+    (let ((org-modern-mode t))
+      (org-modern--unfontify (point-min) (point-max)))
+    (font-lock-flush)))
 
 (defun org-modern--unfontify (beg end &optional _)
   "Unfontify prettified elements between BEG and END."
