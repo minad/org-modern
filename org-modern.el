@@ -240,6 +240,22 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 (defvar-local org-modern--keywords nil
   "List of font lock keywords.")
 
+(defvar org-modern--keyword-faces
+  (mapcar (lambda (keyword-face)
+            (let* ((keyword (car keyword-face))
+                   (face (cdr keyword-face))
+                   (face-name (intern (concat "org-modern-"
+                                              (downcase keyword)))))
+              (custom-declare-face face-name
+                                   (list (append
+                                          '(t :inherit (org-todo org-modern-label))
+                                          (if (stringp face)
+                                              (list :foreground face)
+                                            face)))
+                                   "org-modern todo faces")
+              (cons keyword face-name)))
+          org-todo-keyword-faces))
+
 (defun org-modern--checkbox ()
   "Prettify checkboxes according to `org-modern-checkbox'."
   (let ((beg (match-beginning 1))
@@ -310,9 +326,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
     (put-text-property
      beg end
      'face
-     (if (member todo org-done-keywords)
-         'org-modern-done
-       'org-modern-todo))))
+     (alist-get todo org-modern--keyword-faces 'org-modern-todo nil 'string-equal))))
 
 (defun org-modern--timestamp ()
   "Prettify timestamps."
