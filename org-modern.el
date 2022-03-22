@@ -133,6 +133,18 @@ Set to nil to disable styling checkboxes."
   "Prettify todo keywords, see `org-todo-keywords'."
   :type 'boolean)
 
+(defcustom org-modern-todo-faces nil
+  "Faces for todo keywords.
+This is an alist, with todo keywords in the car
+and faces in the cdr. Example:
+
+  (setq org-modern-todo-faces
+    '((\"TODO\" :background \"red\"
+                :foreground \"yellow\")))"
+  :type '(repeat
+          (cons (string :tag "Keyword")
+                (sexp   :tag "Face   "))))
+
 (defcustom org-modern-tag t
   "Prettify tags in headlines, e.g., :tag1:tag2:."
   :type 'boolean)
@@ -310,9 +322,11 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
     (put-text-property
      beg end
      'face
-     (if (member todo org-done-keywords)
-         'org-modern-done
-       'org-modern-todo))))
+     (if-let (face (cdr (assoc todo org-modern-todo-faces)))
+         `(:inherit (,face org-modern-label))
+       (if (member todo org-done-keywords)
+           'org-modern-done
+         'org-modern-todo)))))
 
 (defun org-modern--timestamp ()
   "Prettify timestamps."
