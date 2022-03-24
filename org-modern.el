@@ -92,12 +92,14 @@ Set to nil to disable styling the headlines."
 Set to nil to disable styling the time stamps."
   :type 'boolean)
 
-(defcustom org-modern-custom-timestamp-format '("%Y-%m-%d" . "%H:%M")
-  "Format of custom timestamps.
-It should be (DATE . TIME) where DATE is the format for date, and
-TIME is the format for time.  For the syntax, refer to
-`format-time-string'."
-  :type '(cons string string))
+(defcustom org-modern-custom-timestamp-format nil
+  "Format of custom timestamps, or nil for none.
+If non-nil, it should be (DATE . TIME) where DATE is the format
+for date, and TIME is the format for time.  For the syntax, refer
+to `format-time-string'."
+  :type '(choice
+          (const :tag "Do not use custom timestamp format" nil)
+          (cons :tag "Custom date and time format" string string)))
 
 (defcustom org-modern-table t
   "Prettify tables."
@@ -335,7 +337,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            'org-modern-done
          'org-modern-todo)))))
 
-(defun org-modern--timestamp ()
+(defun org-modern--timestamp-default ()
   "Prettify timestamps."
   (let* ((active (eq (char-after (match-beginning 0)) ?<))
          (date-face (if active
@@ -343,15 +345,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
                       'org-modern-date-inactive))
          (time-face (if active
                         'org-modern-time-active
-                      'org-modern-time-inactive))
-         (time (when org-display-custom-times
-                 (save-match-data
-                   (encode-time
-                    (org-fix-decoded-time
-                     (org-parse-time-string
-                      (buffer-substring (match-beginning 0) (match-end 0)))))))))
-    (when org-display-custom-times
-      (remove-text-properties (match-beginning 0) (match-end 0) '(display nil)))
+                      'org-modern-time-inactive)))
+    (remove-text-properties (match-beginning 0) (match-end 0) '(display nil))
     (put-text-property
      (match-beginning 0)
      (1+ (match-beginning 0))
@@ -365,28 +360,63 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
      (match-beginning 0)
      (if (eq (match-beginning 2) (match-end 2)) (match-end 0) (match-end 1))
      'face date-face)
-    (when org-display-custom-times
-      (put-text-property
-       (match-beginning 1)
-       (match-end 1)
-       'display (format-time-string (car org-modern-custom-timestamp-format) time)))
     ;; hour:minute
     (unless (eq (match-beginning 2) (match-end 2))
       (put-text-property
        (1- (match-end 1))
        (match-end 1)
-       'display (if org-display-custom-times
-                    " "
-                  (format "%c " (char-before (match-end 1)))))
+       'display (format "%c " (char-before (match-end 1))))
+      (put-text-property
+       (match-beginning 2)
+       (match-end 0)
+       'face time-face))))
+
+(defun org-modern--timestamp-custom ()
+  "Prettify timestamps per `org-modern-custom-timestamp-format'."
+  (let* ((active (eq (char-after (match-beginning 0)) ?<))
+         (date-face (if active
+                        'org-modern-date-active
+                      'org-modern-date-inactive))
+         (time-face (if active
+                        'org-modern-time-active
+                      'org-modern-time-inactive))
+         (time (save-match-data
+                 (encode-time
+                  (org-fix-decoded-time
+                   (org-parse-time-string
+                    (buffer-substring (match-beginning 0) (match-end 0))))))))
+    (remove-text-properties (match-beginning 0) (match-end 0) '(display nil))
+    (put-text-property
+     (match-beginning 0)
+     (1+ (match-beginning 0))
+     'display " ")
+    (put-text-property
+     (1- (match-end 0))
+     (match-end 0)
+     'display " ")
+    ;; year-month-day
+    (put-text-property
+     (match-beginning 0)
+     (if (eq (match-beginning 2) (match-end 2)) (match-end 0) (match-end 1))
+     'face date-face)
+    (put-text-property
+     (match-beginning 1)
+     (match-end 1)
+     'display (format-time-string (car org-modern-custom-timestamp-format) time))
+    ;; hour:minute
+    (unless (eq (match-beginning 2) (match-end 2))
+      (put-text-property
+       (1- (match-end 1))
+       (match-end 1)
+       'display " ")
       (put-text-property
        (match-beginning 2)
        (match-end 0)
        'face time-face)
-      (when org-display-custom-times
-        (put-text-property
-         (match-beginning 2)
-         (match-end 2)
-         'display (format-time-string (concat " " (cdr org-modern-custom-timestamp-format)) time))))))
+      (put-text-property
+       (match-beginning 2)
+       (match-end 2)
+       'display (concat " " (format-time-string (cdr org-modern-custom-timestamp-format) time))))))
 
 (defun org-modern--star ()
   "Prettify headline stars."
@@ -539,8 +569,10 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (when org-modern-tag
         '(("^\\*+.*?\\( \\)\\(:.*:\\)[ \t]*$" (0 (org-modern--tag)))))
       (when org-modern-timestamp
-        '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
-           (0 (org-modern--timestamp)))
+        `(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
+           (0 ,(if org-modern-custom-timestamp-format
+                  '(org-modern--timestamp-custom)
+                 '(org-modern--timestamp-default))))
           ("<[^>]+>\\(-\\)\\(-\\)<[^>]+>\\|\\[[^]]+\\]\\(?1:-\\)\\(?2:-\\)\\[[^]]+\\]"
            (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
            (2 '(face org-modern-label display #("  " 0 1 (face (:strike-through t)))) t))))
