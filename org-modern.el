@@ -429,7 +429,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
     (save-excursion
       (goto-char (match-beginning 0))
       (add-text-properties
-       (point) (min (1+ (line-end-position)) (point-max))
+       (point) (min (line-end-position) (point-max))
        '(wrap-prefix
          #(" " 0 1 (display (left-fringe org-modern--block-begin org-block-begin-line)))
          line-prefix
@@ -443,7 +443,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
                 (re-search-forward
                  "^[ \t]*#\\+end_" (line-end-position) 'noerror)))
             (add-text-properties
-             (point) (min (1+ (line-end-position)) (point-max))
+             (point) (min (line-end-position) (point-max))
              '(wrap-prefix
                #(" " 0 1 (display (left-fringe org-modern--block-end org-block-begin-line)))
                line-prefix
