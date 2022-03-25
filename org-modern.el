@@ -206,11 +206,13 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   "Face used for done labels.")
 
 (defface org-modern-todo
+  ;; `:inverse-video' to use todo foreground as label background
   '((t :inherit (org-todo org-modern-label)
        :weight semibold :inverse-video t))
   "Face used for todo labels.")
 
 (defface org-modern-priority
+  ;; `:inverse-video' to use priority foreground as label background
   '((t :inherit (org-priority org-modern-label)
        :weight semibold :inverse-video t))
   "Face used for priority labels.")
@@ -224,6 +226,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   "Face used for active date labels.")
 
 (defface org-modern-time-active
+  ;; Use `:distant-foreground' to ensure readability if `hl-line-mode' is used.
   '((default :inherit org-modern-label :weight semibold)
     (((background light))
      :background "gray35" :foreground "white" :distant-foreground "black")
@@ -238,6 +241,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   "Face used for inactive date labels.")
 
 (defface org-modern-time-inactive
+  ;; Use `:distant-foreground' to ensure readability if `hl-line-mode' is used.
   '((default :inherit org-modern-label :background "gray50")
     (((background light)) :foreground "gray95" :distant-foreground "gray5")
     (t :foreground "gray5" :distant-foreground "gray95"))
