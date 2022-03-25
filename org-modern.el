@@ -226,8 +226,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 (defface org-modern-time-active
   '((default :inherit org-modern-label :weight semibold)
     (((background light))
-     :background "gray35" :foreground "white")
-    (t :background "gray75" :foreground "black"))
+     :background "gray35" :foreground "white" :distant-foreground "black")
+    (t :background "gray75" :foreground "black" :distant-foreground "white"))
   "Face used for active time labels.")
 
 (defface org-modern-date-inactive
@@ -239,8 +239,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 
 (defface org-modern-time-inactive
   '((default :inherit org-modern-label :background "gray50")
-    (((background light)) :foreground "gray95")
-    (t :foreground "gray5"))
+    (((background light)) :foreground "gray95" :distant-foreground "gray5")
+    (t :foreground "gray5" :distant-foreground "gray95"))
   "Face used for inactive time labels.")
 
 (defface org-modern-horizontal-rule
