@@ -35,6 +35,8 @@
 (require 'org)
 (eval-when-compile
   (require 'cl-lib))
+(eval-when-compile
+  (require 'subr-x))
 
 (defgroup org-modern nil
   "Modern looks for Org."
