@@ -35,6 +35,8 @@ TREPEATED:  <2022-02-26 Sat 10:00 .+1d/2d>
 * Blocks
 
 #+begin_src emacs-lisp
+  ;; Taken from the well-structured Emacs config by @oantolin.
+  ;; Take a look at https://github.com/oantolin/emacs-config!
   (defun command-of-the-day ()
     "Show the documentation for a random command."
     (interactive)
