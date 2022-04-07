@@ -561,7 +561,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
           (org-modern--todo))))))
 
 ;;;###autoload
-(define-global-minor-mode org-modern-global-mode
+(define-globalized-minor-mode org-modern-global-mode
   org-modern-mode org-modern--on
   :group 'org-modern
   (if org-modern-global-mode
