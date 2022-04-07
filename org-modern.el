@@ -560,5 +560,18 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         (while (re-search-forward re nil 'noerror)
           (org-modern--todo))))))
 
+;;;###autoload
+(define-global-minor-mode org-modern-global-mode
+  org-modern-mode org-modern--on
+  :group 'org-modern
+  (if org-modern-global-mode
+      (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+    (remove-hook 'org-agenda-finalize-hook #'org-modern-agenda)))
+
+(defun org-modern--on ()
+  "Enable `org-modern' in every Org buffer."
+  (when (derived-mode-p #'org-mode)
+    (org-modern-mode)))
+
 (provide 'org-modern)
 ;;; org-modern.el ends here
