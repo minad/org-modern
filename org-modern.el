@@ -76,7 +76,7 @@ A value between 0.1 and 0.4 of `line-spacing' is recommended."
   :type '(choice (const nil) (const auto) integer)
   :set #'org-modern--setter)
 
-(defcustom org-modern-star ["◉""○""◈""◇""⁕"]
+(defcustom org-modern-star ["◉""○""◈""◇""✳"]
   "Replacement strings for headline stars for each level.
 Set to nil to disable styling the headlines."
   :type '(choice (const nil) (vector string)))
