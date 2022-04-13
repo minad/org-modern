@@ -561,10 +561,10 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
           (org-modern--todo))))))
 
 ;;;###autoload
-(define-globalized-minor-mode org-modern-global-mode
+(define-globalized-minor-mode global-org-modern-mode
   org-modern-mode org-modern--on
   :group 'org-modern
-  (if org-modern-global-mode
+  (if global-org-modern-mode
       (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
     (remove-hook 'org-agenda-finalize-hook #'org-modern-agenda)))
 
