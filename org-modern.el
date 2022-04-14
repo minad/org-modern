@@ -552,7 +552,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   (save-excursion
     (save-match-data
       (goto-char (point-min))
-      (let ((re (format " %s "
+      (let ((re (format ": +%s "
                         (regexp-opt
                          (append org-todo-keywords-for-agenda
                                  org-done-keywords-for-agenda) t)))
