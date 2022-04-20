@@ -140,8 +140,8 @@ This is an alist, with todo keywords in the car
 and faces in the cdr. Example:
 
   (setq org-modern-todo-faces
-    (quote (\"TODO\" :background \"red\"
-                   :foreground \"yellow\")))"
+    (quote ((\"TODO\" :background \"red\"
+                    :foreground \"yellow\"))))"
   :type '(repeat
           (cons (string :tag "Keyword")
                 (sexp   :tag "Face   "))))
