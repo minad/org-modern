@@ -90,19 +90,15 @@ Set to nil to disable styling the headlines."
 
 (defcustom org-modern-timestamp t
   "Prettify time stamps, e.g. <2022-03-01>.
-Set to nil to disable styling the time stamps."
-  :type 'boolean)
-
-(defcustom org-modern-custom-timestamp-format nil
-  "Format of custom timestamps, or nil for none.
-If non-nil, it should be (DATE . TIME) where DATE is the format
-for date, and TIME is the format for time.  DATE and TIME must be
-surrounded with space.  For the syntax, refer to
-`format-time-string'."
+Set to nil to disable styling the time stamps. In order to use custom
+timestamps, the format should be (DATE . TIME) where DATE is the format
+for date, and TIME is the format for time. DATE and TIME must be
+surrounded with space. For the syntax, refer to `format-time-string'."
   :type '(choice
-          (const :tag "Do not use custom timestamp format" nil)
-          (const :tag " YYYY-MM-DD  HH:MM " '(" %Y-%m-%d " . " %H:%M "))
-          (cons :tag "Custom date and time format" string string)))
+          (const :tag "Disable time stamp styling" nil)
+          (const :tag "Enable timestamp styling" t)
+          (const :tag "Use format YYYY-MM-DD HH:MM" (" %Y-%m-%d " . " %H:%M "))
+          (cons :tag "Custom format" string string)))
 
 (defcustom org-modern-table t
   "Prettify tables."
@@ -344,68 +340,45 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            'org-modern-done
          'org-modern-todo)))))
 
-(defun org-modern--timestamp-default ()
+(defun org-modern--timestamp ()
   "Prettify timestamps."
-  (let* ((active (eq (char-after (match-beginning 0)) ?<))
+  (let* ((beg (match-beginning 0))
+         (end (match-end 0))
+         (tbeg (match-beginning 2))
+         (tend (match-end 2))
+         (active (eq (char-after beg) ?<))
          (date-face (if active
                         'org-modern-date-active
                       'org-modern-date-inactive))
          (time-face (if active
                         'org-modern-time-active
                       'org-modern-time-inactive)))
-    (remove-text-properties (match-beginning 0) (match-end 0) '(display nil))
-    (put-text-property
-     (match-beginning 0)
-     (1+ (match-beginning 0))
-     'display " ")
-    (put-text-property
-     (1- (match-end 0))
-     (match-end 0)
-     'display " ")
-    ;; year-month-day
-    (put-text-property
-     (match-beginning 0)
-     (if (eq (match-beginning 2) (match-end 2)) (match-end 0) (match-end 1))
-     'face date-face)
-    ;; hour:minute
-    (unless (eq (match-beginning 2) (match-end 2))
-      (put-text-property
-       (1- (match-end 1))
-       (match-end 1)
-       'display (format "%c " (char-before (match-end 1))))
-      (put-text-property
-       (match-beginning 2)
-       (match-end 0)
-       'face time-face))))
-
-(defun org-modern--timestamp-custom ()
-  "Prettify timestamps per `org-modern-custom-timestamp-format'."
-  (let* ((active (eq (char-after (match-beginning 0)) ?<))
-         (date-face (if active
-                        'org-modern-date-active
-                      'org-modern-date-inactive))
-         (time-face (if active
-                        'org-modern-time-active
-                      'org-modern-time-inactive))
-         (time (save-match-data
-                 (encode-time
-                  (org-fix-decoded-time
-                   (org-parse-time-string
-                    (buffer-substring (match-beginning 0) (match-end 0))))))))
-    (remove-list-of-text-properties (match-beginning 0) (match-end 0) '(display))
-    ;; year-month-day
-    (add-text-properties
-     (match-beginning 0)
-     (if (eq (match-beginning 2) (match-end 2)) (match-end 0) (match-end 1))
-     `( face ,date-face
-        display ,(format-time-string (car org-modern-custom-timestamp-format) time)))
-    ;; hour:minute
-    (unless (eq (match-beginning 2) (match-end 2))
-      (add-text-properties
-       (match-beginning 2)
-       (match-end 0)
-       `( face ,time-face
-          display ,(format-time-string (cdr org-modern-custom-timestamp-format) time))))))
+    (remove-list-of-text-properties beg end '(display))
+    (if (consp org-modern-timestamp)
+        (let* ((time (save-match-data
+                       (encode-time
+                        (org-fix-decoded-time
+                         (org-parse-time-string
+                          (buffer-substring beg end))))))
+               (fmt org-modern-timestamp)
+               (date-str (format-time-string (car fmt) time))
+               (time-str (format-time-string (cdr fmt) time)))
+          ;; year-month-day
+          (add-text-properties beg (if (eq tbeg tend) end tbeg)
+                               `(face ,date-face display ,date-str))
+          ;; hour:minute
+          (unless (eq tbeg tend)
+            (add-text-properties tbeg end
+                                 `(face ,time-face display ,time-str))))
+      (put-text-property beg (1+ beg) 'display " ")
+      (put-text-property (1- end) end 'display " ")
+      ;; year-month-day
+      (put-text-property beg (if (eq tbeg tend) end tbeg) 'face date-face)
+      ;; hour:minute
+      (unless (eq tbeg tend)
+        (put-text-property (1- tbeg) tbeg
+                           'display (format "%c " (char-before tbeg)))
+        (put-text-property tbeg end 'face time-face)))))
 
 (defun org-modern--star ()
   "Prettify headline stars."
@@ -559,10 +532,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
            (0 (org-modern--tag)))))
       (when org-modern-timestamp
-        `(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
-           (0 ,(if org-modern-custom-timestamp-format
-                   '(org-modern--timestamp-custom)
-                 '(org-modern--timestamp-default))))
+        '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
+           (0 (org-modern--timestamp)))
           ("<[^>]+>\\(-\\)\\(-\\)<[^>]+>\\|\\[[^]]+\\]\\(?1:-\\)\\(?2:-\\)\\[[^]]+\\]"
            (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
            (2 '(face org-modern-label display #("  " 0 1 (face (:strike-through t)))) t))))
