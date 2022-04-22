@@ -34,7 +34,8 @@
 
 (require 'org)
 (eval-when-compile
-  (require 'cl-lib))
+  (require 'cl-lib)
+  (require 'subr-x))
 
 (defgroup org-modern nil
   "Modern looks for Org."
@@ -48,7 +49,7 @@
   (when (facep 'org-modern-label)
     (set-face-attribute
      'org-modern-label nil
-     :inherit (and org-modern-variable-pitch 'variable-pitch)
+     :inherit org-modern-variable-pitch
      :box (when org-modern-label-border
             (let ((border (if (eq org-modern-label-border 'auto)
                               (max 3 (cond
@@ -75,7 +76,7 @@ A value between 0.1 and 0.4 of `line-spacing' is recommended."
   :type '(choice (const nil) (const auto) integer)
   :set #'org-modern--setter)
 
-(defcustom org-modern-star ["◉""○""◈""◇""⁕"]
+(defcustom org-modern-star ["◉""○""◈""◇""✳"]
   "Replacement strings for headline stars for each level.
 Set to nil to disable styling the headlines."
   :type '(choice (const nil) (vector string)))
@@ -150,8 +151,8 @@ This is an alist, with todo keywords in the car
 and faces in the cdr. Example:
 
   (setq org-modern-todo-faces
-    '((\"TODO\" :background \"red\"
-                :foreground \"yellow\")))"
+    (quote ((\"TODO\" :background \"red\"
+                    :foreground \"yellow\"))))"
   :type '(repeat
           (cons (string :tag "Keyword")
                 (sexp   :tag "Face   "))))
@@ -180,9 +181,9 @@ If set to a string, e.g., \"‣\", the string is used as replacement for #+."
 Set to nil to disable the indicator."
   :type '(choice (const nil) (vector string)))
 
-(defcustom org-modern-variable-pitch t
-  "Prefer variable pitch for modern style."
-  :type 'boolean
+(defcustom org-modern-variable-pitch 'variable-pitch
+  "Use variable pitch for modern style labels."
+  :type 'symbol
   :set #'org-modern--setter)
 
 (defgroup org-modern-faces nil
@@ -217,11 +218,13 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   "Face used for done labels.")
 
 (defface org-modern-todo
+  ;; `:inverse-video' to use todo foreground as label background
   '((t :inherit (org-todo org-modern-label)
        :weight semibold :inverse-video t))
   "Face used for todo labels.")
 
 (defface org-modern-priority
+  ;; `:inverse-video' to use priority foreground as label background
   '((t :inherit (org-priority org-modern-label)
        :weight semibold :inverse-video t))
   "Face used for priority labels.")
@@ -235,10 +238,11 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   "Face used for active date labels.")
 
 (defface org-modern-time-active
+  ;; Use `:distant-foreground' to ensure readability if `hl-line-mode' is used.
   '((default :inherit org-modern-label :weight semibold)
     (((background light))
-     :background "gray35" :foreground "white")
-    (t :background "gray75" :foreground "black"))
+     :background "gray35" :foreground "white" :distant-foreground "black")
+    (t :background "gray75" :foreground "black" :distant-foreground "white"))
   "Face used for active time labels.")
 
 (defface org-modern-date-inactive
@@ -249,9 +253,10 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   "Face used for inactive date labels.")
 
 (defface org-modern-time-inactive
+  ;; Use `:distant-foreground' to ensure readability if `hl-line-mode' is used.
   '((default :inherit org-modern-label :background "gray50")
-    (((background light)) :foreground "gray95")
-    (t :foreground "gray5"))
+    (((background light)) :foreground "gray95" :distant-foreground "gray5")
+    (t :foreground "gray5" :distant-foreground "gray95"))
   "Face used for inactive time labels.")
 
 (defface org-modern-horizontal-rule
@@ -470,7 +475,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
     (save-excursion
       (goto-char (match-beginning 0))
       (add-text-properties
-       (point) (min (1+ (line-end-position)) (point-max))
+       (point) (min (line-end-position) (point-max))
        '(wrap-prefix
          #(" " 0 1 (display (left-fringe org-modern--block-begin org-block-begin-line)))
          line-prefix
@@ -484,7 +489,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
                 (re-search-forward
                  "^[ \t]*#\\+end_" (line-end-position) 'noerror)))
             (add-text-properties
-             (point) (min (1+ (line-end-position)) (point-max))
+             (point) (min (line-end-position) (point-max))
              '(wrap-prefix
                #(" " 0 1 (display (left-fringe org-modern--block-end org-block-begin-line)))
                line-prefix
@@ -551,12 +556,11 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (1 '(face nil display (space :width (3))))
            (2 'org-modern-block-keyword append))))
       (when org-modern-tag
-        '(("^\\*+.*?\\( \\)\\(:.*:\\)[ \t]*$" (0 (org-modern--tag)))))
-      (when org-modern-timestamp
-        `(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
-           (0 ,(if org-modern-custom-timestamp-format
-                  '(org-modern--timestamp-custom)
-                 '(org-modern--timestamp-default))))
+        `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
+           (0 (org-modern--tag)))))
+      (when (and org-modern-timestamp (not org-display-custom-times))
+        '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
+           (0 (org-modern--timestamp)))
           ("<[^>]+>\\(-\\)\\(-\\)<[^>]+>\\|\\[[^]]+\\]\\(?1:-\\)\\(?2:-\\)\\[[^]]+\\]"
            (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
            (2 '(face org-modern-label display #("  " 0 1 (face (:strike-through t)))) t))))
@@ -589,13 +593,26 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   (save-excursion
     (save-match-data
       (goto-char (point-min))
-      (let ((re (format " %s "
+      (let ((re (format ": +%s "
                         (regexp-opt
                          (append org-todo-keywords-for-agenda
                                  org-done-keywords-for-agenda) t)))
             (org-done-keywords org-done-keywords-for-agenda))
         (while (re-search-forward re nil 'noerror)
           (org-modern--todo))))))
+
+;;;###autoload
+(define-globalized-minor-mode global-org-modern-mode
+  org-modern-mode org-modern--on
+  :group 'org-modern
+  (if global-org-modern-mode
+      (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+    (remove-hook 'org-agenda-finalize-hook #'org-modern-agenda)))
+
+(defun org-modern--on ()
+  "Enable `org-modern' in every Org buffer."
+  (when (derived-mode-p #'org-mode)
+    (org-modern-mode)))
 
 (provide 'org-modern)
 ;;; org-modern.el ends here

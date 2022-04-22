@@ -56,8 +56,12 @@ invoking =M-x org-modern-mode=. In order to enable =org-modern= for all your Org
 buffers, add =org-modern-mode= to the Org mode hooks.
 
 #+begin_src emacs-lisp
+  ;; Option 1: Per buffer
   (add-hook 'org-mode-hook #'org-modern-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+
+  ;; Option 2: Globally
+  (global-org-modern-mode)
 #+end_src
 
 Try the following minimal setup in =emacs -Q= to emulate the looks of the
@@ -72,8 +76,8 @@ screenshot above.
   (modus-themes-load-operandi)
 
   ;; Choose some fonts
-  ;; (set-face-attribute 'default nil :family "???")
-  ;; (set-face-attribute 'variable-pitch nil :family "???")
+  ;; (set-face-attribute 'default nil :family "Iosevka")
+  ;; (set-face-attribute 'variable-pitch nil :family "Iosevka Aile")
   ;; (set-face-attribute 'org-modern-symbol nil :family "Iosevka")
 
   ;; Add frame borders and window dividers
@@ -109,9 +113,7 @@ screenshot above.
    org-agenda-current-time-string
    "⭠ now ─────────────────────────────────────────────────")
 
-  ;; Enable org-modern-mode
-  (add-hook 'org-mode-hook #'org-modern-mode)
-  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+  (global-org-modern-mode)
 #+end_src
 
 * Contributions
