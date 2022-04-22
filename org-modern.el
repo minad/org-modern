@@ -558,9 +558,11 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (when org-modern-tag
         `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
            (0 (org-modern--tag)))))
-      (when (and org-modern-timestamp (not org-display-custom-times))
-        '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
-           (0 (org-modern--timestamp)))
+      (when org-modern-timestamp
+        `(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
+           (0 ,(if org-modern-custom-timestamp-format
+                   '(org-modern--timestamp-custom)
+                 '(org-modern--timestamp-default))))
           ("<[^>]+>\\(-\\)\\(-\\)<[^>]+>\\|\\[[^]]+\\]\\(?1:-\\)\\(?2:-\\)\\[[^]]+\\]"
            (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
            (2 '(face org-modern-label display #("  " 0 1 (face (:strike-through t)))) t))))
