@@ -95,10 +95,12 @@ Set to nil to disable styling the time stamps."
 (defcustom org-modern-custom-timestamp-format nil
   "Format of custom timestamps, or nil for none.
 If non-nil, it should be (DATE . TIME) where DATE is the format
-for date, and TIME is the format for time.  For the syntax, refer
-to `format-time-string'."
+for date, and TIME is the format for time.  DATE and TIME must be
+surrounded with space.  For the syntax, refer to
+`format-time-string'."
   :type '(choice
           (const :tag "Do not use custom timestamp format" nil)
+          (const :tag " YYYY-MM-DD  HH:MM " '(" %Y-%m-%d " . " %H:%M "))
           (cons :tag "Custom date and time format" string string)))
 
 (defcustom org-modern-table t
@@ -385,38 +387,20 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
                   (org-fix-decoded-time
                    (org-parse-time-string
                     (buffer-substring (match-beginning 0) (match-end 0))))))))
-    (remove-text-properties (match-beginning 0) (match-end 0) '(display nil))
-    (put-text-property
-     (match-beginning 0)
-     (1+ (match-beginning 0))
-     'display " ")
-    (put-text-property
-     (1- (match-end 0))
-     (match-end 0)
-     'display " ")
+    (remove-list-of-text-properties (match-beginning 0) (match-end 0) '(display))
     ;; year-month-day
-    (put-text-property
+    (add-text-properties
      (match-beginning 0)
      (if (eq (match-beginning 2) (match-end 2)) (match-end 0) (match-end 1))
-     'face date-face)
-    (put-text-property
-     (match-beginning 1)
-     (match-end 1)
-     'display (format-time-string (car org-modern-custom-timestamp-format) time))
+     `( face ,date-face
+        display ,(format-time-string (car org-modern-custom-timestamp-format) time)))
     ;; hour:minute
     (unless (eq (match-beginning 2) (match-end 2))
-      (put-text-property
-       (1- (match-end 1))
-       (match-end 1)
-       'display " ")
-      (put-text-property
+      (add-text-properties
        (match-beginning 2)
        (match-end 0)
-       'face time-face)
-      (put-text-property
-       (match-beginning 2)
-       (match-end 2)
-       'display (concat " " (format-time-string (cdr org-modern-custom-timestamp-format) time))))))
+       `( face ,time-face
+          display ,(format-time-string (cdr org-modern-custom-timestamp-format) time))))))
 
 (defun org-modern--star ()
   "Prettify headline stars."
