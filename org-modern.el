@@ -163,10 +163,18 @@ and faces in the cdr. Example:
 
 (defcustom org-modern-keyword t
   "Prettify keywords like #+title.
-If set to a string, e.g., \"‣\", the string is used as replacement for #+."
+If set to a string, e.g., \"‣\", the string is used as replacement for #+.
+
+If set to an alist of keywords and strings, the associated string will be
+used as replacement for \"#+keyword:\", and the association with the symbol
+default treated as the value for all other keywords."
   :type '(choice (boolean :tag "Hide keyword prefix")
                  (string :tag "Custom replacement")
-                 (const :tag "Triangle bullet" "‣")))
+                 (const :tag "Triangle bullet" "‣")
+                 (alist :key-type (choice (string :tag "Keyword")
+                                          (const :tag "Default" default))
+                        :value-type (choice (string :tag "Replacement")
+                                            (boolean :tag "Whether to hide #+")))))
 
 (defcustom org-modern-statistics t
   "Prettify todo statistics."
@@ -274,6 +282,24 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
      (propertize (alist-get (char-after (1+ beg))
                             org-modern-checkbox)
                  'face 'org-modern-symbol))))
+
+(defun org-modern--keyword ()
+  "Prettify keywords according to `org-modern-keyword'."
+  (let ((beg (match-beginning 1))
+        (end (match-end 2))
+        (keyword (substring-no-properties (match-string 2) 0 -1))
+        replacement default-p partial-p)
+    (if-let ((kw-replacement (assoc keyword org-modern-keyword)))
+        (setq replacement (cdr kw-replacement))
+      (setq replacement (alist-get 'default org-modern-keyword)
+            default-p t))
+    (setq partial-p (or default-p (booleanp replacement)))
+    (when replacement
+      (apply #'put-text-property
+             beg (if partial-p (+ 2 beg) end)
+             (if (stringp replacement)
+                 (list 'display (propertize replacement 'face 'org-modern-symbol))
+               (list 'invisible t))))))
 
 (defun org-modern--statistics ()
   "Prettify headline todo statistics."
@@ -502,12 +528,15 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (3 '(face nil display " ")))))
       (when org-modern-todo
         `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t)) (0 (org-modern--todo)))))
-      (when org-modern-keyword
+      (when (or (eq org-modern-keyword t) (stringp org-modern-keyword))
         `(("^[ \t]*\\(#\\+\\)\\S-" 1
            '(face nil
                   ,@(if (stringp org-modern-keyword)
                        `(display ,org-modern-keyword)
                      '(invisible t))))))
+      (when (consp org-modern-keyword)
+        `(("^[ \t]*\\(#\\+\\)\\(\\S-+?:\\)"
+           (0 (org-modern--keyword)))))
       (when org-modern-checkbox
         '(("^[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\)[ \t]+\\(\\[[ X-]\\]\\)[ \t]"
            (0 (org-modern--checkbox)))))
