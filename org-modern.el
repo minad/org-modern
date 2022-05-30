@@ -158,8 +158,23 @@ and faces in the cdr. Example:
   :type 'boolean)
 
 (defcustom org-modern-block t
-  "Prettify blocks, wrapped by #+begin and #+end keywords."
-  :type 'boolean)
+  "Prettify blocks, wrapped by #+begin and #+end keywords.
+If set to a cons cell of two strings, e.g. (\"‣\" . \"‣\"), the strings are
+used as replacements for the #+begin and #+end block keywords, respectively.
+
+If set to an alist of block names and cons cells of strings, the associated
+strings will be used as a replacements for the entire #+begin and #+end block
+keywords,respectively, and the association with the symbol default treated as
+the value for all other keywords."
+  :type '(choice (boolean :tag "Hide #+begin and #+end keyword prefixes")
+                 (cons (string :tag "#+begin replacement")
+                       (string :tag "#+end replacement"))
+                 (const :tag "Triangle bullets" ("‣" . "‣"))
+                 (alist :key-type (choice (string :tag "Block")
+                                          (const :tag "Default" default))
+                        :value-type (choice (cons (string :tag "#+begin replacement")
+                                                  (string :tag "#+end replacement"))
+                                            (boolean :tag "Hide #+begin and #+end keyword prefixes")))))
 
 (defcustom org-modern-block-fringe t
   "Add a bitmap fringe to blocks."
@@ -275,6 +290,31 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 
 (defvar-local org-modern--keywords nil
   "List of font lock keywords.")
+
+(defun org-modern--block ()
+  "Prettify block accordig to `org-modern-block'."
+  (let ((beg (match-beginning 1))
+        (beg-name (match-beginning 2))
+        (end (match-end 2))
+        (begin-p (member (substring-no-properties (match-string 1) 2 -1)
+                         '("begin" "BEGIN")))
+        (block (substring-no-properties (match-string 2)))
+        replacement default-p partial-p)
+    (if-let ((blk-replacement (assoc block org-modern-block)))
+        (setq replacement (cdr blk-replacement))
+      (setq replacement (alist-get 'default org-modern-block)
+            default-p t))
+    (when (consp replacement)
+      (setq replacement (funcall (if begin-p #'car #'cdr) replacement)))
+    (setq partial-p (or default-p (booleanp replacement)))
+    (when replacement
+      (apply #'put-text-property
+             beg (if partial-p beg-name end)
+             (if (stringp replacement)
+                 (list 'display (propertize replacement 'face 'org-modern-symbol))
+               (list 'invisible t)))
+      (when partial-p
+        (add-face-text-property beg-name end 'org-modern-block-keyword 'append)))))
 
 (defun org-modern--checkbox ()
   "Prettify checkboxes according to `org-modern-checkbox'."
@@ -555,13 +595,23 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
       (when org-modern-block-fringe
         '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-" (0 (org-modern--block-fringe)))))
-      (when org-modern-block
-        '(("^\\([ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
-           (1 '(face nil display (space :width (3))))
-           (2 'org-modern-block-keyword append))
-          ("^\\([ \t]*#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
-           (1 '(face nil display (space :width (3))))
-           (2 'org-modern-block-keyword append))))
+      (when-let ((block-type
+                  (cond
+                   ((eq org-modern-block t) 'hide)
+                   ((and (consp org-modern-block) (stringp (car org-modern-block))) 'replace)
+                   ((and (consp org-modern-block) (consp (car org-modern-block))) 'dynamic)))
+                 (block-specs
+                  (pcase block-type
+                    ('hide '((1 '(face nil invisible t)) . (1 '(face nil invisible t))))
+                    ('replace `((1 '(face nil display ,(car org-modern-block))) .
+                                (1 '(face nil display ,(cdr org-modern-block)))))
+                    ('dynamic '((0 (org-modern--block)) . (0 (org-modern--block)))))))
+        `(("^[ \t]*\\(#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
+           ,(car block-specs)
+           ,@(and (not (eq block-type 'dynamic)) '((2 'org-modern-block-keyword append))))
+          ("^[ \t]*\\(#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
+           ,(cdr block-specs)
+           ,@(and (not (eq block-type 'dynamic)) '((2 'org-modern-block-keyword append))))))
       (when org-modern-tag
         `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
            (0 (org-modern--tag)))))
