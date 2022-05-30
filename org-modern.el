@@ -163,10 +163,16 @@ and faces in the cdr. Example:
 
 (defcustom org-modern-keyword t
   "Prettify keywords like #+title.
-If set to a string, e.g., \"‣\", the string is used as replacement for #+."
-  :type '(choice (boolean :tag "Hide keyword prefix")
-                 (string :tag "Custom replacement")
-                 (const :tag "Triangle bullet" "‣")))
+If set to a string, e.g., \"‣\", the string is used as replacement for #+.
+If set to an alist of keywords and strings, the associated string will be
+used as replacement for \"#+keyword:\", with t the default key."
+  :type '(choice (boolean :tag "Hide prefix")
+                 (string :tag "Replacement")
+                 (const :tag "Triangle bullet" "‣")
+                 (alist :key-type (choice (string :tag "Keyword")
+                                          (const :tag "Default" t))
+                        :value-type (choice (string :tag "Replacement")
+                                            (const :tag "Hide prefix" t)))))
 
 (defcustom org-modern-internal-link '(" ↪ " t " ")
   "Prettify internal links, e.g., <<introduction>>."
@@ -282,6 +288,14 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
      (propertize (alist-get (char-after (1+ beg))
                             org-modern-checkbox)
                  'face 'org-modern-symbol))))
+
+(defun org-modern--keyword ()
+  "Prettify keywords according to `org-modern-keyword'."
+  (if-let (rep (cdr (assoc (match-string 2) org-modern-keyword)))
+      (if (eq rep t)
+          (put-text-property (match-beginning 1) (match-end 1) 'invisible t)
+        (put-text-property (match-beginning 0) (match-end 0) 'display
+                           (propertize rep 'face 'org-modern-symbol)))))
 
 (defun org-modern--statistics ()
   "Prettify headline todo statistics."
@@ -511,11 +525,11 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (when org-modern-todo
         `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t)) (0 (org-modern--todo)))))
       (when org-modern-keyword
-        `(("^[ \t]*\\(#\\+\\)\\S-" 1
-           '(face nil
-                  ,@(if (stringp org-modern-keyword)
-                       `(display ,org-modern-keyword)
-                     '(invisible t))))))
+        `(("^[ \t]*\\(#\\+\\)\\([^:]+\\):"
+           ,@(pcase org-modern-keyword
+               ('t '(1 '(face nil invisible t)))
+               ((pred stringp) `(1 '(face nil display ,org-modern-keyword)))
+               (_ '(0 (org-modern--keyword)))))))
       (when org-modern-checkbox
         '(("^[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\)[ \t]+\\(\\[[ X-]\\]\\)[ \t]"
            (0 (org-modern--checkbox)))))
