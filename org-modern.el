@@ -291,6 +291,25 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 (defvar-local org-modern--keywords nil
   "List of font lock keywords.")
 
+(defsubst org-modern--find-replacement (replacement-alist key)
+  "Find the associated value of KEY in REPLACEMENT-ALIST.
+If it is not present, check for a default key.
+Returns a cons cell of the value and whether it was the default."
+  (if-let ((replacement-cell (assoc key replacement-alist)))
+      (cons (cdr replacement-cell) nil)
+    (cons (alist-get 'default replacement-alist) t)))
+
+(defsubst org-modern--perform-replacement (replacement beg end)
+  "Affect the region BEG..END with REPLACEMENT.
+String REPLACEMENT causes it to be displayed over the region,
+t REPLACEMENT causes the region to be hidden with the invisible text property,
+all other values are ignored."
+  (cond
+   ((stringp replacement)
+    (put-text-property beg end 'display (propertize replacement 'face 'org-modern-symbol)))
+   ((eq replacement t)
+    (put-text-property beg end 'invisible t))))
+
 (defun org-modern--block ()
   "Prettify block accordig to `org-modern-block'."
   (let ((beg (match-beginning 1))
@@ -299,21 +318,15 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         (begin-p (member (substring-no-properties (match-string 1) 2 -1)
                          '("begin" "BEGIN")))
         (block (substring-no-properties (match-string 2)))
-        replacement default-p partial-p)
-    (if-let ((blk-replacement (assoc block org-modern-block)))
-        (setq replacement (cdr blk-replacement))
-      (setq replacement (alist-get 'default org-modern-block)
-            default-p t))
-    (when (consp replacement)
-      (setq replacement (funcall (if begin-p #'car #'cdr) replacement)))
-    (setq partial-p (or default-p (booleanp replacement)))
-    (when replacement
-      (apply #'put-text-property
-             beg (if partial-p beg-name end)
-             (if (stringp replacement)
-                 (list 'display (propertize replacement 'face 'org-modern-symbol))
-               (list 'invisible t)))
-      (when partial-p
+        partial-p)
+    (cl-destructuring-bind
+        (replacement . default-p)
+        (org-modern--find-replacement org-modern-block block)
+      (when (consp replacement)
+        (setq replacement (funcall (if begin-p #'car #'cdr) replacement)))
+      (setq partial-p (or default-p (eq replacement t)))
+      (org-modern--perform-replacement replacement beg (if partial-p beg-name end))
+      (when (eq t replacement)
         (add-face-text-property beg-name end 'org-modern-block-keyword 'append)))))
 
 (defun org-modern--checkbox ()
@@ -332,18 +345,12 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   (let ((beg (match-beginning 1))
         (end (match-end 2))
         (keyword (substring-no-properties (match-string 2) 0 -1))
-        replacement default-p partial-p)
-    (if-let ((kw-replacement (assoc keyword org-modern-keyword)))
-        (setq replacement (cdr kw-replacement))
-      (setq replacement (alist-get 'default org-modern-keyword)
-            default-p t))
-    (setq partial-p (or default-p (booleanp replacement)))
-    (when replacement
-      (apply #'put-text-property
-             beg (if partial-p (+ 2 beg) end)
-             (if (stringp replacement)
-                 (list 'display (propertize replacement 'face 'org-modern-symbol))
-               (list 'invisible t))))))
+        partial-p)
+    (cl-destructuring-bind
+        (replacement . default-p)
+        (org-modern--find-replacement org-modern-keyword keyword)
+      (setq partial-p (or default-p (eq replacement t)))
+      (org-modern--perform-replacement replacement beg (if partial-p (+ 2 beg) end)))))
 
 (defun org-modern--statistics ()
   "Prettify headline todo statistics."
@@ -576,8 +583,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         `(("^[ \t]*\\(#\\+\\)\\S-" 1
            '(face nil
                   ,@(if (stringp org-modern-keyword)
-                       `(display ,org-modern-keyword)
-                     '(invisible t))))))
+                        `(display ,org-modern-keyword)
+                      '(invisible t))))))
       (when (consp org-modern-keyword)
         `(("^[ \t]*\\(#\\+\\)\\(\\S-+?:\\)"
            (0 (org-modern--keyword)))))
