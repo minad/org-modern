@@ -303,9 +303,9 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         (beg-name (match-beginning 2))
         (end (match-end 2))
         (end-rep (match-end 2))
-        (rep (assoc (match-string 2) org-modern-block)))
+        (rep (assoc (match-string 2) org-modern-block-name)))
     (unless rep
-      (setq rep (assq t org-modern-block)
+      (setq rep (assq t org-modern-block-name)
             end-rep beg-name))
     (when (consp (cdr rep))
       (setcdr rep (if (= 7 (length (match-string 1))) (cadr rep) (caddr rep))))
@@ -315,7 +315,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
        (add-face-text-property beg-name end 'org-modern-block-name 'append))
       ((pred stringp)
        (put-text-property beg end-rep 'display
-                          (propertize replacement 'face 'org-modern-symbol))))))
+                          (propertize rep 'face 'org-modern-symbol))))))
 
 (defun org-modern--checkbox ()
   "Prettify checkboxes according to `org-modern-checkbox'."
