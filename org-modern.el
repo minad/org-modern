@@ -292,7 +292,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 (defun org-modern--keyword ()
   "Prettify keywords according to `org-modern-keyword'."
   (let ((beg (match-beginning 0))
-        (end (1+ (match-end 0)))
+        (end (match-end 0))
         (rep (assoc (match-string 2) org-modern-keyword)))
     (unless rep
       (setq rep (assq t org-modern-keyword) end (match-end 1)))
