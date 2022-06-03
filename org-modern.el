@@ -587,7 +587,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (when org-modern-table
         '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
       (when org-modern-block-fringe
-        ("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-" (0 (org-modern--block-fringe))))
+        '("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-" (0 (org-modern--block-fringe))))
       (when-let ((block-specs
                   (cond
                    ((eq org-modern-block-name t) ; hide
