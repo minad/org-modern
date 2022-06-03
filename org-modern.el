@@ -516,37 +516,6 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
     (setq
      org-modern--keywords
      (append
-      (when-let (bullet (alist-get ?+ org-modern-list))
-        `(("^[ \t]*\\(+\\)[ \t]" 1 '(face nil display ,bullet))))
-      (when-let (bullet (alist-get ?- org-modern-list))
-        `(("^[ \t]*\\(-\\)[ \t]" 1 '(face nil display ,bullet))))
-      (when-let (bullet (alist-get ?* org-modern-list))
-        `(("^[ \t]+\\(*\\)[ \t]" 1 '(face nil display ,bullet))))
-      (when org-modern-priority
-        '(("^\\*+.*? \\(\\(\\[\\)#.\\(\\]\\)\\) "
-           (1 'org-modern-priority t)
-           (2 '(face nil display " "))
-           (3 '(face nil display " ")))))
-      (when org-modern-todo
-        `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t)) (0 (org-modern--todo)))))
-      (when org-modern-keyword
-        `(("^[ \t]*\\(#\\+\\)\\([^:]+\\):"
-           ,@(pcase org-modern-keyword
-               ('t '(1 '(face nil invisible t)))
-               ((pred stringp) `(1 '(face nil display ,org-modern-keyword)))
-               (_ '(0 (org-modern--keyword)))))))
-      (when org-modern-checkbox
-        '(("^[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\)[ \t]+\\(\\[[ X-]\\]\\)[ \t]"
-           (0 (org-modern--checkbox)))))
-      (when (or org-modern-star org-modern-hide-stars)
-        `(("^\\(\\**\\)\\(\\*\\) "
-           ,@(and (not (eq org-modern-hide-stars t)) org-modern-star '((0 (org-modern--star))))
-           ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil invisible t))))
-           ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible t)))))))
-      (when org-modern-horizontal-rule
-        '(("^-\\{5,\\}$" 0 '(face org-modern-horizontal-rule display (space :width text)))))
-      (when org-modern-table
-        '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
       (when org-modern-block
         '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-" (0 (org-modern--block-fringe)))
           ("^\\([ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
@@ -555,24 +524,55 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
           ("^\\([ \t]*#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
            (1 '(face nil display (space :width (3))))
            (2 'org-modern-block-keyword append))))
-      (when org-modern-tag
-        `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
-           (0 (org-modern--tag)))))
+      (when-let (bullet (alist-get ?+ org-modern-list))
+        `(("^[ \t]*\\(+\\)[ \t]" 1 '(face nil display ,bullet))))
+      (when-let (bullet (alist-get ?- org-modern-list))
+        `(("^[ \t]*\\(-\\)[ \t]" 1 '(face nil display ,bullet))))
+      (when-let (bullet (alist-get ?* org-modern-list))
+        `(("^[ \t]+\\(*\\)[ \t]" 1 '(face nil display ,bullet))))
+      (when org-modern-checkbox
+        '(("^[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\)[ \t]+\\(\\[[ X-]\\]\\)[ \t]"
+           (0 (org-modern--checkbox)))))
+      (when org-modern-horizontal-rule
+        '(("^-\\{5,\\}$" 0 '(face org-modern-horizontal-rule display (space :width text)))))
       (when org-modern-internal-link
         `(("\\(<<\\)\\(.+?\\)\\(>>\\)"
            (0 '(face org-modern-internal-link) t)
            (1 '(face nil display ,(car org-modern-internal-link)))
            (3 '(face nil display ,(caddr org-modern-internal-link)))
            ,@(unless (cadr org-modern-internal-link)
-              '((2 '(face nil invisible t)))))))
+               '((2 '(face nil invisible t)))))))
+      (when org-modern-keyword
+        `(("^[ \t]*\\(#\\+\\)\\([^:]+\\):"
+           ,@(pcase org-modern-keyword
+               ('t '(1 '(face nil invisible t)))
+               ((pred stringp) `(1 '(face nil display ,org-modern-keyword)))
+               (_ '(0 (org-modern--keyword)))))))
+      (when (or org-modern-star org-modern-hide-stars)
+        `(("^\\(\\**\\)\\(\\*\\) "
+           ,@(and (not (eq org-modern-hide-stars t)) org-modern-star '((0 (org-modern--star))))
+           ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil invisible t))))
+           ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible t)))))))
+      (when org-modern-statistics
+        '((" \\[\\(\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\]" (0 (org-modern--statistics)))))
+      (when org-modern-table
+        '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
+      (when org-modern-tag
+        `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
+           (0 (org-modern--tag)))))
       (when org-modern-timestamp
         '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
            (0 (org-modern--timestamp)))
           ("<[^>]+>\\(-\\)\\(-\\)<[^>]+>\\|\\[[^]]+\\]\\(?1:-\\)\\(?2:-\\)\\[[^]]+\\]"
            (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
            (2 '(face org-modern-label display #("  " 0 1 (face (:strike-through t)))) t))))
-      (when org-modern-statistics
-        '((" \\[\\(\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\]" (0 (org-modern--statistics)))))))
+      (when org-modern-todo
+        `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t)) (0 (org-modern--todo)))))
+      (when org-modern-priority
+        '(("^\\*+.*? \\(\\(\\[\\)#.\\(\\]\\)\\) "
+           (1 'org-modern-priority t)
+           (2 '(face nil display " "))
+           (3 '(face nil display " ")))))))
     (font-lock-add-keywords nil org-modern--keywords 'append)
     (advice-add #'org-unfontify-region :after #'org-modern--unfontify))
    (t (font-lock-remove-keywords nil org-modern--keywords)))
