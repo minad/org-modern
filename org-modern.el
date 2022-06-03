@@ -530,7 +530,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (when org-modern-todo
         `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t)) (0 (org-modern--todo)))))
       (when org-modern-keyword
-        `(("^[ \t]*\\(#\\+\\)\\([^: \t]+\\):"
+        `(("^[ \t]*\\(#\\+\\)\\([^: \t\n]+\\):"
            ,@(pcase org-modern-keyword
                ('t '(1 '(face nil invisible t)))
                ((pred stringp) `(1 '(face nil display ,org-modern-keyword)))
@@ -549,10 +549,10 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
       (when org-modern-block
         '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-" (0 (org-modern--block-fringe)))
-          ("^\\([ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
+          ("^\\([ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\)"
            (1 '(face nil display (space :width (3))))
            (2 'org-modern-block-keyword append))
-          ("^\\([ \t]*#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
+          ("^\\([ \t]*#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\)"
            (1 '(face nil display (space :width (3))))
            (2 'org-modern-block-keyword append))))
       (when org-modern-tag
