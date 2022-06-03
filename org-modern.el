@@ -168,6 +168,10 @@ If set to a string, e.g., \"‣\", the string is used as replacement for #+."
                  (string :tag "Custom replacement")
                  (const :tag "Triangle bullet" "‣")))
 
+(defcustom org-modern-internal-link '(" ↪ " t " ")
+  "Prettify internal links, e.g., <<introduction>>."
+  :type '(choice nil (list string boolean string)))
+
 (defcustom org-modern-statistics t
   "Prettify todo statistics."
   :type 'boolean)
@@ -206,6 +210,13 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
     (((background light)) :foreground "black")
     (t :foreground "white"))
   "Face used for tag labels.")
+
+(defface org-modern-internal-link
+  '((default :inherit org-modern-label)
+    (((background light))
+     :background "gray35" :foreground "white" :distant-foreground "black")
+    (t :background "gray75" :foreground "black" :distant-foreground "white"))
+  "Face used for internal link.")
 
 (defface org-modern-done
   '((default :inherit org-modern-label)
@@ -531,6 +542,13 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (when org-modern-tag
         `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
            (0 (org-modern--tag)))))
+      (when org-modern-internal-link
+        `(("\\(<<\\)\\(.+?\\)\\(>>\\)"
+           (0 '(face org-modern-internal-link) t)
+           (1 '(face nil display ,(car org-modern-internal-link)))
+           ,(unless (cadr org-modern-internal-link)
+              '(2 '(face nil invisible t)))
+           (3 '(face nil display ,(caddr org-modern-internal-link))))))
       (when org-modern-timestamp
         '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
            (0 (org-modern--timestamp)))
