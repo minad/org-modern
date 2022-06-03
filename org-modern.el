@@ -163,11 +163,12 @@ and faces in the cdr. Example:
 
 (defcustom org-modern-keyword t
   "Prettify keywords like #+title.
-If set to t, the keyword prefix will be hidden. If set to an alist of
-keywords, the associated string will be used as replacement for
-\"#+keyword:\". The key t is the default key. The value t is the default
-value and will hide the keyword prefix only."
+If set to a string, e.g., \"‣\", the string is used as replacement for #+.
+If set to an alist of keywords and strings, the associated string will be
+used as replacement for \"#+keyword:\", with t the default key."
   :type '(choice (boolean :tag "Hide prefix")
+                 (string :tag "Replacement")
+                 (const :tag "Triangle bullet" "‣")
                  (alist :key-type (choice (string :tag "Keyword")
                                           (const :tag "Default" t))
                         :value-type (choice (string :tag "Replacement")
@@ -530,9 +531,10 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t)) (0 (org-modern--todo)))))
       (when org-modern-keyword
         `(("^[ \t]*\\(#\\+\\)\\([^:]+\\):"
-           ,@(if (consp org-modern-keyword)
-                 '(0 (org-modern--keyword))
-               '(1 '(face nil invisible t))))))
+           ,@(pcase org-modern-keyword
+               ('t '(1 '(face nil invisible t)))
+               ((pred stringp) `(1 '(face nil display ,org-modern-keyword)))
+               (_ '(0 (org-modern--keyword)))))))
       (when org-modern-checkbox
         '(("^[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\)[ \t]+\\(\\[[ X-]\\]\\)[ \t]"
            (0 (org-modern--checkbox)))))
