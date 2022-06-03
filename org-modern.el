@@ -297,7 +297,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 (defvar-local org-modern--keywords nil
   "List of font lock keywords.")
 
-(defun org-modern--block ()
+(defun org-modern--block-name ()
   "Prettify block according to `org-modern-block-name'."
   (let ((beg (match-beginning 1))
         (beg-name (match-beginning 2))
@@ -603,7 +603,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
                         (2 'org-modern-block-name append))))
                    ((and (consp org-modern-block-name) ; dynamic replacement
                          (consp (car org-modern-block-name)))
-                    '(((0 (org-modern--block))) . ((0 (org-modern--block))))))))
+                    '(((0 (org-modern--block-name))) . ((0 (org-modern--block-name))))))))
         `(("^[ \t]*\\(#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
            ,@(car block-specs))
           ("^[ \t]*\\(#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
