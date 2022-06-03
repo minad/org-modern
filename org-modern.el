@@ -558,9 +558,9 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         `(("\\(<<\\)\\(.+?\\)\\(>>\\)"
            (0 '(face org-modern-internal-link) t)
            (1 '(face nil display ,(car org-modern-internal-link)))
-           ,(unless (cadr org-modern-internal-link)
-              '(2 '(face nil invisible t)))
-           (3 '(face nil display ,(caddr org-modern-internal-link))))))
+           (3 '(face nil display ,(caddr org-modern-internal-link)))
+           ,@(unless (cadr org-modern-internal-link)
+              '((2 '(face nil invisible t)))))))
       (when org-modern-timestamp
         '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
            (0 (org-modern--timestamp)))
