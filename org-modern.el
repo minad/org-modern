@@ -291,12 +291,16 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 
 (defun org-modern--keyword ()
   "Prettify keywords according to `org-modern-keyword'."
-  (when-let (rep (cdr (or (assoc (match-string 2) org-modern-keyword)
-                          (assq t org-modern-keyword))))
-    (if (stringp rep)
-        (put-text-property (match-beginning 0) (1+ (match-end 0)) 'display
-                           (propertize rep 'face 'org-modern-symbol))
-      (put-text-property (match-beginning 1) (match-end 1) 'invisible t))))
+  (let ((beg (match-beginning 0))
+        (end (1+ (match-end 0)))
+        (rep (assoc (match-string 2) org-modern-keyword)))
+    (unless rep
+      (setq rep (assq t org-modern-keyword) end (match-end 1)))
+    (pcase (cdr rep)
+      ('t (put-text-property beg (match-end 1) 'invisible t))
+      ((pred stringp)
+       (put-text-property beg end 'display
+                          (propertize (cdr rep) 'face 'org-modern-symbol))))))
 
 (defun org-modern--statistics ()
   "Prettify headline todo statistics."
