@@ -93,3 +93,9 @@ TREPEATED: <2022-02-26 Sat 10:00 .+1d/2d>
 | 2 |  4 |  8 | 16 |  1.4142 |     1.1892 |
 | 3 |  9 | 27 | 81 |  1.7321 |     1.3161 |
 |---+----+----+----+---------+------------|
+
+* Internal Links
+
+<<This is an internal link>>
+
+[[This is an internal link]]
