@@ -176,7 +176,7 @@ used as replacement for \"#+keyword:\", with t the default key."
 
 (defcustom org-modern-internal-link '(" ↪ " t " ")
   "Prettify internal links, e.g., <<introduction>>."
-  :type '(choice nil (list string boolean string)))
+  :type '(choice (const nil) (list string boolean string)))
 
 (defcustom org-modern-statistics t
   "Prettify todo statistics."
