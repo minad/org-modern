@@ -212,10 +212,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   "Face used for tag labels.")
 
 (defface org-modern-internal-link
-  '((default :inherit org-modern-label)
-    (((background light))
-     :background "gray35" :foreground "white" :distant-foreground "black")
-    (t :background "gray75" :foreground "black" :distant-foreground "white"))
+  '((t :inherit org-modern-done))
   "Face used for internal link.")
 
 (defface org-modern-done
