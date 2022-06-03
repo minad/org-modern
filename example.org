@@ -99,3 +99,8 @@ TREPEATED: <2022-02-26 Sat 10:00 .+1d/2d>
 <<This is an internal link>>
 
 [[This is an internal link]]
+
+* Footnotes
+[fn:1] Org-mode is a document thingx
+
+Org-modern makes your Org-mode[fn:1] documents look great

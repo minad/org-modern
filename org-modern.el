@@ -178,6 +178,10 @@ used as replacement for \"#+keyword:\", with t the default key."
   "Prettify internal links, e.g., <<introduction>>."
   :type '(choice (const nil) (list string boolean string)))
 
+(defcustom org-modern-footnote t
+  "Prettify footnotes, e.g.: [fn:1]"
+  :type 'boolean)
+
 (defcustom org-modern-statistics t
   "Prettify todo statistics."
   :type 'boolean)
@@ -220,6 +224,10 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 (defface org-modern-internal-link
   '((t :inherit org-modern-done))
   "Face used for internal link.")
+
+(defface org-modern-footnote
+  '((t :inherit org-footnote))
+  "Face used for footnote.")
 
 (defface org-modern-done
   '((default :inherit org-modern-label)
@@ -565,6 +573,12 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (3 '(face nil display ,(caddr org-modern-internal-link)))
            ,@(unless (cadr org-modern-internal-link)
               '((2 '(face nil invisible t)))))))
+      (when org-modern-footnote
+        '(("\\(\\[fn:\\)\\([0-9]\\{1,\\}+\\)\\(\\]\\)"
+           (0 '(face org-modern-footnote) t)
+           (1 '(face nil display " ("))
+           (3 '(face nil display ")"))
+           )))
       (when org-modern-timestamp
         '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
            (0 (org-modern--timestamp)))
