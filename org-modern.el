@@ -567,14 +567,14 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
            (0 (org-modern--tag)))))
       (when org-modern-internal-link
-        `(("\\(<<\\)\\([^<].*?\\)\\(>>\\)"
+        `(("\\(<<\\)\\([^<][^\n]*?\\)\\(>>\\)"
            (0 '(face org-modern-internal-link) t)
            (1 '(face nil display ,(car org-modern-internal-link)))
            (3 '(face nil display ,(caddr org-modern-internal-link)))
            ,@(unless (cadr org-modern-internal-link)
                '((2 '(face nil invisible t)))))))
       (when org-modern-radio-link
-        `(("\\(<<<\\)\\(.+?\\)\\(>>>\\)"
+        `(("\\(<<<\\)\\([^\n]+?\\)\\(>>>\\)"
            (0 '(face org-modern-radio-link) t)
            (1 '(face nil display ,(car org-modern-radio-link)))
            (3 '(face nil display ,(caddr org-modern-radio-link)))
