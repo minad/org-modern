@@ -98,4 +98,8 @@ TREPEATED: <2022-02-26 Sat 10:00 .+1d/2d>
 
 <<This is an internal link>>
 
+<<<radio link>>>
+
 [[This is an internal link]]
+
+radio link
