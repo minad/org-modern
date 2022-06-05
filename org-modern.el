@@ -178,11 +178,11 @@ used as replacement for \"#+keyword:\", with t the default key."
   "Prettify footnotes."
   :type '(choice (const nil) sexp))
 
-(defcustom org-modern-internal-link '(" ↪ " t " ")
+(defcustom org-modern-internal-target '(" ↪ " t " ")
   "Prettify internal link targets, e.g., <<introduction>>."
   :type '(choice (const nil) (list string boolean string)))
 
-(defcustom org-modern-radio-link '(" ⛯ " t " ")
+(defcustom org-modern-radio-target '(" ⛯ " t " ")
   "Prettify radio link targets, e.g., <<<radio>>>."
   :type '(choice (const nil) (list string boolean string)))
 
@@ -225,11 +225,11 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
     (t :foreground "white"))
   "Face used for tag labels.")
 
-(defface org-modern-internal-link
+(defface org-modern-internal-target
   '((t :inherit org-modern-done))
   "Face used for internal link targets.")
 
-(defface org-modern-radio-link
+(defface org-modern-radio-target
   '((t :inherit org-modern-done))
   "Face used for radio link targets.")
 
@@ -574,23 +574,23 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         `(("\\(\\[fn:\\)[^]]+\\]"
            (0 '(face nil display ,org-modern-footnote))
            (1 '(face nil display ,(propertize "[" 'display org-modern-footnote))))))
-      (when org-modern-internal-link
+      (when org-modern-internal-target
         `(("\\(<<\\)\\([^<][^\n]*?\\)\\(>>\\)"
-           (0 '(face org-modern-internal-link) t)
-           (1 '(face nil display ,(propertize (car org-modern-internal-link)
+           (0 '(face org-modern-internal-target) t)
+           (1 '(face nil display ,(propertize (car org-modern-internal-target)
                                               'face 'org-modern-symbol)))
-           (3 '(face nil display ,(propertize (caddr org-modern-internal-link)
+           (3 '(face nil display ,(propertize (caddr org-modern-internal-target)
                                               'face 'org-modern-symbol)))
-           ,@(unless (cadr org-modern-internal-link)
+           ,@(unless (cadr org-modern-internal-target)
                '((2 '(face nil invisible t)))))))
-      (when org-modern-radio-link
+      (when org-modern-radio-target
         `(("\\(<<<\\)\\([^\n]+?\\)\\(>>>\\)"
-           (0 '(face org-modern-radio-link) t)
-           (1 '(face nil display ,(propertize (car org-modern-radio-link)
+           (0 '(face org-modern-radio-target) t)
+           (1 '(face nil display ,(propertize (car org-modern-radio-target)
                                               'face 'org-modern-symbol)))
-           (3 '(face nil display ,(propertize (caddr org-modern-radio-link)
+           (3 '(face nil display ,(propertize (caddr org-modern-radio-target)
                                               'face 'org-modern-symbol)))
-           ,@(unless (cadr org-modern-radio-link)
+           ,@(unless (cadr org-modern-radio-target)
                '((2 '(face nil invisible t)))))))
       (when org-modern-timestamp
         '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
