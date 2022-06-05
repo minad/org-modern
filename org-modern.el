@@ -574,11 +574,15 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (0 (org-modern--tag)))))
       (when org-modern-footnote
         `(("^\\(\\[fn:\\)[[:word:]-_]+\\]" ;; Definition
-           (0 '(face nil display ,(car org-modern-footnote)))
-           (1 '(face nil display ,(propertize "[" 'display (car org-modern-footnote)))))
+           ,@(if-let (x (car org-modern-footnote))
+                 `((0 '(face nil display ,x))
+                   (1 '(face nil display ,(propertize "[" 'display x))))
+               '((1 '(face nil display "[")))))
           ("[^\n]\\(\\(\\[fn:\\)[[:word:]-_]+\\]\\)" ;; Reference
-           (1 '(face nil display ,(cdr org-modern-footnote)))
-           (2 '(face nil display ,(propertize "[" 'display (cdr org-modern-footnote)))))))
+           ,@(if-let (x (cdr org-modern-footnote))
+                 `((1 '(face nil display ,x))
+                   (2 '(face nil display ,(propertize "[" 'display x))))
+               '((2 '(face nil display "[")))))))
       (when org-modern-internal-target
         `(("\\(<<\\)\\([^<][^\n]*?\\)\\(>>\\)"
            (0 '(face org-modern-internal-target) t)
