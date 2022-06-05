@@ -94,7 +94,9 @@ TREPEATED: <2022-02-26 Sat 10:00 .+1d/2d>
 | 3 |  9 | 27 | 81 |  1.7321 |     1.3161 |
 |---+----+----+----+---------+------------|
 
-* Internal Links
+* Special Links
+
+Test numeric foonotes[fn:1] and named foonotes[fn:foo].
 
 <<This is an internal link>>
 
@@ -103,3 +105,6 @@ TREPEATED: <2022-02-26 Sat 10:00 .+1d/2d>
 [[This is an internal link]]
 
 radio link
+
+[fn:1] This is footnote 1
+[fn:foo] This is the foonote

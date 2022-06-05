@@ -174,6 +174,10 @@ used as replacement for \"#+keyword:\", with t the default key."
                         :value-type (choice (string :tag "Replacement")
                                             (const :tag "Hide prefix" t)))))
 
+(defcustom org-modern-footnote '((height 0.7) (raise 0.3))
+  "Prettify footnotes."
+  :type '(choice (const nil) sexp))
+
 (defcustom org-modern-internal-link '(" ↪ " t " ")
   "Prettify internal link targets, e.g., <<introduction>>."
   :type '(choice (const nil) (list string boolean string)))
@@ -566,6 +570,10 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (when org-modern-tag
         `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
            (0 (org-modern--tag)))))
+      (when org-modern-footnote
+        `(("\\(\\[fn:\\)[^]]+\\]"
+           (0 '(face nil display ,org-modern-footnote))
+           (1 '(face nil display ,(propertize "[" 'display org-modern-footnote))))))
       (when org-modern-internal-link
         `(("\\(<<\\)\\([^<][^\n]*?\\)\\(>>\\)"
            (0 '(face org-modern-internal-link) t)
