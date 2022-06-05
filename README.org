@@ -64,7 +64,7 @@ buffers, add =org-modern-mode= to the Org mode hooks.
   (global-org-modern-mode)
 #+end_src
 
-Try the following minimal setup in =emacs -Q= to emulate the looks of the
+Try the following more extensive setup in =emacs -Q= to reproduce the looks of the
 screenshot above.
 
 #+begin_src emacs-lisp
