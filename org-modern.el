@@ -134,8 +134,10 @@ Set to nil to disable styling checkboxes."
   :type '(alist :key-type character :value-type string))
 
 (defcustom org-modern-horizontal-rule t
-  "Prettify horizontal rulers."
-  :type 'boolean)
+  "Prettify horizontal rulers.
+The value can either be a boolean to enable/disable style or display
+replacement expression, e.g., a string."
+  :type '(choice boolean sexp))
 
 (defcustom org-modern-todo t
   "Prettify todo keywords, see `org-todo-keywords'."
@@ -558,7 +560,11 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil invisible t))))
            ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible t)))))))
       (when org-modern-horizontal-rule
-        '(("^[ \t]*-\\{5,\\}$" 0 '(face org-modern-horizontal-rule display (space :width text)))))
+        `(("^[ \t]*-\\{5,\\}$" 0
+           '(face org-modern-horizontal-rule display
+                  ,(if (eq org-modern-horizontal-rule t)
+                       '(space :width text)
+                     org-modern-horizontal-rule)))))
       (when org-modern-table
         '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
       (when org-modern-block
