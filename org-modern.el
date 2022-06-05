@@ -635,6 +635,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   "Finalize Org agenda highlighting."
   (save-excursion
     (save-match-data
+      ;; Todo keywords
       (goto-char (point-min))
       (let ((re (format ": +%s "
                         (regexp-opt
@@ -643,10 +644,12 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
             (org-done-keywords org-done-keywords-for-agenda))
         (while (re-search-forward re nil 'noerror)
           (org-modern--todo)))
+      ;; Tags
       (goto-char (point-min))
       (let ((re (concat "\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")))
         (while (re-search-forward re nil 'noerror)
           (org-modern--tag)))
+      ;; Priorities
       (goto-char (point-min))
       (while (re-search-forward "\\(\\[\\)#.\\(\\]\\)" nil 'noerror)
         ;; For some reason the org-agenda-fontify-priorities adds overlays?!
