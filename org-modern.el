@@ -174,9 +174,13 @@ used as replacement for \"#+keyword:\", with t the default key."
                         :value-type (choice (string :tag "Replacement")
                                             (const :tag "Hide prefix" t)))))
 
-(defcustom org-modern-footnote '((height 0.7) (raise 0.3))
-  "Prettify footnotes."
-  :type '(choice (const nil) sexp))
+(defcustom org-modern-footnote-reference t
+  "Prettify footnote references."
+  :type '(choice boolean sexp))
+
+(defcustom org-modern-footnote-definition t
+  "Prettify footnote definitions."
+  :type '(choice boolean sexp))
 
 (defcustom org-modern-internal-target '(" ↪ " t " ")
   "Prettify internal link targets, e.g., <<introduction>>."
@@ -570,10 +574,21 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (when org-modern-tag
         `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
            (0 (org-modern--tag)))))
-      (when org-modern-footnote
-        `(("\\(\\[fn:\\)[^]]+\\]"
-           (0 '(face nil display ,org-modern-footnote))
-           (1 '(face nil display ,(propertize "[" 'display org-modern-footnote))))))
+      (when-let ((fn-display
+                  (pcase org-modern-footnote-reference
+                    ((and (pred consp) val) val)
+                    ('t (cadr org-script-display)))))
+        `(("[^\n]\\(\\[\\)\\(fn:\\)\\([[:word:]\\-_]+\\]\\)"
+           (1 '(face nil display ,fn-display))
+           (2 '(face nil invisible t))
+           (3 '(face nil display ,fn-display)))))
+      (when-let ((fn-display
+                  (pcase org-modern-footnote-definition
+                    ((and (pred consp) val) val)
+                    ('t (cadr org-script-display)))))
+        `(("^\\[\\(fn:\\)[[:word:]\\-_]+\\]"
+           (0 '(face nil display ,fn-display))
+           (1 '(face nil invisible t)))))
       (when org-modern-internal-target
         `(("\\(<<\\)\\([^<][^\n]*?\\)\\(>>\\)"
            (0 '(face org-modern-internal-target) t)
