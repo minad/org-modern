@@ -299,8 +299,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   (let ((beg (match-beginning 1))
         (end (match-end 1)))
     (put-text-property
-     beg end
-     'display
+     beg end 'display
      (propertize (alist-get (char-after (1+ beg))
                             org-modern-checkbox)
                  'face 'org-modern-symbol))))
@@ -349,17 +348,12 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (while (search-forward ":" end 'noerror)
         (when colon
           (put-text-property
-           colon
-           (1+ colon)
-           'display (format #(" %c" 1 3 (cursor t)) (char-after colon)))
+           colon (1+ colon) 'display
+           (format #(" %c" 1 3 (cursor t)) (char-after colon)))
           (put-text-property
-           (- (point) 2)
-           (1- (point))
-           'display (format "%c " (char-before (1- (point)))))
-          (put-text-property
-           colon
-           (1- (point))
-           'face 'org-modern-tag))
+           (- (point) 2) (1- (point)) 'display
+           (format "%c " (char-before (1- (point)))))
+          (put-text-property colon (1- (point)) 'face 'org-modern-tag))
         (setq colon (point))
         (add-text-properties (1- colon) colon colon-props)))))
 
@@ -368,15 +362,12 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   (let ((todo (match-string 1))
         (beg (match-beginning 1))
         (end (match-end 1)))
+    (put-text-property beg (1+ beg) 'display
+                       (format #(" %c" 1 3 (cursor t)) (char-after beg)))
+    (put-text-property (1- end) end 'display
+                       (format "%c " (char-before end)))
     (put-text-property
-     beg (1+ beg)
-     'display (format #(" %c" 1 3 (cursor t)) (char-after beg)))
-    (put-text-property
-     (1- end) end
-     'display (format "%c " (char-before end)))
-    (put-text-property
-     beg end
-     'face
+     beg end 'face
      (if-let (face (cdr (assoc todo org-modern-todo-faces)))
          `(:inherit (,face org-modern-label))
        (if (member todo org-done-keywords)
@@ -427,9 +418,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   "Prettify headline stars."
   (let ((level (- (match-end 1) (match-beginning 1))))
     (put-text-property
-     (match-beginning 2)
-     (match-end 2)
-     'display
+     (match-beginning 2) (match-end 2) 'display
      (propertize (aref org-modern-star (min (1- (length org-modern-star)) level))
                  'face 'org-modern-symbol))))
 
@@ -478,10 +467,10 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
                      (put-text-property i (1+ i) 'display
                                         (if (= 0 (mod i 2)) sp1 sp2)))))))))
 
-
 (define-fringe-bitmap 'org-modern--block-inner (make-vector 1 #x80) nil nil '(top t))
 (define-fringe-bitmap 'org-modern--block-begin (vconcat (make-vector 20 0) [#xFF] (make-vector 107 #x80)) nil nil 'top)
 (define-fringe-bitmap 'org-modern--block-end (vconcat (make-vector 107 #x80) [#xFF] (make-vector 20 0)) nil nil 'bottom)
+
 (defun org-modern--block-fringe ()
   "Prettify blocks with fringe bitmaps."
   ;; Do not add source block fringe markers if org-indent-mode is
@@ -544,7 +533,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (2 '(face nil display " "))
            (3 '(face nil display " ")))))
       (when org-modern-todo
-        `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t)) (0 (org-modern--todo)))))
+        `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t))
+           (0 (org-modern--todo)))))
       (when org-modern-keyword
         `(("^[ \t]*\\(#\\+\\)\\([^: \t\n]+\\):"
            ,@(pcase org-modern-keyword
@@ -568,7 +558,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (when org-modern-table
         '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
       (when org-modern-block
-        '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-" (0 (org-modern--block-fringe)))
+        '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-"
+           (0 (org-modern--block-fringe)))
           ("^\\([ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\)"
            (1 '(face nil display (space :width (3))))
            (2 'org-modern-block-keyword append))
