@@ -174,7 +174,7 @@ used as replacement for \"#+keyword:\", with t the default key."
                         :value-type (choice (string :tag "Replacement")
                                             (const :tag "Hide prefix" t)))))
 
-(defcustom org-modern-footnote '((height 0.7) (raise 0.3))
+(defcustom org-modern-footnote (cadr org-script-display)
   "Prettify footnotes."
   :type '(choice (const nil) sexp))
 
@@ -571,7 +571,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
            (0 (org-modern--tag)))))
       (when org-modern-footnote
-        `(("\\(\\[fn:\\)[^]]+\\]"
+        `(("\\(\\[fn:\\)[[:word:]-_]+\\]"
            (0 '(face nil display ,org-modern-footnote))
            (1 '(face nil display ,(propertize "[" 'display org-modern-footnote))))))
       (when org-modern-internal-target
