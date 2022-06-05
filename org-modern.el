@@ -558,7 +558,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil invisible t))))
            ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible t)))))))
       (when org-modern-horizontal-rule
-        '(("^-\\{5,\\}$" 0 '(face org-modern-horizontal-rule display (space :width text)))))
+        '(("^[ \t]*-\\{5,\\}$" 0 '(face org-modern-horizontal-rule display (space :width text)))))
       (when org-modern-table
         '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
       (when org-modern-block
