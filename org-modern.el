@@ -644,6 +644,10 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         (while (re-search-forward re nil 'noerror)
           (org-modern--todo)))
       (goto-char (point-min))
+      (let ((re (concat "\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")))
+        (while (re-search-forward re nil 'noerror)
+          (org-modern--tag)))
+      (goto-char (point-min))
       (while (re-search-forward "\\(\\[\\)#.\\(\\]\\)" nil 'noerror)
         ;; For some reason the org-agenda-fontify-priorities adds overlays?!
         (when-let (ov (overlays-at (match-beginning 0))) (overlay-put (car ov) 'face nil))
