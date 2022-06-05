@@ -96,7 +96,7 @@ TREPEATED: <2022-02-26 Sat 10:00 .+1d/2d>
 
 * Special Links
 
-Test numeric foonotes[fn:1] and named foonotes[fn:foo].
+Test numeric footnotes[fn:1] and named footnotes[fn:foo].
 
 <<This is an internal link>>
 
