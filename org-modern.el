@@ -642,7 +642,14 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
                                  org-done-keywords-for-agenda) t)))
             (org-done-keywords org-done-keywords-for-agenda))
         (while (re-search-forward re nil 'noerror)
-          (org-modern--todo))))))
+          (org-modern--todo)))
+      (goto-char (point-min))
+      (while (re-search-forward "\\(\\[\\)#.\\(\\]\\)" nil 'noerror)
+        ;; For some reason the org-agenda-fontify-priorities adds overlays?!
+        (when-let (ov (overlays-at (match-beginning 0))) (overlay-put (car ov) 'face nil))
+        (put-text-property (match-beginning 0) (match-end 0) 'face 'org-modern-priority)
+        (put-text-property (match-beginning 1) (match-end 1) 'display " ")
+        (put-text-property (match-beginning 2) (match-end 2) 'display " ")))))
 
 ;;;###autoload
 (define-globalized-minor-mode global-org-modern-mode
