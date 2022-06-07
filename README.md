@@ -9,6 +9,10 @@ This small package reproduces the block styling of `org-modern` when `org-indent
 <img src=https://user-images.githubusercontent.com/93749/172438142-d4090856-dea8-43d0-a68a-bba29198575f.png>
 </p>
 
+## Notes
+
+This package is only for users of `org-indent-mode`, and will enable indent if not set.  Non-zero `line-spacing` will introduce gaps between the block bracket characters.
+
 ## Configure
 
 Be sure to enable `org-indent` (see `org-startup-indented`).
