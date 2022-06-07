@@ -97,16 +97,17 @@ with a box guide unicode character."
 	(org-modern-indent--add-props change-beg change-end line extra-pad)))
   (forward-line))
 
-(defvar org-modern-indent-set-line-properties--orig nil)
+(defvar org-modern-indent-set-line-properties--orig
+  (symbol-function 'org-indent-set-line-properties)
+  "Original `org-indent-set-line-properties' function.")
+
 (define-minor-mode org-modern-indent-mode
   "Org-modern with org-indent"
   :global nil
   :group 'org-modern
   (if org-modern-indent-mode
       (progn
-	(setq org-modern-indent-set-line-properties--orig
-	      (symbol-function 'org-indent-set-line-properties)
-	      org-modern-indent-begin
+	(setq org-modern-indent-begin
 	      (propertize "╭" 'face 'org-meta-line)
 	      org-modern-indent-guide
 	      (propertize "│" 'face 'org-meta-line)
