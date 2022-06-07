@@ -5,7 +5,9 @@
 
 This small package reproduces the block styling of `org-modern` when `org-indent` is enabled. 
 
-![image](https://user-images.githubusercontent.com/93749/172436967-36e69e5a-9a58-46c4-875b-a9d6b829f38e.png)
+<p align="center">
+<img src=https://user-images.githubusercontent.com/93749/172438142-d4090856-dea8-43d0-a68a-bba29198575f.png>
+</p>
 
 ## Configure
 
