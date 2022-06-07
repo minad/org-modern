@@ -35,14 +35,20 @@
   (require 'cl-lib))
 (require 'org-indent)
 (require 'org-modern)
+(require 'seq)
 
-(defsubst org-modern-indent--face-in (face element)
-  (if (consp element)
-      (or (memq face element)
-	  (if-let ((inh (plist-get element :inherit))) ; check inherited faces
-	      (if (consp inh)
-		  (memq face inh) (eq inh face))))
-    (eq element face)))
+(defun org-modern-indent--face-in (faces element)
+  "Determine if any of FACES are present in ELEMENT.
+FACES must be a list.  A face can be 'present' by being named
+explicitly, or inherited."
+  (cl-loop for face in faces
+	   if (cond ((consp element)
+		     (or (memq face element)
+			 (if-let ((inh (plist-get element :inherit))) 
+			     (if (consp inh)
+				 (memq face inh) (eq inh face)))))
+		    (t (eq element face)))
+	   return t))
 
 (defsubst org-modern-indent--add-props (beg end line extra-pad &optional guide wrap-guide)
   (add-text-properties beg end
@@ -77,7 +83,7 @@ with a box guide unicode character."
 		   (face (get-text-property (point) 'face)))
 	  (cond
 	   ;; Block begin: use begin prefix, use guide for following blank line + wrap
-	   ((org-modern-indent--face-in 'org-block-begin-line face)
+	   ((org-modern-indent--face-in '(org-block-begin-line) face)
 	    (org-modern-indent--add-props change-beg line-end line extra-pad
 					  org-modern-indent-begin org-modern-indent-guide)
 	    ;; possible blank line following
@@ -85,15 +91,15 @@ with a box guide unicode character."
 					  org-modern-indent-guide))
 
 	   ;; Block body: use guide prefix
-	   ((org-modern-indent--face-in 'org-block face)
+	   ((org-modern-indent--face-in '(org-block org-quote org-verse) face)
 	    (org-modern-indent--add-props change-beg change-end line extra-pad
 					  org-modern-indent-guide))
 
 	   ;; Block end: use end prefix
-	   ((org-modern-indent--face-in 'org-block-end-line face)
+	   ((org-modern-indent--face-in '(org-block-end-line) face)
 	    (org-modern-indent--add-props change-beg line-end line extra-pad
 					  org-modern-indent-end))))
-	;; Non-block line:  pad normally
+	;; Non-block line: pad normally
 	(org-modern-indent--add-props change-beg change-end line extra-pad)))
   (forward-line))
 
@@ -113,6 +119,7 @@ with a box guide unicode character."
 	      (propertize "│" 'face 'org-meta-line)
 	      org-modern-indent-end
 	      (propertize "╰" 'face 'org-meta-line))
+	(setq-local org-fontify-quote-and-verse-blocks t)
 	(setf (symbol-function 'org-indent-set-line-properties)
 	      (symbol-function 'org-modern-indent-set-line-properties)))
     (setf (symbol-function 'org-indent-set-line-properties)
