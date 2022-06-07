@@ -91,7 +91,7 @@ with a box guide unicode character."
 
 	   ;; Block end: use end prefix
 	   ((org-modern-indent--face-in 'org-block-end-line face)
-	    (org-modern-indent--add-props change-beg change-end line extra-pad
+	    (org-modern-indent--add-props change-beg line-end line extra-pad
 					  org-modern-indent-end))))
 	;; Non-block line:  pad normally
 	(org-modern-indent--add-props change-beg change-end line extra-pad)))
