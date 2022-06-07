@@ -50,12 +50,13 @@ explicitly, or inherited."
 		    (t (eq element face)))
 	   return t))
 
-(defsubst org-modern-indent--add-props (beg end line extra-pad &optional guide wrap-guide)
-  (add-text-properties beg end
-		       `(line-prefix
-			 ,(concat line guide)
-			 wrap-prefix
-			 ,(concat line (or wrap-guide guide) extra-pad))))
+(defun org-modern-indent--add-props (beg end line extra-pad &optional guide wrap-guide)
+  (with-silent-modifications
+    (add-text-properties beg end
+			 `(line-prefix
+			   ,(concat line guide)
+			   wrap-prefix
+			   ,(concat line (or wrap-guide guide) extra-pad)))))
 
 (defvar org-modern-indent-begin nil)
 (defvar org-modern-indent-guide	nil)
