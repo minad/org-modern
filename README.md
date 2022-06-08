@@ -1,9 +1,9 @@
 # org-modern-indent
-`org-modern` and `org-indent`, working together
+Modern block styling with `org-indent`.
 
-[`org-modern`](https://github.com/minad/org-modern) provides a clean and efficient org style.  The blocks (e.g. source, example) are particularly nice.  But when `org-indent` is enabled, the block "bracket", which uses the fringe, is disabled.  
+[`org-modern`](https://github.com/minad/org-modern) provides a clean and efficient org style.  The blocks (e.g. source, example) are particularly nice.  But when `org-indent` is enabled, the block "bracket", which uses the fringe area, is disabled.
 
-This small package reproduces the block styling of `org-modern`, even when `org-indent` is enabled. 
+This small package reproduces the block styling of `org-modern` when using `org-indent`:
 
 <p align="center">
 <img src=https://user-images.githubusercontent.com/93749/172438142-d4090856-dea8-43d0-a68a-bba29198575f.png>
@@ -11,7 +11,9 @@ This small package reproduces the block styling of `org-modern`, even when `org-
 
 ## Notes
 
-This package is only for users of `org-indent-mode`, and will enable indent if not set.  Non-zero `line-spacing` will introduce gaps between the block bracket characters.  Can be used _with or without_ `org-modern`. 
+- This package is only for users of `org-indent-mode`, and will _enable_ org-indent if it is not already.  
+- Can be used _with or without_ `org-modern`. 
+- Non-zero `line-spacing` will introduce gaps between the block bracket characters.  
 
 ## Configure
 
@@ -21,7 +23,7 @@ Be sure to enable `org-indent` (see `org-startup-indented`).
 (use-package org-modern-indent
   ;; :straight or :load-path here, to taste
   :hook
-  (org-modern-mode . org-modern-indent-mode))
+  (org-mode . org-modern-indent-mode))
 ```
 
 ## Related packages
