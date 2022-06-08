@@ -19,6 +19,14 @@ Be sure to enable `org-indent` (see `org-startup-indented`).
 
 ```elisp
 (use-package org-modern-indent
+  ;; :straight or :load-path here, to taste
   :hook
   (org-modern-mode . org-modern-indent-mode))
 ```
+
+## Related packages
+
+- [`org-modern`](https://github.com/minad/org-modern): A modern org styling.  Works best without org-indent.
+- [`org-bullets`](https://github.com/sabof/org-bullets/blob/master/org-bullets.el): Unicode heading bullet replacement.
+- [`org-superstar`](https://github.com/integral-dw/org-superstar-mode): Prettify headings and plain lists.
+- [`nano-emacs`](https://github.com/rougier/nano-emacs): Beautiful and simple SVG-based theme for much of emacs, including org. 
