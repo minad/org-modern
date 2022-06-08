@@ -24,17 +24,15 @@
 
 ;;; Commentary:
 
-;; org-modern-indent enables the block highlighting of org-modern,
+;; org-modern-indent provides the block highlighting of org-modern,
 ;; even when org-indent is enabled.
 ;; Requires:
-;;   - org-modern
 ;;   - org-indent-mode enabled
+;;   
+;; Can be used with or without org-modern.   
 
 ;;; Code:
-(eval-when-compile
-  (require 'cl-lib))
 (require 'org-indent)
-(require 'org-modern)
 (require 'seq)
 
 (defun org-modern-indent--face-in (faces element)
@@ -62,9 +60,10 @@ explicitly, or inherited."
 (defvar org-modern-indent-guide	nil)
 (defvar org-modern-indent-end   nil)
 (defun org-modern-indent-set-line-properties (level indentation &optional heading)
-  "A redefinition of `org-indent-set-line-properties' for org-modern block style.
-Treats blocks specially, by extending the line and wrap prefixes
-with a box guide unicode character."
+  "An org-modern inspired redefinition of `org-indent-set-line-properties'.
+Used to approximate org-modern block style.  Treats blocks
+specially, by extending the line and wrap prefixes with a box
+guide unicode character."
   (let ((line (aref (pcase heading
 		      (`nil org-indent--text-line-prefixes)
 		      (`inlinetask org-indent--inlinetask-line-prefixes)
@@ -108,10 +107,15 @@ with a box guide unicode character."
   (symbol-function 'org-indent-set-line-properties)
   "Original `org-indent-set-line-properties' function.")
 
+(defgroup org-modern-indent nil
+  "org-modern style blocks with org-indent."
+  :group 'org
+  :prefix "org-modern-indent")
+
 (define-minor-mode org-modern-indent-mode
   "Org-modern with org-indent"
   :global nil
-  :group 'org-modern
+  :group 'org-modern-indent
   (if org-modern-indent-mode
       (progn
 	(setq org-modern-indent-begin
