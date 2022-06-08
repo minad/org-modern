@@ -112,6 +112,7 @@ guide unicode character."
   :group 'org
   :prefix "org-modern-indent")
 
+;;;###autoload
 (define-minor-mode org-modern-indent-mode
   "Org-modern with org-indent"
   :global nil
