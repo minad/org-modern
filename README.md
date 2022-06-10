@@ -6,7 +6,7 @@ Modern block styling with `org-indent`.
 This small package reproduces the block styling of `org-modern` when using `org-indent`:
 
 <p align="center">
-<img src=https://user-images.githubusercontent.com/93749/172438142-d4090856-dea8-43d0-a68a-bba29198575f.png>
+<img src=https://user-images.githubusercontent.com/93749/172964083-afafa737-3b54-4d9e-aaf0-9a4741fa085c.png>
 </p>
 
 ## Notes
@@ -25,6 +25,27 @@ Be sure to enable `org-indent` (see `org-startup-indented`).
   :hook
   (org-mode . org-modern-indent-mode))
 ```
+
+Optional, if you want to use org-modern too:
+
+```elisp
+(use-package org-modern
+  :ensure t
+  :custom
+  (org-modern-hide-stars nil) ; adds extra indentation
+  :hook
+  (org-mode . org-modern-mode)
+  (org-agenda-finalize . org-modern-agenda))
+```
+Also optional; use org-bullets instead for nice bullet stars. 
+
+```elisp
+(use-package org-bullets-mode
+  :ensure org-bullets
+  :config
+  :hook org-mode)
+```
+
 
 ## Related packages
 
