@@ -514,12 +514,11 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   (cond
    (org-modern-mode
     (unless (fringe-bitmap-p 'org-modern--block-inner)
-      (let* ((h (ceiling (default-line-height) 2))
-             (v1 (make-vector h 0))
-             (v2 (make-vector (- 127 h) #x80)))
+      (let* ((g (ceiling (frame-char-height) 1.8))
+             (h (- (default-line-height) g)))
         (define-fringe-bitmap 'org-modern--block-inner [128] nil nil '(top t))
-        (define-fringe-bitmap 'org-modern--block-begin (vconcat v1 [#xFF] v2) nil nil 'top)
-        (define-fringe-bitmap 'org-modern--block-end (vconcat v2 [#xFF] v1) nil nil 'bottom)))
+        (define-fringe-bitmap 'org-modern--block-begin (vconcat (make-vector g 0) [#xFF] (make-vector (- 127 g) #x80)) nil nil 'top)
+        (define-fringe-bitmap 'org-modern--block-end (vconcat (make-vector (- 127 h) #x80) [#xFF] (make-vector h 0)) nil nil 'bottom)))
     (org-modern--update-label-face)
     (setq
      org-modern--keywords
