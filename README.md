@@ -26,13 +26,13 @@ Be sure to enable `org-indent` (see `org-startup-indented`).
   (org-mode . org-modern-indent-mode))
 ```
 
-The default `fixed-pitch` font on Mac (and perhaps elsewhere) has line spacing >1.0, introducing gaps _even if you change the default font_.  To correct it, add: 
+The default `fixed-pitch` font (from which `org-meta-line` inherits) has line spacing >1.0 on some systems. This will introduce gaps _even if your default font is changed_, and `line-space` is nil.  To correct it, add: 
 
 ```elisp
 (set-face-attribute 'fixed-pitch nil :family "Hack" :height 1.0) ; or whatever font family
 ```
 
-Optional, if you want to use org-modern too:
+Optionally, if you want to use org-modern too:
 
 ```elisp
 (use-package org-modern
@@ -43,6 +43,7 @@ Optional, if you want to use org-modern too:
   (org-mode . org-modern-mode)
   (org-agenda-finalize . org-modern-agenda))
 ```
+
 Also optional; use org-bullets instead for nicely aligned bullet stars. 
 
 ```elisp
@@ -51,7 +52,6 @@ Also optional; use org-bullets instead for nicely aligned bullet stars.
   :config
   :hook org-mode)
 ```
-
 
 ## Related packages
 
