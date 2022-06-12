@@ -1,10 +1,10 @@
-;;; org-modern-indent.el         -*- lexical-binding: t; -*-
+;;; org-modern-indent.el --- org-indent blocks like org-modern -*- lexical-binding: t; -*-
 ;; Copyright (C) 2022  J.D. Smith
 
 ;; Author: J.D. Smith
 ;; Homepage: https://github.com/jdtsmith/org-modern-indent
-;; Package-Requires: ((emacs "27.2") (org "9.5.2") (org-modern)
-;; Version: 0.0.1
+;; Package-Requires: ((emacs "27.2") (org "9.5.2"))
+;; Version: 0.0.2
 ;; Keywords: convenience
 ;; Prefix: org-modern-indent
 ;; Separator: -
