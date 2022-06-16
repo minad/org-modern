@@ -23,7 +23,7 @@ Be sure to enable `org-indent` (see `org-startup-indented`).
 (use-package org-modern-indent
   ;; :straight or :load-path here, to taste
   :hook
-  (org-mode . org-modern-indent-mode))
+  (org-indent-mode . org-modern-indent-mode))
 ```
 
 The default `fixed-pitch` font (from which `org-meta-line` inherits) has line spacing >1.0 on some systems. This will introduce gaps _even if your default font is changed_, and `line-space` is nil.  To correct it, add: 
