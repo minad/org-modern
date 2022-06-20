@@ -582,24 +582,26 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
                  `((1 '(face nil display ,x))
                    (2 '(face nil display ,(propertize "[" 'display x))))
                '((2 '(face nil display "[")))))))
-      (when org-modern-internal-target
-        `(("\\(<<\\)\\([^<][^\n]*?\\)\\(>>\\)"
-           (0 '(face org-modern-internal-target) t)
-           (1 '(face nil display ,(propertize (car org-modern-internal-target)
-                                              'face 'org-modern-symbol)))
-           (3 '(face nil display ,(propertize (caddr org-modern-internal-target)
-                                              'face 'org-modern-symbol)))
-           ,@(unless (cadr org-modern-internal-target)
-               '((2 '(face nil invisible t)))))))
-      (when org-modern-radio-target
-        `(("\\(<<<\\)\\([^\n]+?\\)\\(>>>\\)"
-           (0 '(face org-modern-radio-target) t)
-           (1 '(face nil display ,(propertize (car org-modern-radio-target)
-                                              'face 'org-modern-symbol)))
-           (3 '(face nil display ,(propertize (caddr org-modern-radio-target)
-                                              'face 'org-modern-symbol)))
-           ,@(unless (cadr org-modern-radio-target)
-               '((2 '(face nil invisible t)))))))
+      (let ((target "\\([^<>\n\r\t ][^<>\n\r]*?[^<>\n\r\t @$]\\|[^<>\n\r\t @$]\\)"))
+        (append
+         (when org-modern-internal-target
+           `((,(format "\\(<<\\)%s\\(>>\\)" target)
+              (0 '(face org-modern-internal-target) t)
+              (1 '(face nil display ,(propertize (car org-modern-internal-target)
+                                                 'face 'org-modern-symbol)))
+              (3 '(face nil display ,(propertize (caddr org-modern-internal-target)
+                                                 'face 'org-modern-symbol)))
+              ,@(unless (cadr org-modern-internal-target)
+                  '((2 '(face nil invisible t)))))))
+         (when org-modern-radio-target
+           `((,(format "\\(<<<\\)%s\\(>>>\\)" target)
+              (0 '(face org-modern-radio-target) t)
+              (1 '(face nil display ,(propertize (car org-modern-radio-target)
+                                                 'face 'org-modern-symbol)))
+              (3 '(face nil display ,(propertize (caddr org-modern-radio-target)
+                                                 'face 'org-modern-symbol)))
+              ,@(unless (cadr org-modern-radio-target)
+                  '((2 '(face nil invisible t)))))))))
       (when org-modern-timestamp
         '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
            (0 (org-modern--timestamp)))
