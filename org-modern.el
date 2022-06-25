@@ -79,10 +79,10 @@ A value between 0.1 and 0.4 of `line-spacing' is recommended."
   :type '(choice (const nil) (const auto) integer)
   :set #'org-modern--setter)
 
-(defcustom org-modern-star ["◉""○""◈""◇""✳"]
+(defcustom org-modern-star '("◉" "○" "◈" "◇" "✳")
   "Replacement strings for headline stars for each level.
 Set to nil to disable styling the headlines."
-  :type '(choice (const nil) (vector string)))
+  :type '(choice (const nil) (list string)))
 
 (defcustom org-modern-hide-stars 'leading
   "Make some of the headline stars invisible."
@@ -294,8 +294,9 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
     (t :strike-through "gray30"))
   "Face used for horizontal ruler.")
 
-(defvar-local org-modern--font-lock-keywords nil
-  "List of font lock keywords.")
+(defvar-local org-modern--font-lock-keywords nil)
+(defvar-local org-modern--star-cache nil)
+(defvar-local org-modern--checkbox-cache nil)
 
 (defun org-modern--checkbox ()
   "Prettify checkboxes according to `org-modern-checkbox'."
@@ -303,9 +304,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         (end (match-end 1)))
     (put-text-property
      beg end 'display
-     (propertize (alist-get (char-after (1+ beg))
-                            org-modern-checkbox)
-                 'face 'org-modern-symbol))))
+     (alist-get (char-after (1+ beg)) org-modern--checkbox-cache))))
 
 (defun org-modern--keyword ()
   "Prettify keywords according to `org-modern-keyword'."
@@ -422,8 +421,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   (let ((level (- (match-end 1) (match-beginning 1))))
     (put-text-property
      (match-beginning 2) (match-end 2) 'display
-     (propertize (aref org-modern-star (min (1- (length org-modern-star)) level))
-                 'face 'org-modern-symbol))))
+     (aref org-modern--star-cache
+           (min (1- (length org-modern--star-cache)) level)))))
 
 (defun org-modern--table ()
   "Prettify vertical table lines."
@@ -527,6 +526,15 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
           (vconcat (make-vector (- 127 h) #x80) [#xFF] (make-vector h 0)) nil nil 'bottom)))
     (org-modern--update-label-face)
     (setq
+     org-modern--star-cache
+     (vconcat (mapcar
+               (lambda (x)
+                 (propertize x 'face 'org-modern-symbol))
+               org-modern-star))
+     org-modern--checkbox-cache
+     (mapcar (pcase-lambda (`(,k . ,v))
+               (cons k (propertize v 'face 'org-modern-symbol)))
+             org-modern-checkbox)
      org-modern--font-lock-keywords
      (append
       (when-let (bullet (alist-get ?+ org-modern-list))
