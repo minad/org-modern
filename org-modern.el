@@ -82,7 +82,7 @@ A value between 0.1 and 0.4 of `line-spacing' is recommended."
 (defcustom org-modern-star '("◉" "○" "◈" "◇" "✳")
   "Replacement strings for headline stars for each level.
 Set to nil to disable styling the headlines."
-  :type '(choice (const nil) (list string)))
+  :type '(repeat string))
 
 (defcustom org-modern-hide-stars 'leading
   "Make some of the headline stars invisible."
@@ -197,10 +197,10 @@ references."
   "Prettify todo statistics."
   :type 'boolean)
 
-(defcustom org-modern-progress ["○""◔""◐""◕""●"]
+(defcustom org-modern-progress '("○" "◔" "◐" "◕" "●")
   "Add a progress indicator to the todo statistics.
 Set to nil to disable the indicator."
-  :type '(choice (const nil) (vector string)))
+  :type '(repeat string))
 
 (defcustom org-modern-variable-pitch 'variable-pitch
   "Use variable pitch for modern style labels."
@@ -297,6 +297,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 (defvar-local org-modern--font-lock-keywords nil)
 (defvar-local org-modern--star-cache nil)
 (defvar-local org-modern--checkbox-cache nil)
+(defvar-local org-modern--progress-cache nil)
 
 (defun org-modern--checkbox ()
   "Prettify checkboxes according to `org-modern-checkbox'."
@@ -319,24 +320,19 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
        (put-text-property beg end 'display
                           (propertize (cdr rep) 'face 'org-modern-symbol))))))
 
-(defun org-modern--statistics ()
-  "Prettify headline todo statistics."
-  (let ((label (substring-no-properties (match-string 1))))
-    (when org-modern-progress
-      (let ((idx (floor
-                  (* (1- (length org-modern-progress))
-                     (if (match-beginning 2)
-                         (* 0.01 (string-to-number (match-string 2)))
-                       (let ((q (string-to-number (match-string 4))))
-                         (if (= q 0)
-                             1.0
-                           (/ (* 1.0 (string-to-number (match-string 3))) q))))))))
-        (setq label (concat (propertize (aref org-modern-progress idx)
-                                        'face 'org-modern-symbol)
-                            " " label))))
-    (setq label (concat " " label " "))
-    (add-text-properties (1- (match-beginning 1)) (1+ (match-end 1))
-                         `(display ,label face org-modern-statistics))))
+(defun org-modern--progress ()
+  "Prettify headline todo progress."
+  (put-text-property
+   (match-beginning 1) (1+ (match-beginning 1)) 'display
+   (aref org-modern--progress-cache
+         (floor
+          (* (1- (length org-modern--progress-cache))
+             (if (match-beginning 2)
+                 (* 0.01 (string-to-number (match-string 2)))
+               (let ((q (string-to-number (match-string 4))))
+                 (if (= q 0)
+                     1.0
+                   (/ (* 1.0 (string-to-number (match-string 3))) q)))))))))
 
 (defun org-modern--tag ()
   "Prettify headline tags."
@@ -527,9 +523,12 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
     (setq
      org-modern--star-cache
      (vconcat (mapcar
-               (lambda (x)
-                 (propertize x 'face 'org-modern-symbol))
+               (lambda (x) (propertize x 'face 'org-modern-symbol))
                org-modern-star))
+     org-modern--progress-cache
+     (vconcat (mapcar
+               (lambda (x) (concat " " (propertize x 'face 'org-modern-symbol) " "))
+               org-modern-progress))
      org-modern--checkbox-cache
      (mapcar (pcase-lambda (`(,k . ,v))
                (cons k (propertize v 'face 'org-modern-symbol)))
@@ -622,8 +621,10 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
            (2 '(face org-modern-label display #("  " 0 1 (face (:strike-through t)))) t))))
       (when org-modern-statistics
-        '((" \\[\\(\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\]"
-           (0 (org-modern--statistics)))))))
+        `((" \\(\\[\\(?:\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\(\\]\\)\\)"
+           (0 ,(if org-modern-progress '(org-modern--progress) ''(face nil display " ")))
+           (1 '(face org-modern-statistics) t)
+           (5 '(face nil display " ")))))))
     (font-lock-add-keywords nil org-modern--font-lock-keywords 'append)
     (advice-add #'org-unfontify-region :after #'org-modern--unfontify))
    (t (font-lock-remove-keywords nil org-modern--font-lock-keywords)))
