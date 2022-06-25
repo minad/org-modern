@@ -50,19 +50,22 @@
     (set-face-attribute
      'org-modern-label nil
      :inherit org-modern-variable-pitch
-     :box (when org-modern-label-border
-            (let ((border (if (eq org-modern-label-border 'auto)
-                              (max 3 (cond
-                                      ((integerp line-spacing) line-spacing)
-                                      ((floatp line-spacing) (ceiling (* line-spacing (frame-char-height))))
-                                      (t (/ (frame-char-height) 10))))
-                            org-modern-label-border)))
-              (list :color (face-attribute 'default :background nil t)
-                    :line-width
-                    ;; Emacs 28 supports different line horizontal and vertical line widths
-                    (if (>= emacs-major-version 28)
-                        (cons 0 (- border))
-                      (- border))))))))
+     :box
+     (when org-modern-label-border
+       (let ((border (if (eq org-modern-label-border 'auto)
+                         (max 3 (cond
+                                 ((integerp line-spacing)
+                                  line-spacing)
+                                 ((floatp line-spacing)
+                                  (ceiling (* line-spacing (frame-char-height))))
+                                 (t (/ (frame-char-height) 10))))
+                       org-modern-label-border)))
+         (list :color (face-attribute 'default :background nil t)
+               :line-width
+               ;; Emacs 28 supports different line horizontal and vertical line widths
+               (if (>= emacs-major-version 28)
+                   (cons 0 (- border))
+                 (- border))))))))
 
 (defun org-modern--setter (sym val)
   "Set SYM to VAL and update faces."
@@ -516,9 +519,12 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
     (unless (fringe-bitmap-p 'org-modern--block-inner)
       (let* ((g (ceiling (frame-char-height) 1.8))
              (h (- (default-line-height) g)))
-        (define-fringe-bitmap 'org-modern--block-inner [128] nil nil '(top t))
-        (define-fringe-bitmap 'org-modern--block-begin (vconcat (make-vector g 0) [#xFF] (make-vector (- 127 g) #x80)) nil nil 'top)
-        (define-fringe-bitmap 'org-modern--block-end (vconcat (make-vector (- 127 h) #x80) [#xFF] (make-vector h 0)) nil nil 'bottom)))
+        (define-fringe-bitmap 'org-modern--block-inner
+          [128] nil nil '(top t))
+        (define-fringe-bitmap 'org-modern--block-begin
+          (vconcat (make-vector g 0) [#xFF] (make-vector (- 127 g) #x80)) nil nil 'top)
+        (define-fringe-bitmap 'org-modern--block-end
+          (vconcat (make-vector (- 127 h) #x80) [#xFF] (make-vector h 0)) nil nil 'bottom)))
     (org-modern--update-label-face)
     (setq
      org-modern--keywords
@@ -609,7 +615,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
            (2 '(face org-modern-label display #("  " 0 1 (face (:strike-through t)))) t))))
       (when org-modern-statistics
-        '((" \\[\\(\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\]" (0 (org-modern--statistics)))))))
+        '((" \\[\\(\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\]"
+           (0 (org-modern--statistics)))))))
     (font-lock-add-keywords nil org-modern--keywords 'append)
     (advice-add #'org-unfontify-region :after #'org-modern--unfontify))
    (t (font-lock-remove-keywords nil org-modern--keywords)))
