@@ -294,7 +294,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
     (t :strike-through "gray30"))
   "Face used for horizontal ruler.")
 
-(defvar-local org-modern--keywords nil
+(defvar-local org-modern--font-lock-keywords nil
   "List of font lock keywords.")
 
 (defun org-modern--checkbox ()
@@ -527,7 +527,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
           (vconcat (make-vector (- 127 h) #x80) [#xFF] (make-vector h 0)) nil nil 'bottom)))
     (org-modern--update-label-face)
     (setq
-     org-modern--keywords
+     org-modern--font-lock-keywords
      (append
       (when-let (bullet (alist-get ?+ org-modern-list))
         `(("^[ \t]*\\(+\\)[ \t]" 1 '(face nil display ,bullet))))
@@ -617,9 +617,9 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (when org-modern-statistics
         '((" \\[\\(\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\]"
            (0 (org-modern--statistics)))))))
-    (font-lock-add-keywords nil org-modern--keywords 'append)
+    (font-lock-add-keywords nil org-modern--font-lock-keywords 'append)
     (advice-add #'org-unfontify-region :after #'org-modern--unfontify))
-   (t (font-lock-remove-keywords nil org-modern--keywords)))
+   (t (font-lock-remove-keywords nil org-modern--font-lock-keywords)))
   (save-restriction
     (widen)
     (let ((org-modern-mode t))
