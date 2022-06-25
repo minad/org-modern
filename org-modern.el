@@ -354,7 +354,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (format #(" %c" 1 3 (cursor t)) (char-after colon)))
           (put-text-property
            (- (point) 2) (1- (point)) 'display
-           (format "%c " (char-before (1- (point)))))
+           (string (char-before (1- (point))) ?\s))
           (put-text-property colon (1- (point)) 'face 'org-modern-tag))
         (setq colon (point))
         (add-text-properties (1- colon) colon colon-props)))))
@@ -366,8 +366,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         (end (match-end 1)))
     (put-text-property beg (1+ beg) 'display
                        (format #(" %c" 1 3 (cursor t)) (char-after beg)))
-    (put-text-property (1- end) end 'display
-                       (format "%c " (char-before end)))
+    (put-text-property (1- end) end 'display (string (char-before end) ?\s))
     (put-text-property
      beg end 'face
      (if-let (face (cdr (assoc todo org-modern-todo-faces)))
@@ -412,8 +411,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (put-text-property beg (if (eq tbeg tend) end tbeg) 'face date-face)
       ;; hour:minute
       (unless (eq tbeg tend)
-        (put-text-property (1- tbeg) tbeg
-                           'display (format "%c " (char-before tbeg)))
+        (put-text-property (1- tbeg) tbeg 'display
+                           (string (char-before tbeg) ?\s))
         (put-text-property tbeg end 'face time-face)))))
 
 (defun org-modern--star ()
