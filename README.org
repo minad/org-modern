@@ -20,23 +20,22 @@ of each syntax element individually via the =org-modern= customization group.
 The screenshots shows [[file:example.org][example.org]] with =org-modern-mode= turned on and off. The
 elegant theme featured in the screenshot is [[https://protesilaos.com/emacs/modus-themes][modus-operandi]].
 
-This package is still early in its development, so expect bugs and issues in
-particular due to unfortunate interactions of the =variable-pitch= and =fixed-pitch=
-fonts. You should ensure that your fonts combine harmonically and have
-approximately the same height. =org-modern-mode= tries to adjust the tag label
-display based on the value of =line-spacing=. This looks best if =line-spacing= has
-a value between 0.1 and 0.4 in the Org buffer. Note that =org-indent-mode=
-interferes with some of the style elements applied by =org-modern-mode=, e.g., the
-block brackets in the fringe.
+Since this package adjusts text styling, it depends on your font settings. You
+should ensure that your =variable-pitch= and =fixed-pitch= fonts combine
+harmonically and have approximately the same height. =org-modern-mode= tries to
+adjust the tag label display based on the value of =line-spacing=. This looks best
+if =line-spacing= has a value between 0.1 and 0.4 in the Org buffer. Note that
+=org-indent-mode= interferes with some of the style elements applied by
+=org-modern-mode=, e.g., the block brackets in the fringe.
 
 Bug reports, improvement or style proposals are welcome! Maybe some more Org
 elements deserve styling or alternative stylings should be offered?
 
-The tag style of =org-modern= is a poor Emacsien's ripoff from Nicholas Rougier's
-beautiful [[https://github.com/rougier/svg-tag-mode][svg-tag-mode]]. In contrast to =svg-tag-mode=, this package avoids images
-and uses cheap and fast Emacs box text properties. By only styling the text via
-text properties, the styled text, e.g., dates or tags stay editable and are easy
-to interact with.
+The tag style of =org-modern= is inspired by Nicholas Rougier's beautiful
+[[https://github.com/rougier/svg-tag-mode][svg-tag-mode]]. In contrast to =svg-tag-mode=, this package avoids images and uses
+cheap and fast Emacs box text properties. By only styling the text via text
+properties, the styled text, e.g., dates or tags stay editable and are easy to
+interact with.
 
 On the downside, this restricts our flexibility and may lead to font-dependent
 issues. We do our best, but for example there is no way we can get round
