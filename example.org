@@ -41,8 +41,10 @@ TREPEATED: <2022-02-26 Sat 10:00 .+1d/2d>
     "Show the documentation for a random command."
     (interactive)
     (let ((commands))
-      (mapatoms (lambda (s) (when (commandp s) (push s commands))))
-      (describe-function (nth (random (length commands)) commands))))
+      (mapatoms (lambda (s)
+                  (when (commandp s) (push s commands))))
+      (describe-function
+       (nth (random (length commands)) commands))))
 #+end_src
 
 #+begin_src calc
