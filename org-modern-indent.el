@@ -59,6 +59,7 @@ explicitly, or inherited."
 (defvar org-modern-indent-begin nil)
 (defvar org-modern-indent-guide	nil)
 (defvar org-modern-indent-end   nil)
+(defvar-local org-modern--disabled nil)
 (defun org-modern-indent-set-line-properties (level indentation &optional heading)
   "An org-modern inspired redefinition of `org-indent-set-line-properties'.
 Used to approximate org-modern block style.  Treats blocks
@@ -77,9 +78,10 @@ guide unicode character."
 	(change-beg (line-beginning-position))
 	(change-end (line-beginning-position 2))
 	(line-end (line-end-position)))
-    (unless (get-text-property (point) 'fontified) ;sometimes we beat font-lock
-      (font-lock-ensure change-beg line-end)) ;We rely on fonts to identify blocks
+    (unless (or org-modern--disabled (get-text-property (point) 'fontified)) 
+      (font-lock-ensure change-beg line-end)) ;sometimes we beat font-lock
     (or (when-let (((eq heading nil))
+		   ((not org-modern--disabled))
 		   (face (get-text-property (point) 'face)))
 	  (cond
 	   ;; Block begin: use begin prefix, use guide for following blank line + wrap
@@ -103,6 +105,15 @@ guide unicode character."
 	(org-modern-indent--add-props change-beg change-end line extra-pad)))
   (forward-line))
 
+(defun org-modern-indent-block-insert (fun &rest r)
+  (let* ((reg (use-region-p))
+	 (p (if reg (region-beginning) (point)))
+	 (m (point-marker)))
+    (set-marker-insertion-type m t)
+    (if reg (set-marker m (region-end)))
+    (let ((org-modern--disabled t)) (apply fun r))
+    (org-indent-refresh-maybe p m nil)))
+
 (defvar org-modern-indent-set-line-properties--orig
   (symbol-function 'org-indent-set-line-properties)
   "Original `org-indent-set-line-properties' function.")
@@ -119,15 +130,17 @@ guide unicode character."
   :group 'org-modern-indent
   (if org-modern-indent-mode
       (progn
-	(setq org-modern-indent-begin
-	      (propertize "╭" 'face 'org-meta-line)
-	      org-modern-indent-guide
-	      (propertize "│" 'face 'org-meta-line)
-	      org-modern-indent-end
-	      (propertize "╰" 'face 'org-meta-line))
-	(setq-local org-fontify-quote-and-verse-blocks t)
-	(setf (symbol-function 'org-indent-set-line-properties)
-	      (symbol-function 'org-modern-indent-set-line-properties)))
+      (setq org-modern-indent-begin
+	    (propertize "╭" 'face 'org-meta-line)
+	    org-modern-indent-guide
+	    (propertize "│" 'face 'org-meta-line)
+	    org-modern-indent-end
+	    (propertize "╰" 'face 'org-meta-line))
+      (setq-local org-fontify-quote-and-verse-blocks t)
+      (setf (symbol-function 'org-indent-set-line-properties)
+	    (symbol-function 'org-modern-indent-set-line-properties))
+      (advice-add #'org-insert-structure-template :around #'org-modern-indent-block-insert))
+    (advice-remove #'org-insert-structure-template #'org-modern-indent-block-insert)
     (setf (symbol-function 'org-indent-set-line-properties)
 	  org-modern-indent-set-line-properties--orig))
   (org-indent-indent-buffer))
