@@ -106,6 +106,8 @@ guide unicode character."
   (forward-line))
 
 (defun org-modern-indent-block-insert (fun &rest r)
+  "Refresh block after insertion.
+To be set as :around advice for `org-insert-structure-template'."
   (let* ((reg (use-region-p))
 	 (p (if reg (region-beginning) (point)))
 	 (m (point-marker)))
