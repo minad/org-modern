@@ -3,7 +3,7 @@ Modern block styling with `org-indent`.
 
 [`org-modern`](https://github.com/minad/org-modern) provides a clean and efficient org style.  The blocks (e.g. source, example) are particularly nice.  But when `org-indent` is enabled, the block "bracket", which uses the fringe area, is disabled.
 
-This small package reproduces the block styling of `org-modern` when using `org-indent`:
+This small package reproduces the block styling of `org-modern` when using `org-indent`, and can be used with or without `org-modern`:
 
 <p align="center">
 <img src=https://user-images.githubusercontent.com/93749/172964083-afafa737-3b54-4d9e-aaf0-9a4741fa085c.png>
@@ -11,9 +11,9 @@ This small package reproduces the block styling of `org-modern` when using `org-
 
 ## Notes
 
-- This package is only for users of `org-indent-mode`, and will _enable_ org-indent if it is not already.  
+- This package is only for users of `org-indent-mode`, and will _enable_ org-indent if it is not already.
 - Can be used _with or without_ `org-modern`. 
-- Non-zero `line-spacing` will introduce gaps between the block bracket characters.  
+- Non-zero `line-spacing` will introduce gaps between the block bracket characters.
 
 ## Configure
 
