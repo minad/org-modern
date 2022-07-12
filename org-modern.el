@@ -35,7 +35,8 @@
 (require 'org)
 (eval-when-compile
   (require 'cl-lib)
-  (require 'subr-x))
+  (require 'subr-x)
+  (require 'face-remap))
 
 (defgroup org-modern nil
   "Modern looks for Org."
@@ -419,6 +420,14 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
      (aref org-modern--star-cache
            (min (1- (length org-modern--star-cache)) level)))))
 
+(defun org-modern--scale (value)
+  (round (* value (expt text-scale-mode-step text-scale-mode-amount))))
+
+(defvar-local org-modern--table-space-width (org-modern--scale (frame-char-width)))
+
+(defun org-modern--update-table-space-width ()
+  (setq-local org-modern--table-space-width (org-modern--scale (frame-char-width))))
+
 (defun org-modern--table ()
   "Prettify vertical table lines."
   (save-excursion
@@ -427,8 +436,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (tbeg (match-beginning 1))
            (tend (match-end 1))
            ;; Unique objects
-           (sp1 (list 'space :width 1))
-           (sp2 (list 'space :width 1))
+           (sp1 (list 'space :width '(org-modern--table-space-width)))
+           (sp2 (list 'space :width '(org-modern--table-space-width)))
            (color (face-attribute 'org-table :foreground nil t))
            (inner (progn
                     (goto-char beg)
@@ -459,7 +468,6 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         (while (re-search-forward "[^|+]+" tend 'noerror)
           (let ((a (match-beginning 0))
                 (b (match-end 0)))
-            ;; TODO Text scaling breaks the table formatting since the space is not scaled accordingly
             (cl-loop for i from a below b do
                      (put-text-property i (1+ i) 'display
                                         (if (= 0 (mod i 2)) sp1 sp2)))))))))
@@ -679,8 +687,11 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   org-modern-mode org-modern--on
   :group 'org-modern
   (if global-org-modern-mode
-      (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
-    (remove-hook 'org-agenda-finalize-hook #'org-modern-agenda)))
+      (progn
+        (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+        (add-hook 'text-scale-mode-hook #'org-modern--update-table-space-width))
+    (remove-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+    (remove-hook 'text-scale-mode-hook #'org-modern--update-table-space-width)))
 
 (defun org-modern--on ()
   "Enable `org-modern' in every Org buffer."
