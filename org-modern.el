@@ -166,6 +166,10 @@ and faces in the cdr. Example:
   "Prettify blocks, wrapped by #+begin and #+end keywords."
   :type 'boolean)
 
+(defcustom org-modern-block-fringe t
+  "Add a bitmap fringe to blocks."
+  :type 'boolean)
+
 (defcustom org-modern-keyword t
   "Prettify keywords like #+title.
 If set to t, the prefix #+ will be hidden.
@@ -573,10 +577,11 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
                      org-modern-horizontal-rule)))))
       (when org-modern-table
         '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
-      (when org-modern-block
+      (when org-modern-block-fringe
         '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-"
-           (0 (org-modern--block-fringe)))
-          ("^\\([ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\)"
+           (0 (org-modern--block-fringe)))))
+      (when org-modern-block
+        '(("^\\([ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\)"
            (1 '(face nil display (space :width (3))))
            (2 'org-modern-block-keyword append))
           ("^\\([ \t]*#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\)"
