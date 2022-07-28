@@ -510,7 +510,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   :group 'org-modern
   (cond
    (org-modern-mode
-    (unless (fringe-bitmap-p 'org-modern--block-inner)
+    (when (and (fboundp 'fringe-bitmap-p)
+               (not (fringe-bitmap-p 'org-modern--block-inner)))
       (let* ((g (ceiling (frame-char-height) 1.8))
              (h (- (default-line-height) g)))
         (define-fringe-bitmap 'org-modern--block-inner
