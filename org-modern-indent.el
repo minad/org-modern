@@ -35,6 +35,11 @@
 (require 'org-indent)
 (require 'seq)
 
+;; Add face for org-modern-indent line
+(defface org-modern-indent-line '((t (:inherit (org-meta-line) :weight light)))
+  "Face for line in org-modern-indent."
+  :group 'faces)
+
 (defun org-modern-indent--face-in (faces element)
   "Determine if any of FACES are present in ELEMENT.
 FACES must be a list.  A face can be 'present' by being named
@@ -133,11 +138,11 @@ To be set as :around advice for `org-insert-structure-template'."
   (if org-modern-indent-mode
       (progn
       (setq org-modern-indent-begin
-	    (propertize "╭" 'face 'org-meta-line)
+	    (propertize "╭" 'face 'org-modern-indent-line)
 	    org-modern-indent-guide
-	    (propertize "│" 'face 'org-meta-line)
+	    (propertize "│" 'face 'org-modern-indent-line)
 	    org-modern-indent-end
-	    (propertize "╰" 'face 'org-meta-line))
+	    (propertize "╰" 'face 'org-modern-indent-line))
       (setq-local org-fontify-quote-and-verse-blocks t)
       (setf (symbol-function 'org-indent-set-line-properties)
 	    (symbol-function 'org-modern-indent-set-line-properties))
