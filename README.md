@@ -53,6 +53,8 @@ Also optional; use org-bullets instead for nicely aligned bullet stars.
   :hook org-mode)
 ```
 
+If you'd like a different face than `org-meta-line` for the "bracket", configure the `org-modern-indent-line` face.
+
 ## Related packages
 
 - [`org-modern`](https://github.com/minad/org-modern): A modern org styling.  Works best without org-indent.
