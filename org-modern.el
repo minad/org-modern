@@ -319,18 +319,20 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 
 (defun org-modern--block-name ()
   "Prettify block according to `org-modern-block-name'."
-  (let ((beg (match-beginning 1))
-        (beg-name (match-beginning 2))
-        (end (match-end 2))
-        (end-rep (match-end 2))
-        (rep (assoc (match-string 2) org-modern-block-name)))
+  (let ((beg (match-beginning 2))
+        (beg-name (match-beginning 3))
+        (end (match-end 3))
+        (end-rep (match-end 3))
+        (rep (assoc (match-string 3) org-modern-block-name)))
     (unless rep
       (setq rep (assq t org-modern-block-name)
             end-rep beg-name))
     (setq rep (if (consp (cdr rep))
-                  (if (= 7 (length (match-string 1)))
+                  (if (= 7 (length (match-string 2)))
                       (cadr rep) (caddr rep))
                 (cdr rep)))
+    (when org-modern-block-fringe
+      (put-text-property (match-beginning 1) beg 'invisible t))
     (cond
      ((eq rep 't)
       (put-text-property beg beg-name 'invisible t)
@@ -615,26 +617,28 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (when org-modern-block-fringe
         '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-"
            (0 (org-modern--block-fringe)))))
-      (when-let ((block-specs
-                  (cond
-                   ((eq org-modern-block-name t) ; hide
-                    '(((1 '(face nil invisible t))
-                       (2 'org-modern-block-name append)) .
-                       ((1 '(face nil invisible t))
-                        (2 'org-modern-block-name append))))
-                   ((and (consp org-modern-block-name) ; static replacement
-                         (stringp (car org-modern-block-name)))
-                    `(((1 '(face nil display ,(car org-modern-block-name)))
-                       (2 'org-modern-block-name append)) .
-                       ((1 '(face nil display ,(cadr org-modern-block-name)))
-                        (2 'org-modern-block-name append))))
-                   ((and (consp org-modern-block-name) ; dynamic replacement
-                         (consp (car org-modern-block-name)))
-                    '(((0 (org-modern--block-name))) . ((0 (org-modern--block-name))))))))
-        `(("^[ \t]*\\(#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
-           ,@(car block-specs))
-          ("^[ \t]*\\(#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
-           ,@(cdr block-specs))))
+      (let* ((block-indent? (and org-modern-block-fringe '((1 '(face nil invisible t)))))
+             (block-append '(3 'org-modern-block-name append))
+             (block-specs
+              (cond ((eq org-modern-block-name t) ; hide
+                     `((,@block-indent? (2 '(face nil invisible t)) ,block-append) .
+                       (,@block-indent? (2 '(face nil invisible t)) ,block-append)))
+                    (((and (consp org-modern-block-name) ; static replacement
+                           (stringp (car org-modern-block-name)))
+                      `((,@block-indent?
+                         (2 '(face nil display ,(car org-modern-block-name)))
+                         ,block-append) .
+                         (,@block-indent?
+                          (2 '(face nil display ,(cadr org-modern-block-name)))
+                          ,block-append))))
+                    ((and (consp org-modern-block-name) ; dynamic replacement
+                          (consp (car org-modern-block-name)))
+                     '(((0 (org-modern--block-name))) . ((0 (org-modern--block-name))))))))
+        (and block-specs
+             `(("^\\([ \t]*\\)\\(#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
+                ,@(car block-specs))
+               ("^\\([ \t]*\\)\\(#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
+                ,@(cdr block-specs)))))
       (when org-modern-tag
         `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
            (0 (org-modern--tag)))))
