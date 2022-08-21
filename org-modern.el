@@ -168,6 +168,7 @@ and faces in the cdr. Example:
 
 (defcustom org-modern-keyword t
   "Prettify keywords like #+title.
+If set to t, the prefix #+ will be hidden.
 If set to a string, e.g., \"‣\", the string is used as replacement for #+.
 If set to an alist of keywords and strings, the associated string will be
 used as replacement for \"#+keyword:\", with t the default key."
