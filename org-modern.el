@@ -332,15 +332,17 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
                   (if (= 8 (length (match-string 2)))
                       (cadr rep) (caddr rep))
                 (cdr rep)))
-    (when org-modern-block-fringe
-      (put-text-property (match-beginning 1) beg 'invisible t))
     (cond
      ((eq rep 't)
-      (put-text-property beg beg-name 'invisible t)
+      (if org-modern-block-fringe
+          (put-text-property beg beg-name 'display '(space :width (3)))
+        (put-text-property beg beg-name 'invisible t))
       (add-face-text-property beg-name end 'org-modern-block-name))
      ((stringp rep)
       (put-text-property beg end-rep 'display
-                         (propertize rep 'face 'org-modern-symbol))))))
+                         (propertize rep 'face 'org-modern-symbol))
+      (when org-modern-block-fringe
+        (put-text-property (match-beginning 1) beg 'invisible t))))))
 
 (defun org-modern--checkbox ()
   "Prettify checkboxes according to `org-modern-checkbox'."
@@ -620,10 +622,15 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (0 (org-modern--block-fringe)))))
       (let* ((block-indent? (and org-modern-block-fringe '((1 '(face nil invisible t)))))
              (block-append '(3 'org-modern-block-name append))
+             (block-hide-simple
+              (append block-indent?
+                      (list (if org-modern-block-fringe
+                                '(2 '(face nil display (space :width (3))))
+                              '(2 '(face nil invisible t)))
+                            block-append)))
              (block-specs
               (cond ((eq org-modern-block-name t) ; hide
-                     `((,@block-indent? (2 '(face nil invisible t)) ,block-append) .
-                       (,@block-indent? (2 '(face nil invisible t)) ,block-append)))
+                     (cons block-hide-simple block-hide-simple))
                     ((and (consp org-modern-block-name) ; static replacement
                           (stringp (car org-modern-block-name)))
                      `((,@block-indent?
