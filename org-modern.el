@@ -324,7 +324,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
         (beg-name (match-beginning 3))
         (end (match-end 3))
         (end-rep (match-end 3))
-        (rep (assoc (match-string 3) org-modern-block-name)))
+        (rep (assoc (downcase (match-string 3)) org-modern-block-name)))
     (unless rep
       (setq rep (assq t org-modern-block-name)
             end-rep beg-name))
