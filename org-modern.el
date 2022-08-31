@@ -164,21 +164,26 @@ and faces in the cdr. Example:
 
 (defcustom org-modern-block-name t
   "Prettify blocks names, i.e. #+begin_NAME and #+end_NAME lines.
-If set to a list of two strings, e.g. (\"‣\" \"‣\"), the strings are
+If set to a pair of two strings, e.g. (\"‣\" . \"‣\"), the strings are
 used as replacements for the #+begin_ and #+end_ prefixes, respectively.
 If set to an alist of block names and cons cells of strings, the associated
 strings will be used as a replacements for the whole of #+begin_NAME and
 #+end_NAME, respectively, and the association with t treated as the value for
 all other blocks."
-  :type '(choice (boolean :tag "Hide #+begin_ and #+end_ prefixes")
-                 (cons (string :tag "#+begin_ replacement")
-                       (string :tag "#+end_ replacement"))
-                 (const :tag "Triangle bullets" ("‣" . "‣"))
-                 (alist :key-type (choice (string :tag "Block")
-                                          (const :tag "Default" t))
-                        :value-type (choice (list (string :tag "#+begin_NAME replacement")
-                                                  (string :tag "#+end_NAME replacement"))
-                                            (boolean :tag "Hide #+begin_ and #+end_ prefixes")))))
+  :type '(choice
+          (const :tag "Hide #+begin_ and #+end_ prefixes" t)
+          (cons (string :tag "#+begin_ replacement")
+                (string :tag "#+end_ replacement"))
+          (const :tag "Triangle bullets" ("‣" . "‣"))
+          (alist :key-type
+                 (choice
+                  (string :tag "Block name")
+                  (const :tag "Default" t))
+                 :value-type
+                 (choice
+                  (list (string :tag "#+begin_NAME replacement")
+                        (string :tag "#+end_NAME replacement"))
+                  (const :tag "Hide #+begin_ and #+end_ prefixes" t)))))
 
 (defcustom org-modern-block-fringe t
   "Add a bitmap fringe to blocks."
@@ -318,32 +323,6 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 (defvar-local org-modern--checkbox-cache nil)
 (defvar-local org-modern--progress-cache nil)
 
-(defun org-modern--block-name ()
-  "Prettify block according to `org-modern-block-name'."
-  (let ((beg (match-beginning 2))
-        (beg-name (match-beginning 3))
-        (end (match-end 3))
-        (end-rep (match-end 3))
-        (rep (assoc (downcase (match-string 3)) org-modern-block-name)))
-    (unless rep
-      (setq rep (assq t org-modern-block-name)
-            end-rep beg-name))
-    (setq rep (if (consp (cdr rep))
-                  (if (= 8 (length (match-string 2)))
-                      (cadr rep) (caddr rep))
-                (cdr rep)))
-    (cond
-     ((eq rep 't)
-      (if org-modern-block-fringe
-          (put-text-property beg beg-name 'display '(space :width (3)))
-        (put-text-property beg beg-name 'invisible t))
-      (add-face-text-property beg-name end 'org-modern-block-name))
-     ((stringp rep)
-      (put-text-property beg end-rep 'display
-                         (propertize rep 'face 'org-modern-symbol))
-      (when org-modern-block-fringe
-        (put-text-property (match-beginning 1) beg 'invisible t))))))
-
 (defun org-modern--checkbox ()
   "Prettify checkboxes according to `org-modern-checkbox'."
   (let ((beg (match-beginning 1))
@@ -356,14 +335,14 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   "Prettify keywords according to `org-modern-keyword'."
   (let ((beg (match-beginning 0))
         (end (match-end 0))
-        (rep (assoc (downcase (match-string 2)) org-modern-keyword)))
+        (rep (and (listp org-modern-keyword)
+                  (cdr (assoc (downcase (match-string 2)) org-modern-keyword)))))
     (unless rep
-      (setq rep (assq t org-modern-keyword) end (match-end 1)))
-    (pcase (cdr rep)
+      (setq rep (cdr (assq t org-modern-keyword)) end (match-end 1)))
+    (pcase rep
       ('t (put-text-property beg (match-end 1) 'invisible t))
       ((pred stringp)
-       (put-text-property beg end 'display
-                          (propertize (cdr rep) 'face 'org-modern-symbol))))))
+       (put-text-property beg end 'display rep)))))
 
 (defun org-modern--progress ()
   "Prettify headline todo progress."
@@ -509,44 +488,64 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
                      (put-text-property i (1+ i) 'display
                                         (if (= 0 (mod i 2)) sp1 sp2)))))))))
 
+(defun org-modern--block-name ()
+  "Prettify block according to `org-modern-block-name'."
+  (let* ((beg-ind (match-beginning 1))
+         (beg-rep (match-beginning 2))
+         (end-rep (match-end 3))
+         (beg-name (match-beginning 3))
+         (end-name (match-end 3))
+         (names (and (listp org-modern-block-name) org-modern-block-name))
+         (rep (cdr (assoc (downcase (match-string 3)) names)))
+         (fringe (and org-modern-block-fringe (not (bound-and-true-p org-indent-mode)))))
+    (unless rep
+      (setq rep (cdr (assq t names)) end-rep beg-name))
+    (when (consp rep)
+      (setq rep (if (= 8 (- beg-name beg-rep)) (car rep) (cadr rep))))
+    (pcase rep
+      ('t
+       (add-face-text-property beg-name end-name 'org-modern-block-name)
+       (put-text-property (if fringe beg-ind beg-rep) beg-name 'invisible t))
+      ((pred stringp)
+       (add-face-text-property beg-name end-name 'org-modern-block-name)
+       (put-text-property beg-rep end-rep 'display rep)
+       (when fringe
+         (put-text-property beg-ind beg-rep 'invisible t))))))
+
 (defun org-modern--block-fringe ()
   "Prettify blocks with fringe bitmaps."
-  ;; Do not add source block fringe markers if org-indent-mode is
-  ;; enabled. org-indent-mode uses line prefixes for indentation.
-  ;; Therefore we cannot have both.
-  (unless (bound-and-true-p org-indent-mode)
-    (save-excursion
-      (goto-char (match-beginning 0))
-      (add-text-properties
-       (point) (min (line-end-position) (point-max))
-       '(wrap-prefix
-         #(" " 0 1 (display (left-fringe org-modern--block-begin org-block-begin-line)))
-         line-prefix
-         #(" " 0 1 (display (left-fringe org-modern--block-begin org-block-begin-line)))))
-      (forward-line)
-      (while
-          (cond
-           ((eobp) nil)
-           ((save-excursion
-              (let ((case-fold-search t))
-                (re-search-forward
-                 "^[ \t]*#\\+end_" (line-end-position) 'noerror)))
-            (add-text-properties
-             (point) (min (line-end-position) (point-max))
-             '(wrap-prefix
-               #(" " 0 1 (display (left-fringe org-modern--block-end org-block-begin-line)))
-               line-prefix
-               #(" " 0 1 (display (left-fringe org-modern--block-end org-block-begin-line)))))
-            nil)
-           (t
-            (add-text-properties
-             (point) (min (1+ (line-end-position)) (point-max))
-             '(wrap-prefix
-               #(" " 0 1 (display (left-fringe org-modern--block-inner org-block-begin-line)))
-               line-prefix
-               #(" " 0 1 (display (left-fringe org-modern--block-inner org-block-begin-line)))))
-            (forward-line)
-            t))))))
+  (save-excursion
+    (goto-char (match-beginning 0))
+    (add-text-properties
+     (point) (min (line-end-position) (point-max))
+     '(wrap-prefix
+       #(" " 0 1 (display (left-fringe org-modern--block-begin org-block-begin-line)))
+       line-prefix
+       #(" " 0 1 (display (left-fringe org-modern--block-begin org-block-begin-line)))))
+    (forward-line)
+    (while
+        (cond
+         ((eobp) nil)
+         ((save-excursion
+            (let ((case-fold-search t))
+              (re-search-forward
+               "^[ \t]*#\\+end_" (line-end-position) 'noerror)))
+          (add-text-properties
+           (point) (min (line-end-position) (point-max))
+           '(wrap-prefix
+             #(" " 0 1 (display (left-fringe org-modern--block-end org-block-begin-line)))
+             line-prefix
+             #(" " 0 1 (display (left-fringe org-modern--block-end org-block-begin-line)))))
+          nil)
+         (t
+          (add-text-properties
+           (point) (min (1+ (line-end-position)) (point-max))
+           '(wrap-prefix
+             #(" " 0 1 (display (left-fringe org-modern--block-inner org-block-begin-line)))
+             line-prefix
+             #(" " 0 1 (display (left-fringe org-modern--block-inner org-block-begin-line)))))
+          (forward-line)
+          t)))))
 
 ;;;###autoload
 (define-minor-mode org-modern-mode
@@ -617,36 +616,31 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
                      org-modern-horizontal-rule)))))
       (when org-modern-table
         '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
-      (when org-modern-block-fringe
+      ;; Do not add source block fringe markers if org-indent-mode is
+      ;; enabled. org-indent-mode uses line prefixes for indentation.
+      ;; Therefore we cannot have both.
+      (when (and org-modern-block-fringe (not (bound-and-true-p org-indent-mode)))
         '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-"
            (0 (org-modern--block-fringe)))))
-      (let* ((block-indent? (and org-modern-block-fringe '((1 '(face nil invisible t)))))
-             (block-append '(3 'org-modern-block-name append))
-             (block-hide-simple
-              (append block-indent?
-                      (list (if org-modern-block-fringe
-                                '(2 '(face nil display (space :width (3))))
-                              '(2 '(face nil invisible t)))
-                            block-append)))
-             (block-specs
-              (cond ((eq org-modern-block-name t) ; hide
-                     (cons block-hide-simple block-hide-simple))
-                    ((and (consp org-modern-block-name) ; static replacement
-                          (stringp (car org-modern-block-name)))
-                     `((,@block-indent?
-                        (2 '(face nil display ,(car org-modern-block-name)))
-                        ,block-append) .
-                        (,@block-indent?
-                         (2 '(face nil display ,(cadr org-modern-block-name)))
-                         ,block-append)))
-                    ((and (consp org-modern-block-name) ; dynamic replacement
-                          (consp (car org-modern-block-name)))
-                     '(((0 (org-modern--block-name))) . ((0 (org-modern--block-name))))))))
-        (and block-specs
-             `(("^\\([ \t]*\\)\\(#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
-                ,@(car block-specs))
-               ("^\\([ \t]*\\)\\(#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
-                ,@(cdr block-specs)))))
+      (when org-modern-block-name
+        (let* ((indent (and org-modern-block-fringe
+                            (not (bound-and-true-p org-indent-mode))
+                            '((1 '(face nil invisible t)))))
+               (name '(3 'org-modern-block-name append))
+               (hide `(,@indent (2 '(face nil invisible t)) ,name))
+               (specs
+                (pcase org-modern-block-name
+                  ('t ;; Hide
+                   (cons hide hide))
+                  (`((,_k . ,_v) . ,_rest) ;; Dynamic replacement
+                   '(((0 (org-modern--block-name))) . ((0 (org-modern--block-name)))))
+                  (`(,beg . ,end) ;; Static replacement
+                   `((,@indent (2 '(face nil display ,beg)) ,name) .
+                     (,@indent (2 '(face nil display ,end)) ,name))))))
+          `(("^\\([ \t]*\\)\\(#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
+             ,@(car specs))
+            ("^\\([ \t]*\\)\\(#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
+             ,@(cdr specs)))))
       (when org-modern-tag
         `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
            (0 (org-modern--tag)))))
