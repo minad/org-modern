@@ -370,14 +370,14 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
       (while (re-search-forward "::?" end 'noerror)
         (let ((cbeg (match-beginning 0))
               (cend (match-end 0)))
-        (when colon-beg
-          (put-text-property colon-end (1+ colon-end) 'display
-                             (format #(" %c" 1 3 (cursor t)) (char-after colon-end)))
-          (put-text-property (1- cbeg) cbeg 'display
-                             (string (char-before cbeg) ?\s))
-          (put-text-property colon-end cbeg 'face 'org-modern-tag))
-        (setq colon-beg cbeg colon-end cend)
-        (add-text-properties (car colon) (cdr colon) colon-props)))))
+          (when colon-beg
+            (put-text-property colon-end (1+ colon-end) 'display
+                               (format #(" %c" 1 3 (cursor t)) (char-after colon-end)))
+            (put-text-property (1- cbeg) cbeg 'display
+                               (string (char-before cbeg) ?\s))
+            (put-text-property colon-end cbeg 'face 'org-modern-tag))
+          (add-text-properties cbeg cend colon-props)
+          (setq colon-beg cbeg colon-end cend))))))
 
 (defun org-modern--todo ()
   "Prettify headline todo keywords."
