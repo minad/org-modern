@@ -208,7 +208,12 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 
 (defface org-modern-label
   `((t :height 0.9 :width condensed :weight regular :underline nil))
-  "Parent face for labels.")
+  "Parent face for labels.
+The parameters of this face depend on typographical properties of
+the font and should therefore be adjusted by the user depending
+on their font, e.g., the :width or :height parameters. Themes
+should not override this face, since themes usually don't control
+the font.")
 
 (defface org-modern-block-name
   '((t :height 0.8 :weight light))
