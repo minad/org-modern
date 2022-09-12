@@ -322,6 +322,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
 (defvar-local org-modern--star-cache nil)
 (defvar-local org-modern--checkbox-cache nil)
 (defvar-local org-modern--progress-cache nil)
+(defvar-local org-modern--sp-width (list nil))
 
 (defun org-modern--checkbox ()
   "Prettify checkboxes according to `org-modern-checkbox'."
@@ -450,9 +451,9 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (end (match-end 0))
            (tbeg (match-beginning 1))
            (tend (match-end 1))
-           ;; Unique objects
-           (sp1 (list 'space :width 1))
-           (sp2 (list 'space :width 1))
+           ;; Unique space objects
+           (sp1 (list 'space :width org-modern--sp-width))
+           (sp2 (list 'space :width org-modern--sp-width))
            (color (face-attribute 'org-table :foreground nil t))
            (inner (progn
                     (goto-char beg)
@@ -547,6 +548,10 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
           (forward-line)
           t)))))
 
+(defun org-modern--pre-redisplay (_)
+  "Compute font width before redisplay."
+  (setcar org-modern--sp-width (default-font-width)))
+
 ;;;###autoload
 (define-minor-mode org-modern-mode
   "Modern looks for Org."
@@ -554,6 +559,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   :group 'org-modern
   (cond
    (org-modern-mode
+    (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
     (when (and (fboundp 'fringe-bitmap-p)
                (not (fringe-bitmap-p 'org-modern--block-inner)))
       (let* ((g (ceiling (frame-char-height) 1.8))
@@ -566,6 +572,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
           (vconcat (make-vector (- 127 h) #x80) [#xFF] (make-vector h 0)) nil nil 'bottom)))
     (org-modern--update-label-face)
     (setq
+     org-modern--sp-width (list nil)
      org-modern--star-cache
      (vconcat (mapcar
                (lambda (x) (propertize x 'face 'org-modern-symbol))
@@ -688,7 +695,9 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (6 '(face nil display " ")))))))
     (font-lock-add-keywords nil org-modern--font-lock-keywords 'append)
     (advice-add #'org-unfontify-region :after #'org-modern--unfontify))
-   (t (font-lock-remove-keywords nil org-modern--font-lock-keywords)))
+   (t
+    (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)
+    (font-lock-remove-keywords nil org-modern--font-lock-keywords)))
   (save-restriction
     (widen)
     (let ((org-modern-mode t))
