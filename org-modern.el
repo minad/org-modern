@@ -365,19 +365,19 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
            (colon-props `(display #(":" 0 1 (face org-hide)) face ,default-face))
            (beg (match-beginning 2))
            (end (match-end 2))
-           colon)
+           colon-beg colon-end)
       (goto-char beg)
-      (while (search-forward ":" end 'noerror)
-        (when colon
-          (put-text-property
-           colon (1+ colon) 'display
-           (format #(" %c" 1 3 (cursor t)) (char-after colon)))
-          (put-text-property
-           (- (point) 2) (1- (point)) 'display
-           (string (char-before (1- (point))) ?\s))
-          (put-text-property colon (1- (point)) 'face 'org-modern-tag))
-        (setq colon (point))
-        (add-text-properties (1- colon) colon colon-props)))))
+      (while (re-search-forward "::?" end 'noerror)
+        (let ((cbeg (match-beginning 0))
+              (cend (match-end 0)))
+        (when colon-beg
+          (put-text-property colon-end (1+ colon-end) 'display
+                             (format #(" %c" 1 3 (cursor t)) (char-after colon-end)))
+          (put-text-property (1- cbeg) cbeg 'display
+                             (string (char-before cbeg) ?\s))
+          (put-text-property colon-end cbeg 'face 'org-modern-tag))
+        (setq colon-beg cbeg colon-end cend)
+        (add-text-properties (car colon) (cdr colon) colon-props)))))
 
 (defun org-modern--todo ()
   "Prettify headline todo keywords."
@@ -723,7 +723,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
             (org-modern--todo))))
       (when org-modern-tag
         (goto-char (point-min))
-        (let ((re (concat "\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")))
+        (let ((re (concat "\\( \\)\\(:\\(?:" org-tag-re "::?\\)+\\)[ \t]*$")))
           (while (re-search-forward re nil 'noerror)
             (org-modern--tag))))
       (when org-modern-priority
