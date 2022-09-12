@@ -553,7 +553,8 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   (cond
    (org-modern-mode
     (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
-    (when (and (fboundp 'fringe-bitmap-p)
+    (when (and org-modern-block-fringe
+               (fboundp 'fringe-bitmap-p)
                (not (fringe-bitmap-p 'org-modern--block-inner)))
       (let* ((g (ceiling (frame-char-height) 1.8))
              (h (- (default-line-height) g)))
