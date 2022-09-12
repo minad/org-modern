@@ -43,13 +43,11 @@
   :prefix "org-modern-")
 
 (defvar org-modern-label-border)
-(defvar org-modern-variable-pitch)
 (defun org-modern--update-label-face ()
   "Update border of the `org-modern-label' face."
   (when (facep 'org-modern-label)
     (set-face-attribute
      'org-modern-label nil
-     :inherit org-modern-variable-pitch
      :box
      (when org-modern-label-border
        (let ((border (if (eq org-modern-label-border 'auto)
@@ -225,11 +223,6 @@ references."
   "Add a progress indicator to the todo statistics.
 Set to nil to disable the indicator."
   :type '(repeat string))
-
-(defcustom org-modern-variable-pitch 'variable-pitch
-  "Use variable pitch for modern style labels."
-  :type 'symbol
-  :set #'org-modern--setter)
 
 (defgroup org-modern-faces nil
   "Faces used by `org-modern'."
