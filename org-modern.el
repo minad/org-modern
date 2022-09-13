@@ -634,7 +634,7 @@ the font.")
         (1 '(face org-modern-statistics) t)
         (2 ,(if org-modern-progress '(org-modern--progress) ''(face nil display " ")))
         (6 '(face nil display " ")))))
-   '(org-modern--fontify-blocks) ;; Ensure that blocks are properly fontified
+   '((org-fontify-meta-lines-and-blocks)) ;; Ensure that blocks are properly fontified
    (when org-modern-keyword
      `(("^[ \t]*\\(#\\+\\)\\([^: \t\n]+\\):"
         ,@(pcase org-modern-keyword
@@ -688,16 +688,19 @@ the font.")
      (mapcar (pcase-lambda (`(,k . ,v))
                (cons k (propertize v 'face 'org-modern-symbol)))
              org-modern-checkbox)
-     org-modern--font-lock-keywords (org-modern--make-font-lock-keywords))
-    (font-lock-add-keywords nil org-modern--font-lock-keywords 'append)
+     org-modern--font-lock-keywords
+     (append (remove '(org-fontify-meta-lines-and-blocks) org-font-lock-keywords)
+             (org-modern--make-font-lock-keywords)))
+    (font-lock-remove-keywords nil org-font-lock-keywords)
+    (font-lock-add-keywords nil org-modern--font-lock-keywords)
     (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
     (advice-add #'org-unfontify-region :after #'org-modern--unfontify)
-    (advice-add #'org-fontify-meta-lines-and-blocks :around #'org-modern--disable-fontify-blocks)
     (org-modern--update-label-face)
     (org-modern--update-fringe-bitmaps))
    (t
     (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)
-    (font-lock-remove-keywords nil org-modern--font-lock-keywords)))
+    (font-lock-remove-keywords nil org-modern--font-lock-keywords)
+    (font-lock-add-keywords nil org-font-lock-keywords)))
   (save-restriction
     (widen)
     (let ((org-modern-mode t))
@@ -715,20 +718,6 @@ the font.")
        (if (bound-and-true-p org-indent-mode)
            '(display face invisible)
          '(wrap-prefix line-prefix display face invisible))))))
-
-;; HACK: I am not sure how to manipulate the font-lock-keywords properly. The
-;; problem is that we have to move `org-fontify-meta-lines-and-blocks' behind
-;; the org-modern font lock keywords.
-(defun org-modern--disable-fontify-blocks (fun limit)
-  "Advice for `org-fontify-meta-lines-and-blocks'.
-Call FUN with LIMIT only if `org-modern-mode' is disabled."
-  (unless org-modern-mode
-    (funcall fun limit)))
-
-(defun org-modern--fontify-blocks (limit)
-  "Fontify blocks up to LIMIT."
-  (let (org-modern-mode)
-    (org-fontify-meta-lines-and-blocks limit)))
 
 ;;;###autoload
 (defun org-modern-agenda ()
