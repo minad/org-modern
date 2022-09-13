@@ -96,6 +96,12 @@ TREPEATED: <2022-02-26 Sat 10:00 .+1d/2d>
 | 3 |  9 | 27 | 81 |  1.7321 |     1.3161 |
 |---+----+----+----+---------+------------|
 
+#+begin_example
+| a | b | c |
+| a | b | c |
+| a | b | c |
+#+end_example
+
 * Special Links
 
 Test numeric footnotes[fn:1] and named footnotes[fn:foo].
