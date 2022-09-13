@@ -693,31 +693,31 @@ the font.")
              (org-modern--make-font-lock-keywords)))
     (font-lock-remove-keywords nil org-font-lock-keywords)
     (font-lock-add-keywords nil org-modern--font-lock-keywords)
+    (setq-local font-lock-unfontify-region-function #'org-modern--unfontify)
     (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
-    (advice-add #'org-unfontify-region :after #'org-modern--unfontify)
     (org-modern--update-label-face)
     (org-modern--update-fringe-bitmaps))
    (t
-    (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)
     (font-lock-remove-keywords nil org-modern--font-lock-keywords)
-    (font-lock-add-keywords nil org-font-lock-keywords)))
+    (font-lock-add-keywords nil org-font-lock-keywords)
+    (setq-local font-lock-unfontify-region-function #'org-unfontify-region)
+    (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)))
   (save-restriction
     (widen)
-    (let ((org-modern-mode t))
-      (org-modern--unfontify (point-min) (point-max)))
+    (org-modern--unfontify (point-min) (point-max))
     (font-lock-flush)))
 
-(defun org-modern--unfontify (beg end &optional _)
+(defun org-modern--unfontify (beg end &optional _loud)
   "Unfontify prettified elements between BEG and END."
-  (when org-modern-mode
-    ;; TODO implement better unfontify
-    (with-silent-modifications
-      ;; Only remove line-prefix and wrap-prefix if org-indent-mode is disabled.
-      (remove-list-of-text-properties
-       beg end
-       (if (bound-and-true-p org-indent-mode)
-           '(display face invisible)
-         '(wrap-prefix line-prefix display face invisible))))))
+  (org-unfontify-region beg end)
+  ;; TODO implement better unfontify
+  (with-silent-modifications
+    ;; Only remove line-prefix and wrap-prefix if org-indent-mode is disabled.
+    (remove-list-of-text-properties
+     beg end
+     (if (bound-and-true-p org-indent-mode)
+         '(display face invisible)
+       '(wrap-prefix line-prefix display face invisible)))))
 
 ;;;###autoload
 (defun org-modern-agenda ()
