@@ -523,25 +523,24 @@ the font.")
 
 (defun org-modern--update-label-face ()
   "Update border of the `org-modern-label' face."
-  (when (facep 'org-modern-label)
-    (set-face-attribute
-     'org-modern-label nil
-     :box
-     (when org-modern-label-border
-       (let ((border (if (eq org-modern-label-border 'auto)
-                         (max 3 (cond
-                                 ((integerp line-spacing)
-                                  line-spacing)
-                                 ((floatp line-spacing)
-                                  (ceiling (* line-spacing (frame-char-height))))
-                                 (t (/ (frame-char-height) 10))))
-                       org-modern-label-border)))
-         (list :color (face-attribute 'default :background nil t)
-               :line-width
-               ;; Emacs 28 supports different line horizontal and vertical line widths
-               (if (>= emacs-major-version 28)
-                   (cons 0 (- border))
-                 (- border))))))))
+  (set-face-attribute
+   'org-modern-label nil
+   :box
+   (when org-modern-label-border
+     (let ((border (if (eq org-modern-label-border 'auto)
+                       (max 3 (cond
+                               ((integerp line-spacing)
+                                line-spacing)
+                               ((floatp line-spacing)
+                                (ceiling (* line-spacing (frame-char-height))))
+                               (t (/ (frame-char-height) 10))))
+                     org-modern-label-border)))
+       (list :color (face-attribute 'default :background nil t)
+             :line-width
+             ;; Emacs 28 supports different line horizontal and vertical line widths
+             (if (>= emacs-major-version 28)
+                 (cons 0 (- border))
+               (- border)))))))
 
 (defun org-modern--update-fringe-bitmaps ()
   "Update fringe bitmaps."
