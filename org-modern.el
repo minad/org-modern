@@ -573,12 +573,6 @@ the font.")
    (when org-modern-todo
      `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t))
         (0 (org-modern--todo)))))
-   (when org-modern-keyword
-     `(("^[ \t]*\\(#\\+\\)\\([^: \t\n]+\\):"
-        ,@(pcase org-modern-keyword
-            ('t '(1 '(face nil invisible t)))
-            ((pred stringp) `(1 '(face nil display ,org-modern-keyword)))
-            (_ '(0 (org-modern--keyword)))))))
    (when org-modern-checkbox
      '(("^[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\)[ \t]+\\(\\[[ X-]\\]\\)[ \t]"
         (0 (org-modern--checkbox)))))
@@ -595,31 +589,6 @@ the font.")
                   org-modern-horizontal-rule)))))
    (when org-modern-table
      '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
-   ;; Do not add source block fringe markers if org-indent-mode is
-   ;; enabled. org-indent-mode uses line prefixes for indentation.
-   ;; Therefore we cannot have both.
-   (when (and org-modern-block-fringe (not (bound-and-true-p org-indent-mode)))
-     '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-"
-        (0 (org-modern--block-fringe)))))
-   (when org-modern-block-name
-     (let* ((indent (and org-modern-block-fringe
-                         (not (bound-and-true-p org-indent-mode))
-                         '((1 '(face nil invisible t)))))
-            (name '(3 'org-modern-block-name append))
-            (hide `(,@indent (2 '(face nil invisible t)) ,name))
-            (specs
-             (pcase org-modern-block-name
-               ('t ;; Hide
-                (cons hide hide))
-               (`((,_k . ,_v) . ,_rest) ;; Dynamic replacement
-                '(((0 (org-modern--block-name))) . ((0 (org-modern--block-name)))))
-               (`(,beg . ,end) ;; Static replacement
-                `((,@indent (2 '(face nil display ,beg)) ,name) .
-                  (,@indent (2 '(face nil display ,end)) ,name))))))
-       `(("^\\([ \t]*\\)\\(#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
-          ,@(car specs))
-         ("^\\([ \t]*\\)\\(#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
-          ,@(cdr specs)))))
    (when org-modern-tag
      `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
         (0 (org-modern--tag)))))
@@ -664,8 +633,39 @@ the font.")
      `((" \\(\\(\\[\\)\\(?:\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\(\\]\\)\\)"
         (1 '(face org-modern-statistics) t)
         (2 ,(if org-modern-progress '(org-modern--progress) ''(face nil display " ")))
-        (6 '(face nil display " ")))))))
-
+        (6 '(face nil display " ")))))
+   '(org-modern--fontify-blocks) ;; Ensure that blocks are properly fontified
+   (when org-modern-keyword
+     `(("^[ \t]*\\(#\\+\\)\\([^: \t\n]+\\):"
+        ,@(pcase org-modern-keyword
+            ('t '(1 '(face nil invisible t)))
+            ((pred stringp) `(1 '(face nil display ,org-modern-keyword)))
+            (_ '(0 (org-modern--keyword)))))))
+   ;; Do not add source block fringe markers if org-indent-mode is
+   ;; enabled. org-indent-mode uses line prefixes for indentation.
+   ;; Therefore we cannot have both.
+   (when (and org-modern-block-fringe (not (bound-and-true-p org-indent-mode)))
+     '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-"
+        (0 (org-modern--block-fringe)))))
+   (when org-modern-block-name
+     (let* ((indent (and org-modern-block-fringe
+                         (not (bound-and-true-p org-indent-mode))
+                         '((1 '(face nil invisible t)))))
+            (name '(3 'org-modern-block-name append))
+            (hide `(,@indent (2 '(face nil invisible t)) ,name))
+            (specs
+             (pcase org-modern-block-name
+               ('t ;; Hide
+                (cons hide hide))
+               (`((,_k . ,_v) . ,_rest) ;; Dynamic replacement
+                '(((0 (org-modern--block-name))) . ((0 (org-modern--block-name)))))
+               (`(,beg . ,end) ;; Static replacement
+                `((,@indent (2 '(face nil display ,beg)) ,name) .
+                  (,@indent (2 '(face nil display ,end)) ,name))))))
+       `(("^\\([ \t]*\\)\\(#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
+          ,@(car specs))
+         ("^\\([ \t]*\\)\\(#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
+          ,@(cdr specs)))))))
 
 ;;;###autoload
 (define-minor-mode org-modern-mode
@@ -692,6 +692,7 @@ the font.")
     (font-lock-add-keywords nil org-modern--font-lock-keywords 'append)
     (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
     (advice-add #'org-unfontify-region :after #'org-modern--unfontify)
+    (advice-add #'org-fontify-meta-lines-and-blocks :around #'org-modern--disable-fontify-blocks)
     (org-modern--update-label-face)
     (org-modern--update-fringe-bitmaps))
    (t
@@ -714,6 +715,20 @@ the font.")
        (if (bound-and-true-p org-indent-mode)
            '(display face invisible)
          '(wrap-prefix line-prefix display face invisible))))))
+
+;; HACK: I am not sure how to manipulate the font-lock-keywords properly. The
+;; problem is that we have to move `org-fontify-meta-lines-and-blocks' behind
+;; the org-modern font lock keywords.
+(defun org-modern--disable-fontify-blocks (fun limit)
+  "Advice for `org-fontify-meta-lines-and-blocks'.
+Call FUN with LIMIT only if `org-modern-mode' is disabled."
+  (unless org-modern-mode
+    (funcall fun limit)))
+
+(defun org-modern--fontify-blocks (limit)
+  "Fontify blocks up to LIMIT."
+  (let (org-modern-mode)
+    (org-fontify-meta-lines-and-blocks limit)))
 
 ;;;###autoload
 (defun org-modern-agenda ()
