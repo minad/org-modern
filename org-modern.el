@@ -292,6 +292,7 @@ the font.")
 (defvar-local org-modern--checkbox-cache nil)
 (defvar-local org-modern--progress-cache nil)
 (defvar-local org-modern--table-sp-width 0)
+(defconst org-modern--table-overline '(:overline t))
 (defconst org-modern--table-sp '((space :width (org-modern--table-sp-width))
                                  (space :width (org-modern--table-sp-width))))
 
@@ -422,7 +423,6 @@ the font.")
            (end (match-end 0))
            (tbeg (match-beginning 1))
            (tend (match-end 1))
-           (color (face-attribute 'org-table :foreground nil t))
            (inner (progn
                     (goto-char beg)
                     (forward-line)
@@ -447,7 +447,7 @@ the font.")
       (goto-char beg)
       (when separator
         (when (numberp org-modern-table-horizontal)
-          (add-face-text-property tbeg tend `(:overline ,color) 'append)
+          (add-face-text-property tbeg tend org-modern--table-overline 'append)
           (add-face-text-property beg (1+ end) `(:height ,org-modern-table-horizontal) 'append))
         (while (re-search-forward "[^|+]+" tend 'noerror)
           (let ((a (match-beginning 0))
@@ -516,8 +516,14 @@ the font.")
           t)))))
 
 (defun org-modern--pre-redisplay (_)
-  "Compute font width before redisplay."
-  (setq org-modern--table-sp-width (default-font-width)))
+  "Compute font parameters before redisplay."
+  (when-let (box (and org-modern-label-border
+                      (face-attribute 'org-modern-label :box nil t)))
+    (unless (equal (and (listp box) (plist-get box :color))
+                   (face-attribute 'default :background nil t))
+      (org-modern--update-label-face)))
+  (setf org-modern--table-sp-width (default-font-width)
+        (cadr org-modern--table-overline) (face-attribute 'org-table :foreground nil t)))
 
 (defun org-modern--update-label-face ()
   "Update border of the `org-modern-label' face."
