@@ -725,6 +725,7 @@ the font.")
 ;;;###autoload
 (defun org-modern-agenda ()
   "Finalize Org agenda highlighting."
+  (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
   (save-excursion
     (save-match-data
       (when org-modern-todo
