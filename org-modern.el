@@ -705,10 +705,11 @@ the font.")
     (font-lock-add-keywords nil org-font-lock-keywords)
     (setq-local font-lock-unfontify-region-function #'org-unfontify-region)
     (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)))
-  (save-restriction
-    (widen)
-    (org-modern--unfontify (point-min) (point-max))
-    (font-lock-flush)))
+  (with-silent-modifications
+    (save-restriction
+      (widen)
+      (org-modern--unfontify (point-min) (point-max))
+      (font-lock-flush))))
 
 (defun org-modern--unfontify (beg end &optional _loud)
   "Unfontify prettified elements between BEG and END."
