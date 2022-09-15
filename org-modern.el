@@ -705,23 +705,22 @@ the font.")
     (font-lock-add-keywords nil org-font-lock-keywords)
     (setq-local font-lock-unfontify-region-function #'org-unfontify-region)
     (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)))
-  (with-silent-modifications
-    (save-restriction
-      (widen)
-      (org-modern--unfontify (point-min) (point-max))
-      (font-lock-flush))))
+  (save-restriction
+    (widen)
+    (with-silent-modifications
+      (org-modern--unfontify (point-min) (point-max)))
+    (font-lock-flush)))
 
 (defun org-modern--unfontify (beg end &optional _loud)
   "Unfontify prettified elements between BEG and END."
-  (org-unfontify-region beg end)
-  ;; TODO implement better unfontify
-  (with-silent-modifications
-    ;; Only remove line-prefix and wrap-prefix if org-indent-mode is disabled.
-    (remove-list-of-text-properties
-     beg end
-     (if (bound-and-true-p org-indent-mode)
-         '(display face invisible)
-       '(wrap-prefix line-prefix display face invisible)))))
+  (let ((font-lock-extra-managed-props
+         (append
+          ;; Only remove line-prefix and wrap-prefix if org-indent-mode is disabled.
+          (if (bound-and-true-p org-indent-mode)
+              '(display face invisible)
+            '(wrap-prefix line-prefix display face invisible))
+          font-lock-extra-managed-props)))
+    (org-unfontify-region beg end)))
 
 ;;;###autoload
 (defun org-modern-agenda ()
