@@ -717,8 +717,8 @@ the font.")
          (append
           ;; Only remove line-prefix and wrap-prefix if org-indent-mode is disabled.
           (if (bound-and-true-p org-indent-mode)
-              '(display face invisible)
-            '(wrap-prefix line-prefix display face invisible))
+              '(display invisible)
+            '(wrap-prefix line-prefix display invisible))
           font-lock-extra-managed-props)))
     (org-unfontify-region beg end)))
 
