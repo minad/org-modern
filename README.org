@@ -3,8 +3,8 @@
 #+language: en
 
 #+html: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true"/></a>
-#+html: <a href="http://elpa.gnu.org/packages/org-modern.html"><img alt="GNU ELPA" src="https://elpa.gnu.org/packages/org-modern.svg"/></a>
-#+html: <a href="http://elpa.gnu.org/devel/org-modern.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/org-modern.svg"/></a>
+#+html: <a href="https://elpa.gnu.org/packages/org-modern.html"><img alt="GNU ELPA" src="https://elpa.gnu.org/packages/org-modern.svg"/></a>
+#+html: <a href="https://elpa.gnu.org/devel/org-modern.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/org-modern.svg"/></a>
 #+html: <a href="https://melpa.org/#/org-modern"><img alt="MELPA" src="https://melpa.org/packages/org-modern-badge.svg"/></a>
 #+html: <a href="https://stable.melpa.org/#/org-modern"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/org-modern-badge.svg"/></a>
 
@@ -118,5 +118,5 @@ screenshot above.
 
 * Contributions
 
-Since this package is part of [[http://elpa.gnu.org/packages/org-modern.html][GNU ELPA]] contributions require a copyright
+Since this package is part of [[https://elpa.gnu.org/packages/org-modern.html][GNU ELPA]] contributions require a copyright
 assignment to the FSF.
