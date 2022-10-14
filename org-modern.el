@@ -321,10 +321,13 @@ the font.")
 (defun org-modern--heading-hidestar ()
   "Prettify headline leading with hidestar character."
   (let ((beg (match-beginning 1))
-        (end (match-end 1)))
-    (put-text-property beg end 'display
-                       (make-string (- end beg)
-                                    org-modern-hide-stars))))
+        (end (match-end 1))
+        (acc ""))
+    (if (stringp org-modern-hide-stars)
+        (dotimes (_i (- end beg))
+          (setq acc (concat acc org-modern-hide-stars)))
+      (setq acc (make-string (- end beg) org-modern-hide-stars)))
+    (put-text-property beg end 'display acc)))
 
 (defun org-modern--progress ()
   "Prettify headline todo progress."
@@ -594,7 +597,8 @@ the font.")
         ,@(and (not (eq org-modern-hide-stars t)) org-modern-star '((0 (org-modern--star))))
         ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil invisible t))))
         ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible t))))
-        ,@(and (characterp org-modern-hide-stars) `((0 (org-modern--heading-hidestar)))))))
+        ,@(and (or (stringp org-modern-hide-stars) (characterp org-modern-hide-stars))
+			   `((0 (org-modern--heading-hidestar)))))))
    (when org-modern-horizontal-rule
      `(("^[ \t]*-\\{5,\\}$" 0
         '(face org-modern-horizontal-rule display
