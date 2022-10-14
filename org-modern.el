@@ -56,6 +56,7 @@ Set to nil to disable styling the headlines."
 (defcustom org-modern-hide-stars 'leading
   "Make some of the headline stars invisible."
   :type '(choice
+          char
           (const :tag "Do not hide stars" nil)
           (const :tag "Hide all stars" t)
           (const :tag "Hide leading stars" leading)))
@@ -316,6 +317,14 @@ the font.")
       ('t (put-text-property beg (match-end 1) 'invisible t))
       ((pred stringp)
        (put-text-property beg end 'display rep)))))
+
+(defun org-modern--heading-hidestar ()
+  "Prettify headline leading with hidestar character."
+  (let ((beg (match-beginning 1))
+        (end (match-end 1)))
+    (put-text-property beg end 'display
+                       (make-string (- end beg)
+                                    org-modern-hide-stars))))
 
 (defun org-modern--progress ()
   "Prettify headline todo progress."
@@ -584,7 +593,8 @@ the font.")
      `(("^\\(\\**\\)\\(\\*\\) "
         ,@(and (not (eq org-modern-hide-stars t)) org-modern-star '((0 (org-modern--star))))
         ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil invisible t))))
-        ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible t)))))))
+        ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible t))))
+        ,@(and (characterp org-modern-hide-stars) `((0 (org-modern--heading-hidestar)))))))
    (when org-modern-horizontal-rule
      `(("^[ \t]*-\\{5,\\}$" 0
         '(face org-modern-horizontal-rule display
