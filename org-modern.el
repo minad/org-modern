@@ -54,9 +54,11 @@ Set to nil to disable styling the headlines."
   :type '(repeat string))
 
 (defcustom org-modern-hide-stars 'leading
-  "Make some of the headline stars invisible."
+  "Changes the displays of the stars.
+Can be leading, t, or a string replacement for each leading star.
+Set to nil to disable."
   :type '(choice
-          char
+          (string :tag "Replacement string for leading stars")
           (const :tag "Do not hide stars" nil)
           (const :tag "Hide all stars" t)
           (const :tag "Hide leading stars" leading)))
@@ -318,17 +320,6 @@ the font.")
       ((pred stringp)
        (put-text-property beg end 'display rep)))))
 
-(defun org-modern--heading-hidestar ()
-  "Prettify headline leading with hidestar character."
-  (let ((beg (match-beginning 1))
-        (end (match-end 1))
-        (acc ""))
-    (if (stringp org-modern-hide-stars)
-        (dotimes (_i (- end beg))
-          (setq acc (concat acc org-modern-hide-stars)))
-      (setq acc (make-string (- end beg) org-modern-hide-stars)))
-    (put-text-property beg end 'display acc)))
-
 (defun org-modern--progress ()
   "Prettify headline todo progress."
   (put-text-property
@@ -422,11 +413,26 @@ the font.")
 
 (defun org-modern--star ()
   "Prettify headline stars."
-  (let ((level (- (match-end 1) (match-beginning 1))))
-    (put-text-property
-     (match-beginning 2) (match-end 2) 'display
-     (aref org-modern--star-cache
-           (min (1- (length org-modern--star-cache)) level)))))
+  (let ((beg (match-beginning 1))
+        (end (match-end 1)))
+    ;; leading hideStar
+    (unless (eq beg end)
+      (cl-loop for p = beg then p+1
+               for p+1 = (1+ p)
+               until (= p end)
+               ;; gen new str
+               ;; for str = (concat org-modern-hide-stars)
+               ;; do (put-text-property p (1+ p) 'display str)
+               do (compose-region p p+1 org-modern-hide-stars)
+               ))
+    ;; tail star
+    (when org-modern-star
+      (let ((level (- end beg)))
+        (put-text-property
+         (match-beginning 2) (match-end 2) 'display
+         (aref
+          org-modern--star-cache
+          (min (1- (length org-modern--star-cache)) level)))))))
 
 (defun org-modern--table ()
   "Prettify vertical table lines."
@@ -594,11 +600,12 @@ the font.")
         (0 (org-modern--checkbox)))))
    (when (or org-modern-star org-modern-hide-stars)
      `(("^\\(\\**\\)\\(\\*\\) "
-        ,@(and (not (eq org-modern-hide-stars t)) org-modern-star '((0 (org-modern--star))))
+        ,@(and (or (and (not (eq org-modern-hide-stars t))
+						org-modern-star)
+				   (stringp org-modern-hide-stars))
+               '((0 (org-modern--star))))
         ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil invisible t))))
-        ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible t))))
-        ,@(and (or (stringp org-modern-hide-stars) (characterp org-modern-hide-stars))
-			   `((0 (org-modern--heading-hidestar)))))))
+        ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible t)))))))
    (when org-modern-horizontal-rule
      `(("^[ \t]*-\\{5,\\}$" 0
         '(face org-modern-horizontal-rule display
