@@ -292,6 +292,9 @@ the font.")
 
 (defvar-local org-modern--font-lock-keywords nil)
 (defvar-local org-modern--star-cache nil)
+;;  Cache for hidestar, they are a cons pair of copy of the hidestar
+;;  string, propertized with `org-modern-symbol'.
+(defvar-local org-modern--hidestar-cache nil)
 (defvar-local org-modern--checkbox-cache nil)
 (defvar-local org-modern--progress-cache nil)
 (defvar-local org-modern--table-sp-width 0)
@@ -417,14 +420,13 @@ the font.")
         (end (match-end 1)))
     ;; leading hideStar
     (unless (eq beg end)
-      (cl-loop for p = beg then p+1
-               for p+1 = (1+ p)
-               until (= p end)
-               ;; gen new str
-               ;; for str = (concat org-modern-hide-stars)
-               ;; do (put-text-property p (1+ p) 'display str)
-               do (compose-region p p+1 org-modern-hide-stars)
-               ))
+	  (cl-flet ((put-stars
+				 (str beg end)
+				 (cl-loop for p = beg then (+ p 2)
+						  until (>= p end)
+						  do (put-text-property p (1+ p) 'display str))))
+		(put-stars (car org-modern--hidestar-cache) beg end)
+		(put-stars (cdr org-modern--hidestar-cache) (1+ beg) end)))
     ;; tail star
     (when org-modern-star
       (let ((level (- end beg)))
@@ -704,6 +706,12 @@ the font.")
      (vconcat (mapcar
                (lambda (x) (propertize x 'face 'org-modern-symbol))
                org-modern-star))
+	 org-modern--hidestar-cache
+	 (and (stringp org-modern-hide-stars)
+		  (cons (propertize (concat org-modern-hide-stars) 'face
+							'org-modern-symbol)
+				(propertize (concat org-modern-hide-stars) 'face
+							'org-modern-symbol)))
      org-modern--progress-cache
      (vconcat (mapcar
                (lambda (x) (concat " " (propertize x 'face 'org-modern-symbol) " "))
