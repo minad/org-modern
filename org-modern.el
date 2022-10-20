@@ -454,7 +454,7 @@ the font.")
                 (b (match-end 0)))
             (cl-loop for i from a below b do
                      (put-text-property i (1+ i) 'display
-                                        (nth (mod i 2) org-modern--table-sp)))))))))
+                                        (nth (logand i 1) org-modern--table-sp)))))))))
 
 (defun org-modern--block-name ()
   "Prettify block according to `org-modern-block-name'."
