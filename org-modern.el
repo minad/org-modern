@@ -748,7 +748,7 @@ the font.")
     (save-match-data
       (when org-modern-todo
         (goto-char (point-min))
-        (let ((re (format ": +%s "
+        (let ((re (format " %s "
                           (regexp-opt
                            (append org-todo-keywords-for-agenda
                                    org-done-keywords-for-agenda) t)))
