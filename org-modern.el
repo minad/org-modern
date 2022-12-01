@@ -317,7 +317,7 @@ the font.")
     (unless rep
       (setq rep (cdr (assq t org-modern-keyword)) end (match-end 1)))
     (pcase rep
-      ('t (put-text-property beg (match-end 1) 'invisible 'org-modern))
+      ('t (put-text-property beg (match-end 1) 'display ""))
       ((pred stringp)
        (put-text-property beg end 'display rep)))))
 
@@ -485,12 +485,12 @@ the font.")
     (pcase rep
       ('t
        (add-face-text-property beg-name end-name 'org-modern-block-name)
-       (put-text-property (if fringe beg-ind beg-rep) beg-name 'invisible 'org-modern))
+       (put-text-property (if fringe beg-ind beg-rep) beg-name 'display ""))
       ((pred stringp)
        (add-face-text-property beg-name end-name 'org-modern-block-name)
        (put-text-property beg-rep end-rep 'display rep)
        (when fringe
-         (put-text-property beg-ind beg-rep 'invisible 'org-modern))))))
+         (put-text-property beg-ind beg-rep 'display ""))))))
 
 (defun org-modern--block-fringe ()
   "Prettify blocks with fringe bitmaps."
@@ -597,8 +597,8 @@ the font.")
         ,@(and (not (eq org-modern-hide-stars t))
                (or org-modern-star (stringp org-modern-hide-stars))
                '((0 (org-modern--star))))
-        ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil invisible org-modern))))
-        ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible org-modern)))))))
+        ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil display ""))))
+        ,@(and (eq org-modern-hide-stars t) '((0 '(face nil display "")))))))
    (when org-modern-horizontal-rule
      `(("^[ \t]*-\\{5,\\}$" 0
         '(face org-modern-horizontal-rule display
@@ -631,7 +631,7 @@ the font.")
            (3 '(face nil display ,(propertize (caddr org-modern-internal-target)
                                               'face 'org-modern-symbol)))
            ,@(unless (cadr org-modern-internal-target)
-               '((2 '(face nil invisible org-modern)))))))
+               '((2 '(face nil display "")))))))
       (when org-modern-radio-target
         `((,(format "\\(<<<\\)%s\\(>>>\\)" target)
            (0 '(face org-modern-radio-target) t)
@@ -640,7 +640,7 @@ the font.")
            (3 '(face nil display ,(propertize (caddr org-modern-radio-target)
                                               'face 'org-modern-symbol)))
            ,@(unless (cadr org-modern-radio-target)
-               '((2 '(face nil invisible org-modern)))))))))
+               '((2 '(face nil display "")))))))))
    (when org-modern-timestamp
      '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\.?\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
         (0 (org-modern--timestamp)))
@@ -656,7 +656,7 @@ the font.")
    (when org-modern-keyword
      `(("^[ \t]*\\(#\\+\\)\\([^: \t\n]+\\):"
         ,@(pcase org-modern-keyword
-            ('t '(1 '(face nil invisible org-modern)))
+            ('t '(1 '(face nil display "")))
             ((pred stringp) `(1 '(face nil display ,org-modern-keyword)))
             (_ '(0 (org-modern--keyword)))))))
    ;; Do not add source block fringe markers if org-indent-mode is
@@ -668,9 +668,9 @@ the font.")
    (when org-modern-block-name
      (let* ((indent (and org-modern-block-fringe
                          (not (bound-and-true-p org-indent-mode))
-                         '((1 '(face nil invisible org-modern)))))
+                         '((1 '(face nil display "")))))
             (name '(3 'org-modern-block-name append))
-            (hide `(,@indent (2 '(face nil invisible org-modern)) ,name))
+            (hide `(,@indent (2 '(face nil display "")) ,name))
             (specs
              (pcase org-modern-block-name
                ('t ;; Hide
@@ -692,7 +692,6 @@ the font.")
   :group 'org-modern
   (cond
    (org-modern-mode
-    (add-to-invisibility-spec 'org-modern)
     (setq
      org-modern--star-cache
      (vconcat (mapcar
@@ -720,7 +719,6 @@ the font.")
     (org-modern--update-label-face)
     (org-modern--update-fringe-bitmaps))
    (t
-    (remove-from-invisibility-spec 'org-modern)
     (font-lock-remove-keywords nil org-modern--font-lock-keywords)
     (font-lock-add-keywords nil org-font-lock-keywords)
     (setq-local font-lock-unfontify-region-function #'org-unfontify-region)
@@ -737,16 +735,14 @@ the font.")
          (append
           ;; Only remove line-prefix and wrap-prefix if org-indent-mode is disabled.
           (if (bound-and-true-p org-indent-mode)
-              '(display invisible)
-            '(wrap-prefix line-prefix display invisible))
+              '(display)
+            '(wrap-prefix line-prefix display))
           font-lock-extra-managed-props)))
     (org-unfontify-region beg end)))
 
 ;;;###autoload
 (defun org-modern-agenda ()
   "Finalize Org agenda highlighting."
-  (remove-from-invisibility-spec 'org-modern)
-  (add-to-invisibility-spec 'org-modern) ;; Not idempotent?!
   (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
   (save-excursion
     (save-match-data
