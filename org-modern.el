@@ -572,6 +572,12 @@ the font.")
       (define-fringe-bitmap 'org-modern--block-end
         (vconcat (make-vector (- 127 h) #x80) [#xFF] (make-vector h 0)) nil nil 'bottom))))
 
+(defun org-modern--symbol (str)
+  "Add `org-modern-symbol' face to STR."
+  (setq str (copy-sequence str))
+  (add-face-text-property 0 (length str) 'org-modern-symbol 'append str)
+  str)
+
 (defun org-modern--make-font-lock-keywords ()
   "Compute font-lock keywords."
   (append
@@ -626,19 +632,15 @@ the font.")
       (when org-modern-internal-target
         `((,(format "\\(<<\\)%s\\(>>\\)" target)
            (0 '(face org-modern-internal-target) t)
-           (1 '(face nil display ,(propertize (car org-modern-internal-target)
-                                              'face 'org-modern-symbol)))
-           (3 '(face nil display ,(propertize (caddr org-modern-internal-target)
-                                              'face 'org-modern-symbol)))
+           (1 '(face nil display ,(org-modern--symbol (car org-modern-internal-target))))
+           (3 '(face nil display ,(org-modern--symbol (caddr org-modern-internal-target))))
            ,@(unless (cadr org-modern-internal-target)
                '((2 '(face nil display "")))))))
       (when org-modern-radio-target
         `((,(format "\\(<<<\\)%s\\(>>>\\)" target)
            (0 '(face org-modern-radio-target) t)
-           (1 '(face nil display ,(propertize (car org-modern-radio-target)
-                                              'face 'org-modern-symbol)))
-           (3 '(face nil display ,(propertize (caddr org-modern-radio-target)
-                                              'face 'org-modern-symbol)))
+           (1 '(face nil display ,(org-modern--symbol (car org-modern-radio-target))))
+           (3 '(face nil display ,(org-modern--symbol (caddr org-modern-radio-target))))
            ,@(unless (cadr org-modern-radio-target)
                '((2 '(face nil display "")))))))))
    (when org-modern-timestamp
@@ -694,20 +696,17 @@ the font.")
    (org-modern-mode
     (setq
      org-modern--star-cache
-     (vconcat (mapcar
-               (lambda (x) (propertize x 'face 'org-modern-symbol))
-               org-modern-star))
+     (vconcat (mapcar #'org-modern--symbol org-modern-star))
      org-modern--hide-stars-cache
      (and (stringp org-modern-hide-stars)
-          (list (propertize org-modern-hide-stars 'face 'org-modern-symbol)
-                (propertize org-modern-hide-stars 'face 'org-modern-symbol)))
+          (list (org-modern--symbol org-modern-hide-stars)
+                (org-modern--symbol org-modern-hide-stars)))
      org-modern--progress-cache
      (vconcat (mapcar
-               (lambda (x) (concat " " (propertize x 'face 'org-modern-symbol) " "))
+               (lambda (x) (concat " " (org-modern--symbol x) " "))
                org-modern-progress))
      org-modern--checkbox-cache
-     (mapcar (pcase-lambda (`(,k . ,v))
-               (cons k (propertize v 'face 'org-modern-symbol)))
+     (mapcar (pcase-lambda (`(,k . ,v)) (cons k (org-modern--symbol v)))
              org-modern-checkbox)
      org-modern--font-lock-keywords
      (append (remove '(org-fontify-meta-lines-and-blocks) org-font-lock-keywords)
