@@ -130,6 +130,10 @@ and faces in the cdr. Example:
           (cons (string :tag "Keyword")
                 (sexp   :tag "Face   "))))
 
+(defcustom org-modern-fringe-width 8
+  "Minimum fringe width"
+  :type 'integer)
+
 (defcustom org-modern-tag t
   "Prettify tags in headlines, e.g., :tag1:tag2:."
   :type 'boolean)
@@ -566,11 +570,11 @@ the font.")
     (let* ((g (ceiling (frame-char-height) 1.8))
            (h (- (default-line-height) g)))
       (define-fringe-bitmap 'org-modern--block-inner
-        [128] nil nil '(top t))
+        [128] nil org-modern-fringe-width '(top t))
       (define-fringe-bitmap 'org-modern--block-begin
-        (vconcat (make-vector g 0) [#xFF] (make-vector (- 127 g) #x80)) nil nil 'top)
+        (vconcat (make-vector g 0) [#xFF] (make-vector (- 127 g) #x80)) nil org-modern-fringe-width 'top)
       (define-fringe-bitmap 'org-modern--block-end
-        (vconcat (make-vector (- 127 h) #x80) [#xFF] (make-vector h 0)) nil nil 'bottom))))
+        (vconcat (make-vector (- 127 h) #x80) [#xFF] (make-vector h 0)) nil org-modern-fringe-width 'bottom))))
 
 (defun org-modern--symbol (str)
   "Add `org-modern-symbol' face to STR."
@@ -694,6 +698,8 @@ the font.")
   :group 'org-modern
   (cond
    (org-modern-mode
+    (if (< (car (window-fringes)) org-modern-fringe-width)
+        (setq left-fringe-width org-modern-fringe-width))
     (add-to-invisibility-spec 'org-modern)
     (setq
      org-modern--star-cache
