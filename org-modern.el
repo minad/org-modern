@@ -157,9 +157,12 @@ all other blocks."
                         (string :tag "#+end_NAME replacement"))
                   (const :tag "Hide #+begin_ and #+end_ prefixes" t)))))
 
-(defcustom org-modern-block-fringe t
-  "Add a bitmap fringe to blocks."
-  :type 'boolean)
+(defcustom org-modern-block-fringe 0
+  "Add a border to the blocks in the fringe.
+This variable can also be set to an integer between 0 and 16,
+which specifies the offset of the block border from the edge of
+the window."
+  :type '(choice boolean integer))
 
 (defcustom org-modern-keyword t
   "Prettify keywords like #+title.
@@ -564,13 +567,16 @@ the font.")
              (fboundp 'fringe-bitmap-p)
              (not (fringe-bitmap-p 'org-modern--block-inner)))
     (let* ((g (ceiling (frame-char-height) 1.8))
-           (h (- (default-line-height) g)))
+           (h (- (default-line-height) g))
+           (v (expt 2 (- 15 (if (booleanp org-modern-block-fringe) 0
+                              org-modern-block-fringe))))
+           (w (+ v v -1)))
       (define-fringe-bitmap 'org-modern--block-inner
-        [128] nil nil '(top t))
+        (vector v) nil 16 '(top t))
       (define-fringe-bitmap 'org-modern--block-begin
-        (vconcat (make-vector g 0) [#xFF] (make-vector (- 127 g) #x80)) nil nil 'top)
+        (vconcat (make-vector g 0) (vector w) (make-vector (- 127 g) v)) nil 16 'top)
       (define-fringe-bitmap 'org-modern--block-end
-        (vconcat (make-vector (- 127 h) #x80) [#xFF] (make-vector h 0)) nil nil 'bottom))))
+        (vconcat (make-vector (- 127 h) v) (vector w) (make-vector h 0)) nil 16 'bottom))))
 
 (defun org-modern--symbol (str)
   "Add `org-modern-symbol' face to STR."
