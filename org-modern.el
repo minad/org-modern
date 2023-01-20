@@ -557,7 +557,7 @@ the font.")
        (list :color (face-attribute 'default :background nil t)
              :line-width
              ;; Emacs 28 supports different line horizontal and vertical line widths
-             (if (>= emacs-major-version 28)
+             (if (eval-when-compile (>= emacs-major-version 28))
                  (cons 0 (- border))
                (- border)))))))
 
