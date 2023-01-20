@@ -39,6 +39,7 @@
 
 (defgroup org-modern nil
   "Modern looks for Org."
+  :link '(url-link "https://github.com/minad/org-modern")
   :group 'org
   :prefix "org-modern-")
 
