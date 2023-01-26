@@ -33,7 +33,7 @@ if =line-spacing= has a value between 0.1 and 0.4 in the Org buffer. Note that
 =org-modern-mode=, e.g., the block brackets in the fringe.
 
 Bug reports, improvement or style proposals are welcome! Maybe some more Org
-elements deserve styling or alternative stylings should be offered?
+elements deserve styling or alternative styles should be offered?
 
 The tag style of =org-modern= is inspired by Nicholas Rougier's beautiful
 [[https://github.com/rougier/svg-tag-mode][svg-tag-mode]]. In contrast to =svg-tag-mode=, this package avoids images and uses
@@ -52,6 +52,8 @@ Another popular alternative is [[https://github.com/integral-dw/org-superstar-mo
 feature set and mainly adjusts headlines and lists. =org-superstar= relies on
 character composition, while =org-modern= uses text properties, which are
 considered more future-proof.
+
+* Configuration
 
 The package is available on GNU ELPA and MELPA. You can install the package with
 =package-install=. Then =org-modern= can be enabled manually in an Org buffer by
