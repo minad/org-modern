@@ -39,6 +39,7 @@
 
 (defgroup org-modern nil
   "Modern looks for Org."
+  :link '(info-link :tag "Info Manual" "(org-modern)")
   :link '(url-link :tag "Homepage" "https://github.com/minad/org-modern")
   :link '(emacs-library-link :tag "Library Source" "org-modern.el")
   :group 'org
