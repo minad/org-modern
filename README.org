@@ -1,6 +1,10 @@
 #+title: Modern Org Style
 #+author: Daniel Mendler
 #+language: en
+#+export_file_name: org-modern.texi
+#+texinfo_dir_category: Emacs misc features
+#+texinfo_dir_title: Org-Modern: (org-modern).
+#+texinfo_dir_desc: Modern Org Style
 
 #+html: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true"/></a>
 #+html: <a href="https://elpa.gnu.org/packages/org-modern.html"><img alt="GNU ELPA" src="https://elpa.gnu.org/packages/org-modern.svg"/></a>
