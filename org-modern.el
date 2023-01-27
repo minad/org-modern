@@ -142,8 +142,24 @@ and faces in the cdr.  Example:
     (quote ((\"TODO\" :background \"red\"
                     :foreground \"yellow\"))))"
   :type '(repeat
-          (cons (string :tag "Keyword")
-                (sexp   :tag "Face   "))))
+          (cons (choice
+                  (string :tag "Keyword")
+                  (const :tag "Default" t))
+                (sexp :tag "Face   "))))
+
+(defcustom org-modern-priority-faces nil
+  "Faces for priority tags.
+This is an alist, with priority character in the car and faces in
+the cdr.  Example:
+
+  (setq org-modern-priority-faces
+    (quote ((?A :background \"red\"
+                :foreground \"yellow\"))))"
+  :type '(repeat
+          (cons (choice
+                 (character :tag "Priority")
+                 (const :tag "Default" t))
+                (sexp :tag "Face   "))))
 
 (defcustom org-modern-tag t
   "Prettify tags in headlines, e.g., :tag1:tag2:."
@@ -269,13 +285,13 @@ the font.")
   ;; `:inverse-video' to use todo foreground as label background
   '((t :inherit (org-todo org-modern-label)
        :weight semibold :inverse-video t))
-  "Face used for todo labels.")
+  "Default face used for todo labels.")
 
 (defface org-modern-priority
   ;; `:inverse-video' to use priority foreground as label background
   '((t :inherit (org-priority org-modern-label)
        :weight semibold :inverse-video t))
-  "Face used for priority labels.")
+  "Default face used for priority labels.")
 
 (defface org-modern-statistics
   '((t :inherit org-modern-done))
@@ -346,14 +362,20 @@ the font.")
 
 (defun org-modern--priority ()
   "Prettify priorities according to `org-modern-priority'."
-  (let ((beg (match-beginning 1))
-        (end (match-end 1)))
+  (let* ((beg (match-beginning 1))
+         (end (match-end 1))
+         (prio (char-before (1- end))))
     (if-let ((rep (and (consp org-modern-priority)
-                       (cdr (assq (char-before (1- end)) org-modern-priority)))))
+                       (cdr (assq prio org-modern-priority)))))
         (put-text-property beg end 'display rep)
       (put-text-property beg (1+ beg) 'display " ")
       (put-text-property (1- end) end 'display " ")
-      (add-face-text-property beg end 'org-modern-priority t))))
+      (put-text-property
+       beg end 'face
+       (if-let ((face (or (cdr (assq prio org-modern-priority-faces))
+                          (cdr (assq t org-modern-priority-faces)))))
+           `(:inherit (,face org-modern-label))
+         'org-modern-priority)))))
 
 (defun org-modern--progress ()
   "Prettify headline todo progress."
@@ -400,7 +422,8 @@ the font.")
     (put-text-property (1- end) end 'display (string (char-before end) ?\s))
     (put-text-property
      beg end 'face
-     (if-let ((face (cdr (assoc todo org-modern-todo-faces))))
+     (if-let ((face (or (cdr (assoc todo org-modern-todo-faces))
+                        (cdr (assq t org-modern-todo-faces)))))
          `(:inherit (,face org-modern-label))
        (if (member todo org-done-keywords)
            'org-modern-done
@@ -626,11 +649,7 @@ the font.")
      `(("^[ \t]+\\(*\\)[ \t]" 1 '(face nil display ,bullet))))
    (when org-modern-priority
      `(("^\\*+.*? \\(\\(\\[\\)#.\\(\\]\\)\\) "
-        ,@(if (eq org-modern-priority t)
-              '((1 'org-modern-priority t)
-                (2 '(face nil display " "))
-                (3 '(face nil display " ")))
-            '(1 (org-modern--priority))))))
+        (1 (org-modern--priority)))))
    (when org-modern-todo
      `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t))
         (0 (org-modern--todo)))))
