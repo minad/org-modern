@@ -93,8 +93,19 @@ Set to nil to hide the vertical lines."
   :type '(choice (const nil) number))
 
 (defcustom org-modern-priority t
-  "Prettify priorities."
-  :type 'boolean)
+  "Prettify priorities.
+If set to t, the priority will be prettified with the brackets
+hidden.  If set to an alist of characters and strings, the
+associated string will be used as replacement for the given
+priority.  Example:
+
+  (setq org-modern-priority
+    (quote ((?A . \"❗\")
+            (?B . \"⬆\")
+            (?C . \"⬇\"))))"
+  :type '(choice (boolean :tag "Prettify")
+                 (alist :key-type (character :tag "Priority")
+                        :value-type (string :tag "Replacement"))))
 
 (defcustom org-modern-list
   '((?+ . "◦")
@@ -170,10 +181,15 @@ the window."
 
 (defcustom org-modern-keyword t
   "Prettify keywords like #+title.
-If set to t, the prefix #+ will be hidden.
-If set to a string, e.g., \"‣\", the string is used as replacement for #+.
-If set to an alist of keywords and strings, the associated string will be
-used as replacement for \"#+keyword:\", with t the default key."
+If set to t, the prefix #+ will be hidden.  If set to a string,
+e.g., \"‣\", the string is used as replacement for #+.  If set to
+an alist of keywords and strings, the associated string will be
+used as replacement for \"#+keyword:\", with t the default key.
+Example:
+
+  (setq org-modern-keyword
+    (quote ((\"options\" . \"🔧\")
+            (t . t))))"
   :type '(choice (boolean :tag "Hide prefix")
                  (string :tag "Replacement")
                  (const :tag "Triangle bullet" "‣")
@@ -327,6 +343,16 @@ the font.")
       ('t (put-text-property beg (match-end 1) 'invisible 'org-modern))
       ((pred stringp)
        (put-text-property beg end 'display rep)))))
+
+(defun org-modern--priority ()
+  "Prettify priorities according to `org-modern-priority'."
+  (let ((beg (match-beginning 1))
+        (end (match-end 1)))
+    (if-let ((rep (cdr (assq (char-before (1- end)) org-modern-priority))))
+        (put-text-property beg end 'display rep)
+      (put-text-property beg (1+ beg) 'display " ")
+      (put-text-property (1- end) end 'display " ")
+      (add-face-text-property beg end 'org-modern-priority t))))
 
 (defun org-modern--progress ()
   "Prettify headline todo progress."
@@ -598,10 +624,12 @@ the font.")
    (when-let ((bullet (alist-get ?* org-modern-list)))
      `(("^[ \t]+\\(*\\)[ \t]" 1 '(face nil display ,bullet))))
    (when org-modern-priority
-     '(("^\\*+.*? \\(\\(\\[\\)#.\\(\\]\\)\\) "
-        (1 'org-modern-priority t)
-        (2 '(face nil display " "))
-        (3 '(face nil display " ")))))
+     `(("^\\*+.*? \\(\\(\\[\\)#.\\(\\]\\)\\) "
+        ,@(if (eq org-modern-priority t)
+              '((1 'org-modern-priority t)
+                (2 '(face nil display " "))
+                (3 '(face nil display " ")))
+            '(1 (org-modern--priority))))))
    (when org-modern-todo
      `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t))
         (0 (org-modern--todo)))))
