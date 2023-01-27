@@ -348,7 +348,8 @@ the font.")
   "Prettify priorities according to `org-modern-priority'."
   (let ((beg (match-beginning 1))
         (end (match-end 1)))
-    (if-let ((rep (cdr (assq (char-before (1- end)) org-modern-priority))))
+    (if-let ((rep (and (consp org-modern-priority)
+                       (cdr (assq (char-before (1- end)) org-modern-priority)))))
         (put-text-property beg end 'display rep)
       (put-text-property beg (1+ beg) 'display " ")
       (put-text-property (1- end) end 'display " ")
@@ -803,13 +804,11 @@ the font.")
             (org-modern--tag))))
       (when org-modern-priority
         (goto-char (point-min))
-        (while (re-search-forward "\\(\\[\\)#.\\(\\]\\)" nil 'noerror)
+        (while (re-search-forward "\\(\\[#.\\]\\)" nil 'noerror)
           ;; For some reason the org-agenda-fontify-priorities adds overlays?!
           (when-let ((ov (overlays-at (match-beginning 0))))
             (overlay-put (car ov) 'face nil))
-          (put-text-property (match-beginning 0) (match-end 0) 'face 'org-modern-priority)
-          (put-text-property (match-beginning 1) (match-end 1) 'display " ")
-          (put-text-property (match-beginning 2) (match-end 2) 'display " "))))))
+          (org-modern--priority))))))
 
 ;;;###autoload
 (define-globalized-minor-mode global-org-modern-mode
