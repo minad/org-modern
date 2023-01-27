@@ -27,7 +27,7 @@
 ;;; Commentary:
 
 ;; This package adds some styling to your Org buffer, which gives it a
-;; modern look. Enable the styling by default with:
+;; modern look.  Enable the styling by default with:
 ;;   (add-hook 'org-mode-hook 'org-modern-mode)
 
 ;;; Code:
@@ -68,10 +68,11 @@ Set to nil to disable."
 
 (defcustom org-modern-timestamp t
   "Prettify time stamps, e.g. <2022-03-01>.
-Set to nil to disable styling the time stamps. In order to use custom
-timestamps, the format should be (DATE . TIME) where DATE is the format
-for date, and TIME is the format for time. DATE and TIME must be
-surrounded with space. For the syntax, refer to `format-time-string'."
+Set to nil to disable styling the time stamps.  In order to use
+custom timestamps, the format should be (DATE . TIME) where DATE
+is the format for date, and TIME is the format for time.  DATE
+and TIME must be surrounded with space.  For the syntax, refer to
+`format-time-string'."
   :type '(choice
           (const :tag "Disable time stamp styling" nil)
           (const :tag "Enable timestamp styling" t)
@@ -124,7 +125,7 @@ replacement expression, e.g., a string."
 (defcustom org-modern-todo-faces nil
   "Faces for todo keywords.
 This is an alist, with todo keywords in the car
-and faces in the cdr. Example:
+and faces in the cdr.  Example:
 
   (setq org-modern-todo-faces
     (quote ((\"TODO\" :background \"red\"
@@ -212,7 +213,7 @@ Set to nil to disable the indicator."
 
 (defface org-modern-symbol nil
   "Face used for stars, checkboxes and progress indicators.
-You can specify a font `:family'. The font families `Iosevka', `Hack' and
+You can specify a font `:family'.  The font families `Iosevka', `Hack' and
 `DejaVu Sans' give decent results.")
 
 (defface org-modern-label
@@ -220,7 +221,7 @@ You can specify a font `:family'. The font families `Iosevka', `Hack' and
   "Parent face for labels.
 The parameters of this face depend on typographical properties of
 the font and should therefore be adjusted by the user depending
-on their font, e.g., the :width or :height parameters. Themes
+on their font, e.g., the :width or :height parameters.  Themes
 should not override this face, since themes usually don't control
 the font.")
 
