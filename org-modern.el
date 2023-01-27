@@ -329,7 +329,7 @@ the font.")
         (end (match-end 1)))
     (put-text-property
      beg end 'display
-     (alist-get (char-after (1+ beg)) org-modern--checkbox-cache))))
+     (cdr (assq (char-after (1+ beg)) org-modern--checkbox-cache)))))
 
 (defun org-modern--keyword ()
   "Prettify keywords according to `org-modern-keyword'."
