@@ -373,7 +373,7 @@ the font.")
     (put-text-property (1- end) end 'display (string (char-before end) ?\s))
     (put-text-property
      beg end 'face
-     (if-let (face (cdr (assoc todo org-modern-todo-faces)))
+     (if-let ((face (cdr (assoc todo org-modern-todo-faces))))
          `(:inherit (,face org-modern-label))
        (if (member todo org-done-keywords)
            'org-modern-done
@@ -536,8 +536,8 @@ the font.")
 
 (defun org-modern--pre-redisplay (_)
   "Compute font parameters before redisplay."
-  (when-let (box (and org-modern-label-border
-                      (face-attribute 'org-modern-label :box nil t)))
+  (when-let ((box (and org-modern-label-border
+                       (face-attribute 'org-modern-label :box nil t))))
     (unless (equal (and (listp box) (plist-get box :color))
                    (face-attribute 'default :background nil t))
       (org-modern--update-label-face)))
@@ -591,11 +591,11 @@ the font.")
 (defun org-modern--make-font-lock-keywords ()
   "Compute font-lock keywords."
   (append
-   (when-let (bullet (alist-get ?+ org-modern-list))
+   (when-let ((bullet (alist-get ?+ org-modern-list)))
      `(("^[ \t]*\\(+\\)[ \t]" 1 '(face nil display ,bullet))))
-   (when-let (bullet (alist-get ?- org-modern-list))
+   (when-let ((bullet (alist-get ?- org-modern-list)))
      `(("^[ \t]*\\(-\\)[ \t]" 1 '(face nil display ,bullet))))
-   (when-let (bullet (alist-get ?* org-modern-list))
+   (when-let ((bullet (alist-get ?* org-modern-list)))
      `(("^[ \t]+\\(*\\)[ \t]" 1 '(face nil display ,bullet))))
    (when org-modern-priority
      '(("^\\*+.*? \\(\\(\\[\\)#.\\(\\]\\)\\) "
@@ -628,12 +628,12 @@ the font.")
         (0 (org-modern--tag)))))
    (when org-modern-footnote
      `(("^\\(\\[fn:\\)[[:word:]-_]+\\]" ;; Definition
-        ,@(if-let (x (car org-modern-footnote))
+        ,@(if-let ((x (car org-modern-footnote)))
               `((0 '(face nil display ,x))
                 (1 '(face nil display ,(propertize "[" 'display x))))
             '((1 '(face nil display "[")))))
        ("[^\n]\\(\\(\\[fn:\\)[[:word:]-_]+\\]\\)" ;; Reference
-        ,@(if-let (x (cdr org-modern-footnote))
+        ,@(if-let ((x (cdr org-modern-footnote)))
               `((1 '(face nil display ,x))
                 (2 '(face nil display ,(propertize "[" 'display x))))
             '((2 '(face nil display "[")))))))
@@ -777,7 +777,8 @@ the font.")
         (goto-char (point-min))
         (while (re-search-forward "\\(\\[\\)#.\\(\\]\\)" nil 'noerror)
           ;; For some reason the org-agenda-fontify-priorities adds overlays?!
-          (when-let (ov (overlays-at (match-beginning 0))) (overlay-put (car ov) 'face nil))
+          (when-let ((ov (overlays-at (match-beginning 0))))
+            (overlay-put (car ov) 'face nil))
           (put-text-property (match-beginning 0) (match-end 0) 'face 'org-modern-priority)
           (put-text-property (match-beginning 1) (match-end 1) 'display " ")
           (put-text-property (match-beginning 2) (match-end 2) 'display " "))))))
