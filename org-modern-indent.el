@@ -4,7 +4,7 @@
 ;; Author: J.D. Smith
 ;; Homepage: https://github.com/jdtsmith/org-modern-indent
 ;; Package-Requires: ((emacs "27.2") (org "9.5.2"))
-;; Version: 0.0.2
+;; Version: 0.0.3
 ;; Keywords: convenience
 ;; Prefix: org-modern-indent
 ;; Separator: -
