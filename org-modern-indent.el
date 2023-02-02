@@ -137,20 +137,19 @@ To be set as :around advice for `org-insert-structure-template'."
   :group 'org-modern-indent
   (if org-modern-indent-mode
       (progn
-      (setq org-modern-indent-begin
-	    (propertize "╭" 'face 'org-modern-indent-line)
-	    org-modern-indent-guide
-	    (propertize "│" 'face 'org-modern-indent-line)
-	    org-modern-indent-end
-	    (propertize "╰" 'face 'org-modern-indent-line))
-      (setq-local org-fontify-quote-and-verse-blocks t)
-      (setf (symbol-function 'org-indent-set-line-properties)
-	    (symbol-function 'org-modern-indent-set-line-properties))
-      (advice-add #'org-insert-structure-template :around #'org-modern-indent-block-insert))
+	(setq org-modern-indent-begin
+	      (propertize "╭" 'face 'org-modern-indent-line)
+	      org-modern-indent-guide
+	      (propertize "│" 'face 'org-modern-indent-line)
+	      org-modern-indent-end
+	      (propertize "╰" 'face 'org-modern-indent-line))
+	(setq-local org-fontify-quote-and-verse-blocks t)
+	(setf (symbol-function 'org-indent-set-line-properties)
+	      (symbol-function 'org-modern-indent-set-line-properties))
+	(advice-add #'org-insert-structure-template :around #'org-modern-indent-block-insert))
     (advice-remove #'org-insert-structure-template #'org-modern-indent-block-insert)
     (setf (symbol-function 'org-indent-set-line-properties)
-	  org-modern-indent-set-line-properties--orig))
-  (org-indent-indent-buffer))
+	  org-modern-indent-set-line-properties--orig)))
 
 (provide 'org-modern-indent)
 ;;; org-modern-indent.el ends here
