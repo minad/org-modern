@@ -14,6 +14,7 @@ This small package reproduces the block styling of `org-modern` when using `org-
 - This package is only for users of `org-indent-mode`, and will _enable_ org-indent if it is not already.
 - Can be used _with or without_ `org-modern`. 
 - Non-zero `line-spacing` will introduce gaps between the block bracket characters.
+- If you toggle off `org-modern-indent` in an active buffer you need to `M-x org-indent-indent-buffer` to remove the block styling.
 
 ## Configure
 
