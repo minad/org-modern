@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2022
 ;; Version: 0.8
-;; Package-Requires: ((emacs "27.1"))
+;; Package-Requires: ((emacs "27.1") (compat "29.1.4.0"))
 ;; Homepage: https://github.com/minad/org-modern
 
 ;; This file is part of GNU Emacs.
@@ -32,6 +32,7 @@
 
 ;;; Code:
 
+(require 'compat)
 (require 'org)
 (eval-when-compile
   (require 'cl-lib)
@@ -86,7 +87,7 @@ and TIME must be surrounded with space.  For the syntax, refer to
 (defcustom org-modern-table-vertical 3
   "Width of vertical table lines in pixels.
 Set to nil to hide the vertical lines."
-  :type '(choice (const nil) integer))
+  :type '(choice (const nil) natnum))
 
 (defcustom org-modern-table-horizontal 0.1
   "Prettify horizontal table lines."
@@ -193,7 +194,7 @@ all other blocks."
 This variable can also be set to an integer between 0 and 16,
 which specifies the offset of the block border from the edge of
 the window."
-  :type '(choice boolean integer))
+  :type '(choice boolean natnum))
 
 (defcustom org-modern-keyword t
   "Prettify keywords like #+title.
