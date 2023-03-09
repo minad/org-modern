@@ -1,0 +1,14 @@
+#+title: org-modern.el - Changelog
+#+author: Daniel Mendler
+#+language: en
+
+* Development
+
+- Improve prettification of stars, such that line movement commands are not
+  affected negatively.
+- Use =natnum= custom types.
+- Depend on the Compat library.
+
+* Version 0.8 (2023-02-15)
+
+- Start of changelog.
