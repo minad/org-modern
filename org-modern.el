@@ -333,7 +333,6 @@ the font.")
 (defvar-local org-modern--font-lock-keywords nil)
 (defvar-local org-modern--star-cache nil)
 (defvar-local org-modern--hide-stars-cache nil)
-(defvar-local org-modern--reset-hide-leading-stars nil)
 (defvar-local org-modern--checkbox-cache nil)
 (defvar-local org-modern--progress-cache nil)
 (defvar-local org-modern--table-sp-width 0)
@@ -482,11 +481,9 @@ the font.")
                                   (nth (logand i 1)
                                        org-modern--hide-stars-cache))))
     (when org-modern-star
-      (put-text-property
-       (if (eq org-modern-hide-stars 'leading) beg end)
-       (1+ end) 'display
-       (aref org-modern--star-cache
-             (min (1- (length org-modern--star-cache)) level))))))
+      (put-text-property end (1+ end) 'display
+                         (aref org-modern--star-cache
+                               (min (1- (length org-modern--star-cache)) level))))))
 
 (defun org-modern--table ()
   "Prettify vertical table lines."
@@ -661,9 +658,11 @@ the font.")
         (0 (org-modern--checkbox)))))
    (when (or org-modern-star org-modern-hide-stars)
      `(("^\\(\\**\\)\\* "
-        (0 ,(if (eq org-modern-hide-stars t)
-                ''(face nil invisible org-modern)
-              '(org-modern--star))))))
+        ,@(and (not (eq org-modern-hide-stars t))
+               (or org-modern-star (stringp org-modern-hide-stars))
+               '((0 (org-modern--star))))
+        ,@(and (eq org-modern-hide-stars 'leading) '((1 '(face nil invisible org-modern))))
+        ,@(and (eq org-modern-hide-stars t) '((0 '(face nil invisible org-modern)))))))
    (when org-modern-horizontal-rule
      `(("^[ \t]*-\\{5,\\}$" 0
         '(face org-modern-horizontal-rule display
@@ -751,15 +750,9 @@ the font.")
   "Modern looks for Org."
   :global nil
   :group 'org-modern
-  (when org-modern--reset-hide-leading-stars
-    (setq-local org-hide-leading-stars t
-                org-modern--reset-hide-leading-stars nil))
   (cond
    (org-modern-mode
     (add-to-invisibility-spec 'org-modern)
-    (when (and (eq org-modern-hide-stars 'leading) org-hide-leading-stars)
-      (setq-local org-modern--reset-hide-leading-stars t
-                  org-hide-leading-stars nil))
     (setq
      org-modern--star-cache
      (vconcat (mapcar #'org-modern--symbol org-modern-star))
@@ -781,8 +774,6 @@ the font.")
     (font-lock-add-keywords nil org-modern--font-lock-keywords)
     (setq-local font-lock-unfontify-region-function #'org-modern--unfontify)
     (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
-    (add-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line nil 'local)
-    (add-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line nil 'local)
     (org-modern--update-label-face)
     (org-modern--update-fringe-bitmaps))
    (t
@@ -790,18 +781,12 @@ the font.")
     (font-lock-remove-keywords nil org-modern--font-lock-keywords)
     (font-lock-add-keywords nil org-font-lock-keywords)
     (setq-local font-lock-unfontify-region-function #'org-unfontify-region)
-    (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)
-    (remove-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line 'local)
-    (remove-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line 'local)))
+    (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)))
   (save-restriction
     (widen)
     (with-silent-modifications
       (org-modern--unfontify (point-min) (point-max)))
     (font-lock-flush)))
-
-(defun org-modern--unfontify-line ()
-  "Unfontify prettified elements on current line."
-  (org-modern--unfontify (pos-bol) (pos-eol)))
 
 (defun org-modern--unfontify (beg end &optional _loud)
   "Unfontify prettified elements between BEG and END."
