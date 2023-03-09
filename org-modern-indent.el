@@ -1,10 +1,10 @@
 ;;; org-modern-indent.el --- org-indent blocks like org-modern -*- lexical-binding: t; -*-
-;; Copyright (C) 2022  J.D. Smith
+;; Copyright (C) 2022-2023  J.D. Smith
 
 ;; Author: J.D. Smith
 ;; Homepage: https://github.com/jdtsmith/org-modern-indent
-;; Package-Requires: ((emacs "27.2") (org "9.5.2"))
-;; Version: 0.0.3
+;; Package-Requires: ((emacs "27.1") (org "9.5.2") (compat "29.1.4.0"))
+;; Version: 0.1.0
 ;; Keywords: convenience
 ;; Prefix: org-modern-indent
 ;; Separator: -
@@ -25,131 +25,138 @@
 ;;; Commentary:
 
 ;; org-modern-indent provides the block highlighting of org-modern,
-;; even when org-indent is enabled.
-;; Requires:
-;;   - org-indent-mode enabled
+;; when org-indent is enabled.
 ;;   
-;; Can be used with or without org-modern.   
+;; Can be used with or without org-modern.
 
 ;;; Code:
-(require 'org-indent)
-(require 'seq)
-
-;; Add face for org-modern-indent line
-(defface org-modern-indent-line '((t (:inherit (org-meta-line) :weight light)))
-  "Face for line in org-modern-indent."
-  :group 'faces)
-
-(defun org-modern-indent--face-in (faces element)
-  "Determine if any of FACES are present in ELEMENT.
-FACES must be a list.  A face can be 'present' by being named
-explicitly, or inherited."
-  (cl-loop for face in faces
-	   if (cond ((consp element)
-		     (or (memq face element)
-			 (if-let ((inh (plist-get element :inherit))) 
-			     (if (consp inh)
-				 (memq face inh) (eq inh face)))))
-		    (t (eq element face)))
-	   return t))
-
-(defun org-modern-indent--add-props (beg end line extra-pad &optional guide wrap-guide)
-  (with-silent-modifications
-    (add-text-properties beg end
-			 `(line-prefix
-			   ,(concat line guide)
-			   wrap-prefix
-			   ,(concat line (or wrap-guide guide) extra-pad)))))
-
-(defvar org-modern-indent-begin nil)
-(defvar org-modern-indent-guide	nil)
-(defvar org-modern-indent-end   nil)
-(defvar-local org-modern--disabled nil)
-(defun org-modern-indent-set-line-properties (level indentation &optional heading)
-  "An org-modern inspired redefinition of `org-indent-set-line-properties'.
-Used to approximate org-modern block style.  Treats blocks
-specially, by extending the line and wrap prefixes with a box
-guide unicode character."
-  (let ((line (aref (pcase heading
-		      (`nil org-indent--text-line-prefixes)
-		      (`inlinetask org-indent--inlinetask-line-prefixes)
-		      (_ org-indent--heading-line-prefixes))
-		    level))
-	(extra-pad (if (> indentation 0)
-		       (org-add-props
-			   (if heading (concat (make-string level ?*) " ")
-			     (make-string indentation ?\s))
-			   nil 'face 'org-indent)))
-	(change-beg (line-beginning-position))
-	(change-end (line-beginning-position 2))
-	(line-end (line-end-position)))
-    (unless (or org-modern--disabled (get-text-property (point) 'fontified)) 
-      (font-lock-ensure change-beg line-end)) ;sometimes we beat font-lock
-    (or (when-let (((eq heading nil))
-		   ((not org-modern--disabled))
-		   (face (get-text-property (point) 'face)))
-	  (cond
-	   ;; Block begin: use begin prefix, use guide for following blank line + wrap
-	   ((org-modern-indent--face-in '(org-block-begin-line) face)
-	    (org-modern-indent--add-props change-beg line-end line extra-pad
-					  org-modern-indent-begin org-modern-indent-guide)
-	    ;; possible blank line following
-	    (org-modern-indent--add-props line-end change-end line extra-pad
-					  org-modern-indent-guide))
-
-	   ;; Block body: use guide prefix
-	   ((org-modern-indent--face-in '(org-block org-quote org-verse) face)
-	    (org-modern-indent--add-props change-beg change-end line extra-pad
-					  org-modern-indent-guide))
-
-	   ;; Block end: use end prefix
-	   ((org-modern-indent--face-in '(org-block-end-line) face)
-	    (org-modern-indent--add-props change-beg line-end line extra-pad
-					  org-modern-indent-end))))
-	;; Non-block line: pad normally
-	(org-modern-indent--add-props change-beg change-end line extra-pad)))
-  (forward-line))
-
-(defun org-modern-indent-block-insert (fun &rest r)
-  "Refresh block after insertion.
-To be set as :around advice for `org-insert-structure-template'."
-  (let* ((reg (use-region-p))
-	 (p (if reg (region-beginning) (point)))
-	 (m (point-marker)))
-    (set-marker-insertion-type m t)
-    (if reg (set-marker m (region-end)))
-    (let ((org-modern--disabled t)) (apply fun r))
-    (org-indent-refresh-maybe p m nil)))
-
-(defvar org-modern-indent-set-line-properties--orig
-  (symbol-function 'org-indent-set-line-properties)
-  "Original `org-indent-set-line-properties' function.")
+(require 'compat)
+(eval-when-compile (require 'cl-lib))
 
 (defgroup org-modern-indent nil
-  "org-modern style blocks with org-indent."
+  "Org-modern style blocks which works with org-indent."
   :group 'org
-  :prefix "org-modern-indent")
+  :prefix "org-modern-indent-")
+
+;; Face for org-modern-indent line
+(defface org-modern-bracket-line '((t (:inherit (org-meta-line) :weight light)))
+  "Face for bracket line in org-modern-indent."
+  :group 'faces)
+
+(defconst org-modern-indent-begin (propertize "╭" 'face 'org-modern-bracket-line))
+(defconst org-modern-indent-guide (propertize "│" 'face 'org-modern-bracket-line))
+(defconst org-modern-indent-end   (propertize "╰" 'face 'org-modern-bracket-line))
+
+(defvar org-modern-indent--font-lock-keywords
+  `(("^\\([ \t]*\\)\\(#\\+\\)\\(?:begin\\|BEGIN\\)_\\S-"
+     (0 (org-modern-indent--block-bracket)))))
+
+(defun org-modern-indent--block-bracket ()
+  "Prettify blocks with in-text brackets.
+For use with `org-indent'.  Uses either in-text brackets, for
+auto-indented org text (with real spaces in the buffer, e.g. in
+plain lists), or `line-prefix' brackets, when the #+begin part of
+the block is flush left in the buffer."
+  (save-excursion
+    (goto-char (match-beginning 0))
+    (if (eq (length (match-string 1)) 0)
+	(org-modern-indent--block-bracket-flush)
+      (org-modern-indent--block-bracket-indented))))
+
+(defvar org-modern-indent--block-prefixes (make-hash-table :test 'eq))
+(defun org-modern-indent--block-bracket-prefix (prefix)
+  "Return a vector of 3 prefix strings based on the length of the current PREFIX.
+The three returned prefixes include begin, end, and guide bracket
+indicators, and are cached by prefix length, for speed.
+Additionally, the original prefix string is included at the end
+of the returned vector."
+  (let* ((l (length prefix)))
+    (or (gethash l org-modern-indent--block-prefixes)
+	(puthash l (cl-loop for type in '("begin" "guide" "end")
+			    for tstr = (symbol-value
+					(intern (concat "org-modern-indent-" type)))
+			    with pstr = (substring prefix 0 -1)
+			    collect (concat pstr tstr) into prefix-brackets
+			    finally return (vconcat prefix-brackets (list prefix)))
+		 org-modern-indent--block-prefixes))))
+
+(defun org-modern-indent--block-bracket-flush ()
+  "Insert brackets for org blocks flush with the line prefix."
+  (let* ((lpf (get-text-property (point) 'line-prefix))
+	 (vec (org-modern-indent--block-bracket-prefix lpf))
+	 (pind (match-beginning 2)) 	;start of #+begin_
+	 (block-start (min (line-end-position) (point-max))))
+    (add-text-properties (point) block-start
+			 `( line-prefix ,(aref vec 0) wrap-prefix ,(aref vec 1)))
+    (put-text-property pind (1+ pind) 'org-modern-block-flush t)
+    (while
+	(cond
+	 ((eobp) nil)
+	 ((looking-at "^[ \t]*#\\+\\(?:end\\|END\\)_")
+	  (add-text-properties (1+ block-start) (point)
+			       `(line-prefix ,(aref vec 1) wrap-prefix ,(aref vec 1)))
+	  (add-text-properties (point) (min (line-end-position) (point-max))
+			       `(line-prefix ,(aref vec 2) wrap-prefix ,(aref vec 2)))
+	  nil)
+	 (t (forward-line))))))
+
+(defun org-modern-indent--block-bracket-indented ()
+  "Insert brackets on space-indented org blocks, e.g. within plain lists."
+  (let* ((pf (get-text-property (point) 'line-prefix)) ; prefix from org-indent
+	 (pind (match-beginning 2))		       ; at the #
+	 (flush (get-text-property pind 'org-modern-block-flush))
+	 (indent (current-indentation)) ; space up to #+begin_
+	 (block-indent (+ (point) indent))
+	 (search (concat "^[[:blank:]]\\{" (number-to-string indent) "\\}"))
+	 (wrap (concat (make-string (if pf (+ indent (length pf) -1) indent) ?\s)
+		       org-modern-indent-guide))
+	 orig-prefix)
+    (message "PINd: %S" pind)
+    (when flush ; formerly this block was flush left
+      (message "Dealing with formerly flush left")
+      (setq pf (aref (org-modern-indent--block-bracket-prefix pf) 3)
+	    orig-prefix `(line-prefix ,pf)) ; for resetting prefix to saved
+      (add-text-properties (point) (min (line-end-position) (point-max))
+			   `(line-prefix ,pf wrap-prefix ,pf))
+      (put-text-property pind (1+ pind) 'org-modern-block-flush nil))
+    
+    (put-text-property (point) block-indent 'face nil)
+    (put-text-property (1- block-indent) block-indent
+		       'display org-modern-indent-begin)
+    (while
+	(progn
+	  (add-text-properties
+           (point) (min (line-end-position) (point-max))
+           `(wrap-prefix ,wrap ,@orig-prefix))
+	  (forward-line)
+	  (setq block-indent (+ (point) indent))
+	  (let ((lep (line-end-position)))
+	    (when (< block-indent lep)
+	      (put-text-property (point) block-indent 'face nil))
+	    (cond
+	     ((eobp) nil)
+	     ((looking-at "^\\([ \t]*\\)#\\+\\(?:end\\|END\\)_")
+	      (if (>= (length (match-string 1)) indent)
+		  (put-text-property (1- block-indent) block-indent
+				     'display org-modern-indent-end))
+	      (when flush
+		(add-text-properties
+		 (point) (min (line-end-position) (point-max))
+		 `(wrap-prefix ,pf ,@orig-prefix)))
+	      nil)
+	     (t (if (and (<= block-indent lep) (looking-at-p search))
+		    (put-text-property (1- block-indent) block-indent
+				       'display org-modern-indent-guide))
+		t)))))))
 
 ;;;###autoload
 (define-minor-mode org-modern-indent-mode
-  "Org-modern with org-indent"
+  "Org-modern-like block brackets within org-indent."
   :global nil
   :group 'org-modern-indent
   (if org-modern-indent-mode
-      (progn
-	(setq org-modern-indent-begin
-	      (propertize "╭" 'face 'org-modern-indent-line)
-	      org-modern-indent-guide
-	      (propertize "│" 'face 'org-modern-indent-line)
-	      org-modern-indent-end
-	      (propertize "╰" 'face 'org-modern-indent-line))
-	(setq-local org-fontify-quote-and-verse-blocks t)
-	(setf (symbol-function 'org-indent-set-line-properties)
-	      (symbol-function 'org-modern-indent-set-line-properties))
-	(advice-add #'org-insert-structure-template :around #'org-modern-indent-block-insert))
-    (advice-remove #'org-insert-structure-template #'org-modern-indent-block-insert)
-    (setf (symbol-function 'org-indent-set-line-properties)
-	  org-modern-indent-set-line-properties--orig)))
+      (font-lock-add-keywords nil org-modern-indent--font-lock-keywords)
+    (font-lock-remove-keywords nil org-modern-indent--font-lock-keywords)))
 
 (provide 'org-modern-indent)
 ;;; org-modern-indent.el ends here
