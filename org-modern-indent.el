@@ -161,16 +161,14 @@ of the returned vector.  If PREFIX is nil or empty, nil is returned."
 	  (not (memq buf org-indent-agentized-buffers)))
       (progn
 	(font-lock-add-keywords nil org-modern-indent--font-lock-keywords t)
-	;; (org-unfontify-region (point-min) (point-max))
 	(font-lock-flush))
-    (run-with-idle-timer 0.25 nil #'org-modern-indent--wait-and-refresh buf)))
+    (run-at-time 0.1 nil #'org-modern-indent--wait-and-refresh buf)))
 
 (defun org-modern-indent--refresh ()
   "Unfontify entire buffer and refresh line prefix."
   (with-silent-modifications
     (if org-indent-mode
 	(org-indent-refresh-maybe (point-min) (point-max) nil))
-    ;; (org-unfontify-region (point-min) (point-max))
     (font-lock-flush)))
 
 (defun org-modern-indent--unfontify-wrap (fun)
