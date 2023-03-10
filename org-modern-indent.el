@@ -190,7 +190,7 @@ FUN is the wrapped function `org-indent-refresh-maybe', and BEG,
 END, and R are its arguments."
   (let ((hmod org-indent-modified-headline-flag) p end2 is-flush)
     (apply fun beg end r)
-    ;; Recover the args passed to org-indent-add-properties
+    ;; Recover the args just passed to org-indent-add-properties
     (setq end2 (cadr org-modern-indent--refresh-args))
     (when (or hmod (/= end end2))
       (setq p (1- beg))

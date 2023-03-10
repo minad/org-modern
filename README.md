@@ -47,7 +47,7 @@ As an important principle, `org-modern-indent` does not alter the contents of th
    ```
 - **Move flush left**: Note: `M-{` will get you to the start of a block quickly.  `M-\` at block start will move the block's first header line to column 0.  Then `M-S-left` (or `right`) will indent the full block.  
 - **Indent rigidly**: `M-h` selects the entire block. Then `C-x TAB` enters "rigid indent" mode, after which left/right moves the entire block.
-- **Fix a block**: If you have a block with a misaligned or "hanging end", like so:
+- **Re-indent a block**: If you have a block that is partially aligned, perhaps with a "hanging end", like so:
    ```org
    - List 1
        - List 2
@@ -55,9 +55,7 @@ As an important principle, `org-modern-indent` does not alter the contents of th
 		   foo_lang(x)
 	   #+end_src
    ```
-  you can simply use `M-S-left/right` at block start to `org-indent-block`. 
-
-Note that `org-src-preserve-indentation=nil` is an important setting, to allow org to (re-)indent blocks to respect the local indentation inside list and other elements.  Also note that (from `org-indent-region`): 
+  you can simply use `M-S-left/right` at block start (or in fact anywhere on the block header/footer) to `org-indent-block`.  Note that `org-src-preserve-indentation=nil` is an important setting, to allow org to (re-)indent blocks to respect the local indentation inside list and other elements.  Also note that (from `org-indent-region`): 
 
 > The function will not indent contents of example blocks, verse blocks and export blocks as leading white spaces are assumed to be significant there.
 
