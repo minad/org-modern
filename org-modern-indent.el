@@ -31,6 +31,7 @@
 
 ;;; Code:
 (require 'compat)
+(require 'org-indent)
 (eval-when-compile (require 'cl-lib))
 
 (defgroup org-modern-indent nil
@@ -153,14 +154,82 @@ of the returned vector.  If PREFIX is nil or empty, nil is returned."
 		      (put-text-property (1- block-indent) block-indent
 					 'display org-modern-indent-guide))
 		  t))))))))
+
+(defun org-modern-indent--wait-and-refresh (buf)
+  "Wait for org-indent to finish initializing BUF, then refresh."
+  (if (or (not (bound-and-true-p org-indent-agentized-buffers))
+	  (not (memq buf org-indent-agentized-buffers)))
+      (progn
+	(font-lock-add-keywords nil org-modern-indent--font-lock-keywords t)
+	;; (org-unfontify-region (point-min) (point-max))
+	(font-lock-flush))
+    (run-with-idle-timer 0.25 nil #'org-modern-indent--wait-and-refresh buf)))
+
+(defun org-modern-indent--refresh ()
+  "Unfontify entire buffer and refresh line prefix."
+  (with-silent-modifications
+    (if org-indent-mode
+	(org-indent-refresh-maybe (point-min) (point-max) nil))
+    ;; (org-unfontify-region (point-min) (point-max))
+    (font-lock-flush)))
+
+(defun org-modern-indent--unfontify-wrap (fun)
+  "Wrap FUN with extra font lock keywords."
+  (lambda (beg end)
+    (let* ((font-lock-extra-managed-props
+	    (append '(display invisible) font-lock-extra-managed-props)))
+      (funcall fun beg end))))
+
+(defvar org-modern-indent--refresh-args nil)
+(defun org-modern-indent--store-refresh-args (args)
+  "Store the arguments ARGS for `org-indent-add-properties'.
+To be added as :filter-args advice."
+  (setq org-modern-indent--refresh-args args))
+
+(defun org-modern-indent--refresh-watch (fun beg end &rest r)
+  "Watch for org-indent heading refreshes and rebuild prefixes as needed.
+FUN is the wrapped function `org-indent-refresh-maybe', and BEG,
+END, and R are its arguments."
+  (let ((hmod org-indent-modified-headline-flag) p end2 is-flush)
+    (apply fun beg end r)
+    ;; Recover the args passed to org-indent-add-properties
+    (setq end2 (cadr org-modern-indent--refresh-args))
+    (when (or hmod (/= end end2))
+      (setq p (1- beg))
+      (save-excursion
+	(while (< (setq p (next-single-property-change
+			   (1+ p) 'org-modern-indent-block-type nil end2))
+		  end2)
+	  (goto-char p)
+	  (setq is-flush
+		(eq (get-text-property p 'org-modern-indent-block-type) 'flush))
+	  (when (looking-at org-modern-indent-begin-re)
+	    (if is-flush
+		(org-modern-indent--block-bracket-flush)
+	      (org-modern-indent--block-bracket-indented))))))))
+
+(defvar org-modern-indent--initted nil)
+(defvar org-modern-indent--old-unfontify-function nil)
 ;;;###autoload
 (define-minor-mode org-modern-indent-mode
   "Org-modern-like block brackets within org-indent."
   :global nil
   :group 'org-modern-indent
+  
   (if org-modern-indent-mode
-      (font-lock-add-keywords nil org-modern-indent--font-lock-keywords)
-    (font-lock-remove-keywords nil org-modern-indent--font-lock-keywords)))
+      (progn
+	(advice-add 'org-indent-refresh-maybe :around
+		    #'org-modern-indent--refresh-watch)
+	(advice-add 'org-indent-add-properties :filter-args
+		    #'org-modern-indent--store-refresh-args)
+	(org-modern-indent--wait-and-refresh (current-buffer)))
+    ;; Disabling
+    (advice-remove 'org-indent-refresh-maybe
+		   #'org-modern-indent--refresh-watch)
+    (advice-remove 'org-indent-add-properties
+		   #'org-modern-indent--store-refresh-args)
+    (font-lock-remove-keywords nil org-modern-indent--font-lock-keywords)
+    (org-modern-indent--refresh)))
 
 (provide 'org-modern-indent)
 ;;; org-modern-indent.el ends here
