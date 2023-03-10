@@ -11,10 +11,9 @@ This small package approximately reproduces the block styling of `org-modern` wh
 ## Updates
 
 - v0.1 features a complete re-write to use font-lock directly.  This has a few benefits: 
-  1. Does not rely on org mode buffer face names for recognizing
+  1. No longer relies on org-mode face names for recognizing
      blocks, so `org-src-block-faces` can have arbitrary faces
-     applied, e.g. for different `src` languages, as in the screenshot
-     at right.
+     applied, e.g. for different `src` languages, as in the screenshot.
   2. Eliminates the "race" between font-locking and applying the prefix text properties.
   3. Enables in-text bracket decorations for "bulk-indented" blocks, for example blocks situated
      in an arbitrarily-nested plain list item.
