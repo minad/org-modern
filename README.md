@@ -70,7 +70,7 @@ If you'd like a different face than `org-meta-line` for the "bracket", configure
 
 ### Related config
 
-Optionally, if you want to use org-modern too:
+Optionally, if you want to use [org-modern](https://github.com/minad/org-modern) too (I do), a suggested config:
 
 ```elisp
 (use-package org-modern
