@@ -71,16 +71,17 @@ the block is flush left in the buffer."
 The three returned prefixes include begin, end, and guide bracket
 indicators, and are cached by prefix length, for speed.
 Additionally, the original prefix string is included at the end
-of the returned vector."
-  (let* ((l (length prefix)))
-    (or (gethash l org-modern-indent--block-prefixes)
-	(puthash l (cl-loop for type in '("begin" "guide" "end")
-			    for tstr = (symbol-value
-					(intern (concat "org-modern-indent-" type)))
-			    with pstr = (substring prefix 0 -1)
-			    collect (concat pstr tstr) into prefix-brackets
-			    finally return (vconcat prefix-brackets (list prefix)))
-		 org-modern-indent--block-prefixes))))
+of the returned vector.  If PREFIX is nil or empty, nil is returned."
+  (unless (or (not prefix) (string-empty-p prefix))
+    (let* ((l (length prefix)))
+      (or (gethash l org-modern-indent--block-prefixes)
+	  (puthash l (cl-loop for type in '("begin" "guide" "end")
+			      for tstr = (symbol-value
+					  (intern (concat "org-modern-indent-" type)))
+			      with pstr = (substring prefix 0 -1)
+			      collect (concat pstr tstr) into prefix-brackets
+			      finally return (vconcat prefix-brackets (list prefix)))
+		   org-modern-indent--block-prefixes)))))
 
 (defun org-modern-indent--block-bracket-flush ()
   "Insert brackets for org blocks flush with the line prefix."
