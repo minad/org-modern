@@ -45,9 +45,9 @@ As an important principle, `org-modern-indent` does not alter the contents of th
        - sublist, which holds a block:
 	     [C-c C-,] here
    ```
-- **Move flush left** Note: `M-{` will get you to the start of a block quickly.  `M-\` at block start will move the block's first header line to column 0.  Then `M-S-left` (or `right`) will indent the full block.  `org-src-preserve-indentation=t` will help with indenting `example` blocks (where org considers whitespace significant).
-- **Indent rigidly** `M-h` selects the entire block. Then `C-x TAB` enters "rigid indent" mode, where left/right moves the entire block.
-- **Fix a block** If you have a block with a mis-aligned or "hanging end", like so:
+- **Move flush left**: Note: `M-{` will get you to the start of a block quickly.  `M-\` at block start will move the block's first header line to column 0.  Then `M-S-left` (or `right`) will indent the full block.  `org-src-preserve-indentation=t` will help with indenting `example` blocks (where org considers whitespace significant).
+- **Indent rigidly**: `M-h` selects the entire block. Then `C-x TAB` enters "rigid indent" mode, after which left/right moves the entire block.
+- **Fix a block**: If you have a block with a misaligned or "hanging end", like so:
    ```org
    - List 1
        - List 2
