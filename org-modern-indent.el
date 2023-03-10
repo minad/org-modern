@@ -47,8 +47,10 @@
 (defconst org-modern-indent-guide (propertize "│" 'face 'org-modern-bracket-line))
 (defconst org-modern-indent-end   (propertize "╰" 'face 'org-modern-bracket-line))
 
+(defvar org-modern-indent-begin-re
+  "\\([ \t]*\\)\\(#\\+\\)\\(?:begin\\|BEGIN\\)_\\S-")
 (defvar org-modern-indent--font-lock-keywords
-  `(("^\\([ \t]*\\)\\(#\\+\\)\\(?:begin\\|BEGIN\\)_\\S-"
+  `((,(concat "^" org-modern-indent-begin-re)
      (0 (org-modern-indent--block-bracket)))))
 
 (defun org-modern-indent--block-bracket ()
