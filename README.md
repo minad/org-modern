@@ -37,8 +37,8 @@ Also, be sure to enable `org-indent` (see the variable `org-startup-indented`).
 Bulk-indented blocks can have "real" (space/tab) indent applied and managed by org.  This extra indentation is appled by org on _top_ of the (fake, prefix-based) indentation used by org-indent.  To nest blocks within such indented content, e.g. in plain list items, you only have to begin the `#+begin` at the same column as the list element's text.  To help achieve this, here are a few ways to move blocks around in terms of their indentation:
 
 - **Start things right**: Hit return after your last line of text (e.g in a list item), then immediately hit `C-c C,` to create the desired block.  It will be indented at the right level.
-- **Move flush left** `M-{` gets you to the start of a block quickly.  `M-\` there block will move the blocks first header to the very left.  Then `M-S-left` (or `right`) will indent the full block.  `org-src-preserve-indentation=t` will help with indenting `example` blocks.
-- **Indent rigidly** `M-h` selects the entire block. Then `C-x TAB` enters "rigid indent" mode, where left/right moves the entire block.
+- **Move flush left**: `M-{` gets you to the start of a block quickly.  `M-\` there block will move the blocks first header to the very left.  Then `M-S-left` (or `right`) will indent the full block.  `org-src-preserve-indentation=t` will help with indenting `example` blocks.
+- **Indent rigidly**: `M-h` selects the entire block. Then `C-x TAB` enters "rigid indent" mode, where left/right moves the entire block.
 
 ### Font spacing
 
