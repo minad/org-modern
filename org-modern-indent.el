@@ -85,72 +85,73 @@ of the returned vector."
 (defun org-modern-indent--block-bracket-flush ()
   "Insert brackets for org blocks flush with the line prefix."
   (let* ((lpf (get-text-property (point) 'line-prefix))
+	 (beg (match-beginning 0))
+	 (pind (match-beginning 2))
 	 (vec (org-modern-indent--block-bracket-prefix lpf))
-	 (pind (match-beginning 2)) 	;start of #+begin_
 	 (block-start (min (line-end-position) (point-max))))
-    (add-text-properties (point) block-start
-			 `( line-prefix ,(aref vec 0) wrap-prefix ,(aref vec 1)))
-    (put-text-property pind (1+ pind) 'org-modern-block-flush t)
-    (while
-	(cond
-	 ((eobp) nil)
-	 ((looking-at "^[ \t]*#\\+\\(?:end\\|END\\)_")
-	  (add-text-properties (1+ block-start) (point)
-			       `(line-prefix ,(aref vec 1) wrap-prefix ,(aref vec 1)))
-	  (add-text-properties (point) (min (line-end-position) (point-max))
-			       `(line-prefix ,(aref vec 2) wrap-prefix ,(aref vec 2)))
-	  nil)
-	 (t (forward-line))))))
+    (with-silent-modifications
+      (put-text-property pind (1+ pind) 'org-modern-indent-block-type 'flush)
+      (when vec
+	(add-text-properties beg block-start
+			     `( line-prefix ,(aref vec 0)
+				wrap-prefix ,(aref vec 1)))
+	(goto-char (match-end 0))
+	(when (re-search-forward "^[ \t]*#\\+\\(?:end\\|END\\)_" nil 'noerror)
+	  (let ((b (line-beginning-position))
+		(p (line-beginning-position 2)))
+	    (add-text-properties (1+ block-start) p
+				 `(line-prefix ,(aref vec 1) wrap-prefix ,(aref vec 1)))
+	    (add-text-properties b (min (line-end-position) (point-max))
+				 `(line-prefix ,(aref vec 2) wrap-prefix ,(aref vec 2)))))))))
 
 (defun org-modern-indent--block-bracket-indented ()
   "Insert brackets on space-indented org blocks, e.g. within plain lists."
   (let* ((pf (get-text-property (point) 'line-prefix)) ; prefix from org-indent
 	 (pind (match-beginning 2))		       ; at the #
-	 (flush (get-text-property pind 'org-modern-block-flush))
+	 (flush (eq (get-text-property pind 'org-modern-indent-block-type) 'flush))
 	 (indent (current-indentation)) ; space up to #+begin_
 	 (block-indent (+ (point) indent))
 	 (search (concat "^[[:blank:]]\\{" (number-to-string indent) "\\}"))
 	 (wrap (concat (make-string (if pf (+ indent (length pf) -1) indent) ?\s)
 		       org-modern-indent-guide))
 	 orig-prefix)
-    (message "PINd: %S" pind)
-    (when flush ; formerly this block was flush left
-      (message "Dealing with formerly flush left")
-      (setq pf (aref (org-modern-indent--block-bracket-prefix pf) 3)
-	    orig-prefix `(line-prefix ,pf)) ; for resetting prefix to saved
-      (add-text-properties (point) (min (line-end-position) (point-max))
-			   `(line-prefix ,pf wrap-prefix ,pf))
-      (put-text-property pind (1+ pind) 'org-modern-block-flush nil))
-    
-    (put-text-property (point) block-indent 'face nil)
-    (put-text-property (1- block-indent) block-indent
-		       'display org-modern-indent-begin)
-    (while
-	(progn
-	  (add-text-properties
-           (point) (min (line-end-position) (point-max))
-           `(wrap-prefix ,wrap ,@orig-prefix))
-	  (forward-line)
-	  (setq block-indent (+ (point) indent))
-	  (let ((lep (line-end-position)))
-	    (when (< block-indent lep)
-	      (put-text-property (point) block-indent 'face nil))
-	    (cond
-	     ((eobp) nil)
-	     ((looking-at "^\\([ \t]*\\)#\\+\\(?:end\\|END\\)_")
-	      (if (>= (length (match-string 1)) indent)
-		  (put-text-property (1- block-indent) block-indent
-				     'display org-modern-indent-end))
-	      (when flush
-		(add-text-properties
-		 (point) (min (line-end-position) (point-max))
-		 `(wrap-prefix ,pf ,@orig-prefix)))
-	      nil)
-	     (t (if (and (<= block-indent lep) (looking-at-p search))
+    (with-silent-modifications
+      (when flush		  ; formerly this block was flush left
+	(when-let ((vec (org-modern-indent--block-bracket-prefix pf)))
+	  (setq pf (aref vec 3)	       ; for resetting prefix to saved
+		orig-prefix `(line-prefix ,pf))
+	  (add-text-properties (point) (min (line-beginning-position 2) (point-max))
+			       `(line-prefix ,pf wrap-prefix ,pf))) ; restore
+	(put-text-property pind (1+ pind) 'org-modern-indent-block-type 'indent))
+     
+      (put-text-property (point) block-indent 'face nil)
+      (put-text-property (1- block-indent) block-indent
+			 'display org-modern-indent-begin)
+      (while
+	  (progn
+	    (add-text-properties
+             (point) (min (line-beginning-position 2) (point-max))
+             `(wrap-prefix ,wrap ,@orig-prefix))
+	    (forward-line)
+	    (setq block-indent (+ (point) indent))
+	    (let ((lep (line-beginning-position 2)))
+	      (when (< block-indent lep)
+		(put-text-property (point) block-indent 'face nil))
+	      (cond
+	       ((eobp) nil)
+	       ((looking-at "^\\([ \t]*\\)#\\+\\(?:end\\|END\\)_")
+		(if (>= (length (match-string 1)) indent)
 		    (put-text-property (1- block-indent) block-indent
-				       'display org-modern-indent-guide))
-		t)))))))
-
+				       'display org-modern-indent-end))
+		(when flush
+		  (add-text-properties
+		   (point) (min (line-beginning-position 2) (point-max))
+		   `(wrap-prefix ,pf ,@orig-prefix)))
+		nil)
+	       (t (if (and (<= block-indent lep) (looking-at-p search))
+		      (put-text-property (1- block-indent) block-indent
+					 'display org-modern-indent-guide))
+		  t))))))))
 ;;;###autoload
 (define-minor-mode org-modern-indent-mode
   "Org-modern-like block brackets within org-indent."
