@@ -1,37 +1,59 @@
 # org-modern-indent
 Modern block styling with `org-indent`.
 
-[`org-modern`](https://github.com/minad/org-modern) provides a clean and efficient org style.  The blocks (e.g. source, example) are particularly nice.  But when `org-indent` is enabled, the block "bracket", which uses the fringe area, is disabled.
+[`org-modern`](https://github.com/minad/org-modern) provides a clean and efficient org style.  The blocks (e.g. source, example) are particularly nicely decorted.  But when `org-indent` is enabled, the block "bracket", which uses the fringe area, is disabled.
 
-This small package reproduces the block styling of `org-modern` when using `org-indent`, and can be used with or without `org-modern`:
+This small package approximately reproduces the block styling of `org-modern` when using `org-indent`.  It can be used with or without `org-modern`:
 
 <p align="center">
 <img src=https://user-images.githubusercontent.com/93749/172964083-afafa737-3b54-4d9e-aaf0-9a4741fa085c.png>
 </p>
 
-## Notes
+## Updates
 
-- This package is only for users of `org-indent-mode`, and will _enable_ org-indent if it is not already.
-- Can be used _with or without_ `org-modern`. 
-- Non-zero `line-spacing` will introduce gaps between the block bracket characters.
-- If you toggle off `org-modern-indent` in an active buffer you need to `M-x org-indent-indent-buffer` to remove the block styling.
+- v0.1 features a complete re-write to use font-lock directly.  This has a few benefits: 
+  1. Does not rely on org mode buffer face names for recognizing
+     blocks, so `org-src-block-faces` can have arbitrary faces
+     applied, e.g. for different `src` languages, as in the screenshot
+     above.
+  2. Eliminates the "race" between font-locking and applying the prefix text properties.
+  3. Enables in-text bracket decorations for "bulk-indented" blocks, for example blocks situated
+     in an arbitrarily-nested plain list item.
 
 ## Configure
 
-Be sure to enable `org-indent` (see `org-startup-indented`).
+Be sure to enable `org-indent` (see the variable `org-startup-indented`).
 
 ```elisp
 (use-package org-modern-indent
-  ;; :straight or :load-path here, to taste
-  :hook
-  (org-indent-mode . org-modern-indent-mode))
+  :load-path "~/code/emacs/org-modern-indent/"
+  ; :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")) ; for straight
+  :config ; add late to hook
+  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 ```
+
+## Hints
+
+### Bulk-indented blocks (e.g. within lists):
+
+Bulk-indented blocks can have "real" (space/tab) indent applied and managed by org.  This extra indentation is appled by org on _top_ of the (fake, prefix-based) indentation used by org-indent.  To nest blocks withing such indented content, e.g. in plain list items, you only have to begin the `#+begin` at the same level as the list element's text.  To help achieve this, here are a few ways to move blocks around in terms of their indentation:
+
+- **Start things right**: Hit return after your last line of text (e.g in a list item), then immediately hit `C-c C,` to create the desired block.  It will be indented at the right level.
+- **Move flush left** `M-{` gets you to the start of a block quickly.  `M-\` there block will move the blocks first header to the very left.  Then `M-S-left` (or `right`) will indent the full block.  `org-src-preserve-indentation=t` will help with indenting `example` blocks.
+- **Indent rigidly** `M-h` selects the entire block. Then `C-x TAB` enters "rigid indent" mode, where left/right moves the entire block.
+
+### Font spacing
 
 The default `fixed-pitch` font (from which `org-meta-line` inherits) has line spacing >1.0 on some systems. This will introduce gaps _even if your default font is changed_, and `line-space` is nil.  To correct it, add: 
 
 ```elisp
 (set-face-attribute 'fixed-pitch nil :family "Hack" :height 1.0) ; or whatever font family
 ```
+### The bracket style 
+
+If you'd like a different face than `org-meta-line` for the "bracket", configure the `org-modern-bracket-line` face.
+
+### Related config
 
 Optionally, if you want to use org-modern too:
 
@@ -39,7 +61,12 @@ Optionally, if you want to use org-modern too:
 (use-package org-modern
   :ensure t
   :custom
-  (org-modern-hide-stars nil) ; adds extra indentation
+  (org-modern-hide-stars nil)		; adds extra indentation
+  (org-modern-table nil)
+  (org-modern-list 
+   '(;; (?- . "-")
+     (?* . "•")
+     (?+ . "‣")))
   :hook
   (org-mode . org-modern-mode)
   (org-agenda-finalize . org-modern-agenda))
@@ -54,7 +81,6 @@ Also optional; use org-bullets instead for nicely aligned bullet stars.
   :hook org-mode)
 ```
 
-If you'd like a different face than `org-meta-line` for the "bracket", configure the `org-modern-indent-line` face.
 
 ## Related packages
 
