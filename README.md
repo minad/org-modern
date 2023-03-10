@@ -1,5 +1,4 @@
 # org-modern-indent
-<img align="right" width=600 src=https://user-images.githubusercontent.com/93749/224204382-091fcd76-3ad0-467e-9525-287ae80e93c6.png>
 
 Modern block styling with `org-indent`.
 
@@ -7,6 +6,7 @@ Modern block styling with `org-indent`.
 
 This small package approximately reproduces the block styling of `org-modern` when using `org-indent`.  It can be used with or without `org-modern`.  Recent versions support "bulk indented" blocks nested within lists:
 
+<img align="center" width=700 src=https://user-images.githubusercontent.com/93749/224204382-091fcd76-3ad0-467e-9525-287ae80e93c6.png>
 
 ## Updates
 
