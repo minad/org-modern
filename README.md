@@ -4,7 +4,7 @@ Modern block styling with `org-indent`.
 
 [`org-modern`](https://github.com/minad/org-modern) provides a clean and efficient org style.  The blocks (e.g. source, example) are particularly nicely decorated.  But when `org-indent` is enabled, the block "bracket", which uses the fringe area, is disabled.
 
-This small package approximately reproduces the block styling of `org-modern` when using `org-indent`.  It can be used with or without `org-modern`.  Recent versions support "bulk indented" blocks nested within lists:
+This small package approximately reproduces the block styling of `org-modern` when using `org-indent`.  It can be used with or without `org-modern`.  Recent versions support "bulk-indented" blocks nested within lists:
 
 <img align="center" width=700 src=https://user-images.githubusercontent.com/93749/224204382-091fcd76-3ad0-467e-9525-287ae80e93c6.png>
 
