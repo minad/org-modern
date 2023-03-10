@@ -1,13 +1,12 @@
 # org-modern-indent
+<img align="right" width=600 src=https://user-images.githubusercontent.com/93749/224204382-091fcd76-3ad0-467e-9525-287ae80e93c6.png>
+
 Modern block styling with `org-indent`.
 
-[`org-modern`](https://github.com/minad/org-modern) provides a clean and efficient org style.  The blocks (e.g. source, example) are particularly nicely decorted.  But when `org-indent` is enabled, the block "bracket", which uses the fringe area, is disabled.
+[`org-modern`](https://github.com/minad/org-modern) provides a clean and efficient org style.  The blocks (e.g. source, example) are particularly nicely decorated.  But when `org-indent` is enabled, the block "bracket", which uses the fringe area, is disabled.
 
-This small package approximately reproduces the block styling of `org-modern` when using `org-indent`.  It can be used with or without `org-modern`:
+This small package approximately reproduces the block styling of `org-modern` when using `org-indent`.  It can be used with or without `org-modern`.  Recent versions support "bulk indented" blocks nested within lists:
 
-<p align="center">
-<img src=https://user-images.githubusercontent.com/93749/172964083-afafa737-3b54-4d9e-aaf0-9a4741fa085c.png>
-</p>
 
 ## Updates
 
@@ -15,22 +14,22 @@ This small package approximately reproduces the block styling of `org-modern` wh
   1. Does not rely on org mode buffer face names for recognizing
      blocks, so `org-src-block-faces` can have arbitrary faces
      applied, e.g. for different `src` languages, as in the screenshot
-     above.
+     at right.
   2. Eliminates the "race" between font-locking and applying the prefix text properties.
   3. Enables in-text bracket decorations for "bulk-indented" blocks, for example blocks situated
      in an arbitrarily-nested plain list item.
 
 ## Configure
 
-Be sure to enable `org-indent` (see the variable `org-startup-indented`).
-
 ```elisp
 (use-package org-modern-indent
   :load-path "~/code/emacs/org-modern-indent/"
-  ; :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")) ; for straight
+  ; or
+  ; :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent"))
   :config ; add late to hook
   (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 ```
+Also, be sure to enable `org-indent` (see the variable `org-startup-indented`).
 
 ## Hints
 
