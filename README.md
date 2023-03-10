@@ -37,7 +37,7 @@ Also, be sure to enable `org-indent` (see the variable `org-startup-indented`).
 
 Bulk-indented blocks have "real" (space/tab) indent applied and managed by org.  This extra indentation is appled by org on _top_ of the (fake, prefix-based) indentation used by org-indent.  To nest blocks properly within such indented content, e.g. in plain list items, you only have to begin the `#+begin` at the same level as the list element's text.
 
-As an important principle, `org-modern-indent` does not alter the contents of the text in your org documents, not even indentation.  It just styles what is there.  To help achieve proper block alignment, here are a few ways to alter blocks indentation:
+As an important principle, `org-modern-indent` does not alter the contents of the text in your org documents, not even indentation.  It just styles what is there.  To help achieve proper block alignment, here are a few ways to alter blocks indentation using org and other commands:
 
 - **Start things right**: Hit return after your last line of text (e.g in a list item), then immediately hit `C-c C,` to create the desired block.  It will be indented at the right level:
    ```org
@@ -45,7 +45,7 @@ As an important principle, `org-modern-indent` does not alter the contents of th
        - sublist, which holds a block:
 	     [C-c C-,] here
    ```
-- **Move flush left**: Note: `M-{` will get you to the start of a block quickly.  `M-\` at block start will move the block's first header line to column 0.  Then `M-S-left` (or `right`) will indent the full block.  `org-src-preserve-indentation=t` will help with indenting `example` blocks (where org considers whitespace significant).
+- **Move flush left**: Note: `M-{` will get you to the start of a block quickly.  `M-\` at block start will move the block's first header line to column 0.  Then `M-S-left` (or `right`) will indent the full block.  
 - **Indent rigidly**: `M-h` selects the entire block. Then `C-x TAB` enters "rigid indent" mode, after which left/right moves the entire block.
 - **Fix a block**: If you have a block with a misaligned or "hanging end", like so:
    ```org
@@ -56,6 +56,10 @@ As an important principle, `org-modern-indent` does not alter the contents of th
 	   #+end_src
    ```
   you can simply use `M-S-left/right` at block start to `org-indent-block`. 
+
+Note that `org-src-preserve-indentation=nil` is an important setting, to allow org to (re-)indent blocks to respect the local indentation inside list and other elements.  Also note that (from `org-indent-region`): 
+
+> The function will not indent contents of example blocks, verse blocks and export blocks as leading white spaces are assumed to be significant there.
 
 ### Font spacing
 
