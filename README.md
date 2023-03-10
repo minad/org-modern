@@ -83,6 +83,6 @@ Also optional; use org-bullets instead for nicely aligned bullet stars.
 ## Related packages
 
 - [`org-modern`](https://github.com/minad/org-modern): A modern org styling.  Works best without org-indent.
-- [`org-bullets`](https://github.com/sabof/org-bullets/blob/master/org-bullets.el): Unicode heading bullet replacement.
+- [`org-bullets`](https://github.com/sabof/org-bullets): Unicode heading bullet replacement.
 - [`org-superstar`](https://github.com/integral-dw/org-superstar-mode): Prettify headings and plain lists.
 - [`nano-emacs`](https://github.com/rougier/nano-emacs): Beautiful and simple SVG-based theme for much of emacs, including org. 
