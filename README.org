@@ -35,24 +35,6 @@ if =line-spacing= has a value between 0.1 and 0.4 in the Org buffer. Note that
 Bug reports, improvement or style proposals are welcome! Maybe some more Org
 elements deserve styling or alternative styles should be offered?
 
-The tag style of =org-modern= is inspired by Nicholas Rougier's beautiful
-[[https://github.com/rougier/svg-tag-mode][svg-tag-mode]]. In contrast to =svg-tag-mode=, this package avoids images and uses
-cheap and fast Emacs box text properties. By only styling the text via text
-properties, the styled text, e.g., dates or tags stay editable and are easy to
-interact with.
-
-On the downside, this restricts our flexibility and may lead to font-dependent
-issues. We do our best, but for example there is no way we can get round
-corners. Combining =org-modern-mode= with =svg-tag-mode= is possible. You can use
-SVG tags and use the table and block styling from =org-modern=. If you are
-interested in further tweaks, Emacs comes with the builtin =prettify-symbols-mode=
-which can be used for individual styling of custom keywords.
-
-Another popular alternative is [[https://github.com/integral-dw/org-superstar-mode][org-superstar]], which has a more restricted
-feature set and mainly adjusts headlines and lists. =org-superstar= relies on
-character composition, while =org-modern= uses text properties, which are
-considered more future-proof.
-
 * Configuration
 
 The package is available on GNU ELPA and MELPA. You can install the package with
@@ -121,6 +103,26 @@ screenshot above.
 
   (global-org-modern-mode)
 #+end_src
+
+* Alternatives
+
+The tag style of =org-modern= is inspired by Nicholas Rougier's beautiful
+[[https://github.com/rougier/svg-tag-mode][svg-tag-mode]]. In contrast to =svg-tag-mode=, this package avoids images and uses
+cheap and fast Emacs box text properties. By only styling the text via text
+properties, the styled text, e.g., dates or tags stay editable and are easy to
+interact with.
+
+On the downside, this restricts our flexibility and may lead to font-dependent
+issues. We do our best, but for example there is no way we can get round
+corners. Combining =org-modern-mode= with =svg-tag-mode= is possible. You can use
+SVG tags and use the table and block styling from =org-modern=. If you are
+interested in further tweaks, Emacs comes with the builtin =prettify-symbols-mode=
+which can be used for individual styling of custom keywords.
+
+Popular alternatives are the older =org-superstar= and =org-bullets= packages, which
+have are more limited and mainly adjust headlines and lists. =org-superstar=
+relies on character composition, while =org-modern= uses text properties, which
+are considered more future-proof.
 
 * Contributions
 
