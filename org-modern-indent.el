@@ -160,8 +160,9 @@ of the returned vector.  If PREFIX is nil or empty, nil is returned."
   (if (or (not (bound-and-true-p org-indent-agentized-buffers))
 	  (not (memq buf org-indent-agentized-buffers)))
       (progn
-	(font-lock-add-keywords nil org-modern-indent--font-lock-keywords t)
-	(font-lock-flush))
+	(with-current-buffer buf
+	  (font-lock-add-keywords nil org-modern-indent--font-lock-keywords t)
+	  (font-lock-flush)))
     (run-at-time 0.1 nil #'org-modern-indent--wait-and-refresh buf)))
 
 (defun org-modern-indent--refresh ()
