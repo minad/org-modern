@@ -4,7 +4,7 @@
 ;; Author: J.D. Smith
 ;; Homepage: https://github.com/jdtsmith/org-modern-indent
 ;; Package-Requires: ((emacs "27.1") (org "9.5.2") (compat "29.1.4.0"))
-;; Version: 0.1.2
+;; Version: 0.1.3
 ;; Keywords: convenience
 ;; Prefix: org-modern-indent
 ;; Separator: -
@@ -160,9 +160,10 @@ of the returned vector.  If PREFIX is nil or empty, nil is returned."
   (if (or (not (bound-and-true-p org-indent-agentized-buffers))
 	  (not (memq buf org-indent-agentized-buffers)))
       (progn
-	(with-current-buffer buf
-	  (font-lock-add-keywords nil org-modern-indent--font-lock-keywords t)
-	  (font-lock-flush)))
+	(when (buffer-live-p buf) 	; org-capture buffers vanish fast
+	  (with-current-buffer buf
+	    (font-lock-add-keywords nil org-modern-indent--font-lock-keywords t)
+	    (font-lock-flush))))
     (run-at-time 0.1 nil #'org-modern-indent--wait-and-refresh buf)))
 
 (defun org-modern-indent--refresh ()
