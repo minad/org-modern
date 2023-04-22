@@ -251,7 +251,7 @@ You can specify a font `:family'.  The font families `Iosevka', `Hack' and
 `DejaVu Sans' give decent results.")
 
 (defface org-modern-label
-  `((t :height 0.9 :width condensed :weight regular :underline nil))
+  `((t :height 0.8 :width condensed :weight regular :underline nil))
   "Parent face for labels.
 The parameters of this face depend on typographical properties of
 the font and should therefore be adjusted by the user depending
