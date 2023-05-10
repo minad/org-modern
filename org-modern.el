@@ -334,7 +334,6 @@ the font.")
 (defvar-local org-modern--font-lock-keywords nil)
 (defvar-local org-modern--star-cache nil)
 (defvar-local org-modern--hide-stars-cache nil)
-(defvar-local org-modern--reset-hide-leading-stars nil)
 (defvar-local org-modern--checkbox-cache nil)
 (defvar-local org-modern--progress-cache nil)
 (defvar-local org-modern--table-sp-width 0)
@@ -483,6 +482,8 @@ the font.")
                                   (nth (logand i 1)
                                        org-modern--hide-stars-cache))))
     (when org-modern-star
+      (when (and (eq org-modern-hide-stars 'leading) org-hide-leading-stars)
+        (put-text-property beg (1+ end) 'face (get-text-property end 'face)))
       (put-text-property
        (if (eq org-modern-hide-stars 'leading) beg end)
        (1+ end) 'display
@@ -752,15 +753,9 @@ the font.")
   "Modern looks for Org."
   :global nil
   :group 'org-modern
-  (when org-modern--reset-hide-leading-stars
-    (setq-local org-hide-leading-stars t
-                org-modern--reset-hide-leading-stars nil))
   (cond
    (org-modern-mode
     (add-to-invisibility-spec 'org-modern)
-    (when (and (eq org-modern-hide-stars 'leading) org-hide-leading-stars)
-      (setq-local org-modern--reset-hide-leading-stars t
-                  org-hide-leading-stars nil))
     (setq
      org-modern--star-cache
      (vconcat (mapcar #'org-modern--symbol org-modern-star))
