@@ -30,8 +30,7 @@ harmonically and have approximately the same height. As default font, I
 recommend variants of the [[https://github.com/be5invis/Iosevka][Iosevka]] font, e.g., Iosevka Term Curly.
 =org-modern-mode= tries to adjust the tag label display based on the value of
 =line-spacing=. This looks best if =line-spacing= has a value between 0.1 and 0.4 in
-the Org buffer. Note that =org-indent-mode= interferes with some of the style
-elements applied by =org-modern-mode=, e.g., the block brackets in the fringe.
+the Org buffer.
 
 * Configuration
 
