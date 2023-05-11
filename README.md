@@ -35,9 +35,9 @@ Also, be sure to enable `org-indent` (see the variable `org-startup-indented`).
 
 ### Bulk-indented blocks (e.g. within lists):
 
-Bulk-indented blocks have "real" (space/tab) indent applied and managed by org.  This extra indentation is appled by org on _top_ of the (fake, prefix-based) indentation used by org-indent.  To nest blocks properly within such indented content, e.g. in plain list items, you only have to begin the `#+begin` at the same level as the list element's text.
+Bulk-indented blocks have "real" (space/tab) indent applied and managed by org.  This extra indentation is applied by org on _top_ of the (fake, prefix-based) indentation used by org-indent.  To nest blocks properly within such indented content, e.g. in plain list items, you only have to begin the `#+begin` at the same level as the list element's text.
 
-As an important principle, `org-modern-indent` does not alter the contents of the text in your org documents, not even indentation.  It just styles what is there.  To help achieve proper block alignment, here are a few ways to alter blocks indentation using org and other commands:
+As an important principle, `org-modern-indent` does not alter the contents of the text in your org documents, not even indentation.  It just styles what is there.  To help achieve proper block bulk-indented alignment, here are a few ways to alter blocks indentation using org and other commands:
 
 - **Start things right**: Hit return after your last line of text (e.g in a list item), then immediately hit `C-c C,` to create the desired block.  It will be indented at the right level:
    ```org
