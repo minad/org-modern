@@ -818,27 +818,28 @@ the font.")
   (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
   (save-excursion
     (save-match-data
-      (when org-modern-todo
-        (goto-char (point-min))
-        (let ((re (format " %s "
-                          (regexp-opt
-                           (append org-todo-keywords-for-agenda
-                                   org-done-keywords-for-agenda) t)))
-              (org-done-keywords org-done-keywords-for-agenda))
-          (while (re-search-forward re nil 'noerror)
-            (org-modern--todo))))
-      (when org-modern-tag
-        (goto-char (point-min))
-        (let ((re (concat "\\( \\)\\(:\\(?:" org-tag-re "::?\\)+\\)[ \t]*$")))
-          (while (re-search-forward re nil 'noerror)
-            (org-modern--tag))))
-      (when org-modern-priority
-        (goto-char (point-min))
-        (while (re-search-forward "\\(\\[#.\\]\\)" nil 'noerror)
-          ;; For some reason the org-agenda-fontify-priorities adds overlays?!
-          (when-let ((ov (overlays-at (match-beginning 0))))
-            (overlay-put (car ov) 'face nil))
-          (org-modern--priority))))))
+      (let (case-fold-search)
+        (when org-modern-todo
+          (goto-char (point-min))
+          (let ((re (format " %s "
+                            (regexp-opt
+                             (append org-todo-keywords-for-agenda
+                                     org-done-keywords-for-agenda) t)))
+                (org-done-keywords org-done-keywords-for-agenda))
+            (while (re-search-forward re nil 'noerror)
+              (org-modern--todo))))
+        (when org-modern-tag
+          (goto-char (point-min))
+          (let ((re (concat "\\( \\)\\(:\\(?:" org-tag-re "::?\\)+\\)[ \t]*$")))
+            (while (re-search-forward re nil 'noerror)
+              (org-modern--tag))))
+        (when org-modern-priority
+          (goto-char (point-min))
+          (while (re-search-forward "\\(\\[#.\\]\\)" nil 'noerror)
+            ;; For some reason the org-agenda-fontify-priorities adds overlays?!
+            (when-let ((ov (overlays-at (match-beginning 0))))
+              (overlay-put (car ov) 'face nil))
+            (org-modern--priority)))))))
 
 ;;;###autoload
 (define-globalized-minor-mode global-org-modern-mode
