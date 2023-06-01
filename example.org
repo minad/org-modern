@@ -1,5 +1,6 @@
 #+title: Modern Org Example
 #+author: Daniel Mendler
+#+filetags: :example:org:
 
 This example Org file demonstrates the Org elements,
 which are styled by =org-modern=.
