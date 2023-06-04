@@ -234,7 +234,7 @@ references."
   "Prettify todo statistics."
   :type 'boolean)
 
-(defcustom org-modern-progress '("○" "◔" "◐" "◕" "●")
+(defcustom org-modern-progress '("○" "◔" "◑" "◕" "●")
   "Add a progress indicator to the todo statistics.
 Set to nil to disable the indicator."
   :type '(repeat string))
