@@ -343,8 +343,8 @@ the font.")
 
 (defun org-modern--checkbox ()
   "Prettify checkboxes according to `org-modern-checkbox'."
-  (let ((beg (match-beginning 1))
-        (end (match-end 1)))
+  (let ((beg (match-beginning 3))
+        (end (match-end 3)))
     (put-text-property
      beg end 'display
      (cdr (assq (char-after (1+ beg)) org-modern--checkbox-cache)))))
@@ -659,8 +659,8 @@ the font.")
      `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t))
         (0 (org-modern--todo)))))
    (when org-modern-checkbox
-     '(("^[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\)[ \t]+\\(\\[[ X-]\\]\\)[ \t]"
-        (0 (org-modern--checkbox)))))
+     `((,org-list-full-item-re
+        (3 (org-modern--checkbox) nil t))))
    (when (or org-modern-star org-modern-hide-stars)
      `(("^\\(\\**\\)\\* "
         (0 ,(if (eq org-modern-hide-stars t)
