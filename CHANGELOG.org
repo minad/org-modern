@@ -2,8 +2,9 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 0.10 (2023-07-02)
 
+- Bugfixes.
 - Fix star prettification if =org-indent-mode= is enabled.
 - Prettify =filetags=.
 
