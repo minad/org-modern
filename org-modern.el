@@ -33,7 +33,6 @@
 
 ;;; Code:
 
-(require 'compat)
 (require 'org)
 (eval-when-compile
   (require 'cl-lib)
