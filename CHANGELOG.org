@@ -1,6 +1,8 @@
 #+title: org-modern.el - Changelog
 #+author: Daniel Mendler
 #+language: en
+* Version 0.11 (2023-07-05)
+- Remove Compat dependency.
 
 * Version 0.10 (2023-07-02)
 
