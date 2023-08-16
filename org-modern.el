@@ -796,8 +796,7 @@ the font.")
     (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)
     (remove-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line 'local)
     (remove-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line 'local)))
-  (save-restriction
-    (widen)
+  (without-restriction
     (with-silent-modifications
       (org-modern--unfontify (point-min) (point-max)))
     (font-lock-flush)))
