@@ -809,10 +809,10 @@ the font.")
   "Unfontify prettified elements between BEG and END."
   (let ((font-lock-extra-managed-props
          (append
-          ;; Only remove line-prefix and wrap-prefix if org-indent-mode is disabled.
-          (if (bound-and-true-p org-indent-mode)
-              '(display invisible)
-            '(wrap-prefix line-prefix display invisible))
+          ;; Only remove line/wrap-prefix if block fringes are used
+          (if (and org-modern-block-fringe (not (bound-and-true-p org-indent-mode)))
+              '(wrap-prefix line-prefix display invisible)
+            '(display invisible))
           font-lock-extra-managed-props)))
     (org-unfontify-region beg end)))
 
