@@ -5,8 +5,8 @@
 ;; Author: Daniel Mendler <mail@daniel-mendler.de>
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2022
-;; Version: 1.0
-;; Package-Requires: ((emacs "27.1") (compat "29.1.4.0"))
+;; Version: 1.1
+;; Package-Requires: ((emacs "27.1") (compat "29.1.4.4"))
 ;; Homepage: https://github.com/minad/org-modern
 ;; Keywords: outlines, hypermedia, wp
 

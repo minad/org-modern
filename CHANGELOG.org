@@ -2,6 +2,11 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Version 1.1 (2023-12-01)
+
+- Bugfix: Do not use zero line width for box face attribute. Zero line widths
+  are disallowed in Emacs 30.
+
 * Version 1.0 (2023-12-01)
 
 - Bugfix: Remove line/wrap-prefix if fringe is enabled
