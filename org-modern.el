@@ -617,7 +617,7 @@ the font.")
              :line-width
              ;; Emacs 28 supports different line horizontal and vertical line widths
              (if (eval-when-compile (>= emacs-major-version 28))
-                 (cons 0 (- border))
+                 (cons -1 (- border))
                (- border)))))))
 
 (defun org-modern--update-fringe-bitmaps ()
