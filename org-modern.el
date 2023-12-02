@@ -190,7 +190,7 @@ all other blocks."
                         (string :tag "#+end_NAME replacement"))
                   (const :tag "Hide #+begin_ and #+end_ prefixes" t)))))
 
-(defcustom org-modern-block-fringe 0
+(defcustom org-modern-block-fringe 2
   "Add a border to the blocks in the fringe.
 This variable can also be set to an integer between 0 and 16,
 which specifies the offset of the block border from the edge of
