@@ -761,7 +761,7 @@ the font.")
   :global nil
   :group 'org-modern
   (unless (derived-mode-p 'org-mode)
-    (warn "`org-modern-mode' should be enabled only in `org-mode'"))
+    (error "`org-modern-mode' should be enabled only in `org-mode'"))
   (cond
    (org-modern-mode
     (add-to-invisibility-spec 'org-modern)
