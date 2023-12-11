@@ -103,6 +103,15 @@ TREPEATED: <2022-02-26 Sat 10:00 .+1d/2d>
 | a | b | c |
 #+end_example
 
+* Comments
+
+ # <2023-12-11 Mon>
+  # footnote[fn:label]
+   # [[link]]
+# <<This is an internal link>>
+# <<<radio link>>>
+# [1/2]
+
 * Special Links
 
 Test numeric footnotes[fn:1] and named footnotes[fn:foo].

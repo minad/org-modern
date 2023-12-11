@@ -6,6 +6,7 @@
 
 - Bugfix: Do not use zero line width for box face attribute. Zero line widths
   are disallowed in Emacs 30.
+- Unfontify comments.
 
 * Version 1.0 (2023-12-01)
 

@@ -530,6 +530,12 @@ the font.")
                      (put-text-property i (1+ i) 'display
                                         (nth (logand i 1) org-modern--table-sp)))))))))
 
+(defun org-modern--comment ()
+  (put-text-property (match-beginning 1) (match-end 1) 'display nil)
+  ;;(put-text-property (match-beginning 1) (match-end 1) 'invisible nil)
+  ;;(put-text-property (match-beginning 1) (match-end 1) 'face 'font-lock-comment-face)
+  )
+
 (defun org-modern--block-name ()
   "Prettify block according to `org-modern-block-name'."
   (let* ((beg-ind (match-beginning 1))
@@ -753,7 +759,9 @@ the font.")
        `(("^\\([ \t]*\\)\\(#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
           ,@(car specs))
          ("^\\([ \t]*\\)\\(#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
-          ,@(cdr specs)))))))
+          ,@(cdr specs)))))
+   ;; Unfontify comments, links, timestamps, etc.
+   `(("^[ \t]*\\(#[ \t].*\\)$" (1 '(face nil display nil))))))
 
 ;;;###autoload
 (define-minor-mode org-modern-mode
