@@ -222,8 +222,6 @@ END, and R are its arguments."
 		(org-modern-indent--block-bracket-flush)
 	      (org-modern-indent--block-bracket-indented))))))))
 
-(defvar org-modern-indent--initted nil)
-(defvar org-modern-indent--old-unfontify-function nil)
 ;;;###autoload
 (define-minor-mode org-modern-indent-mode
   "Org-modern-like block brackets within org-indent."
