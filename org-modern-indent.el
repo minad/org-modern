@@ -65,7 +65,8 @@ the block is flush left in the buffer."
     (goto-char (match-beginning 0))
     (if (eq (length (match-string 1)) 0)
 	(org-modern-indent--block-bracket-flush)
-      (org-modern-indent--block-bracket-indented))))
+      (org-modern-indent--block-bracket-indented)))
+  nil)
 
 (defvar org-modern-indent--block-prefixes (make-hash-table :test 'eq))
 (defun org-modern-indent--block-bracket-prefix (prefix)
