@@ -40,13 +40,14 @@
   :prefix "org-modern-indent-")
 
 ;; Face for org-modern-indent line
-(defface org-modern-bracket-line '((t (:inherit (org-meta-line) :weight light)))
+(defface org-modern-indent-bracket-line
+  '((t (:inherit (org-meta-line) :weight light)))
   "Face for bracket line in org-modern-indent."
   :group 'faces)
 
-(defconst org-modern-indent-begin (propertize "╭" 'face 'org-modern-bracket-line))
-(defconst org-modern-indent-guide (propertize "│" 'face 'org-modern-bracket-line))
-(defconst org-modern-indent-end   (propertize "╰" 'face 'org-modern-bracket-line))
+(defconst org-modern-indent-begin (propertize "╭" 'face 'org-modern-indent-bracket-line))
+(defconst org-modern-indent-guide (propertize "│" 'face 'org-modern-indent-bracket-line))
+(defconst org-modern-indent-end   (propertize "╰" 'face 'org-modern-indent-bracket-line))
 
 (defvar org-modern-indent-begin-re
   "\\([ \t]*\\)\\(#\\+\\)\\(?:begin\\|BEGIN\\)_\\S-")
