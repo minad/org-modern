@@ -128,7 +128,7 @@ of the returned vector.  If PREFIX is nil or empty, nil is returned."
 			       `(line-prefix ,pf wrap-prefix ,pf))) ; restore
 	(put-text-property pind (1+ pind) 'org-modern-indent-block-type 'indent))
      
-      (put-text-property (point) (1- block-indent) 'face nil)
+      (put-text-property (point) block-indent 'face nil)
       (put-text-property (1- block-indent) block-indent
 			 'display org-modern-indent-begin)
       (while
