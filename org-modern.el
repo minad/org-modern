@@ -8,7 +8,7 @@
 ;; Version: 1.1
 ;; Package-Requires: ((emacs "27.1") (compat "29.1.4.4"))
 ;; Homepage: https://github.com/minad/org-modern
-;; Keywords: outlines, hypermedia, wp
+;; Keywords: outlines, hypermedia, text
 
 ;; This file is part of GNU Emacs.
 
