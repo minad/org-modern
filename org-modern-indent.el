@@ -93,7 +93,7 @@ returned."
 	 (beg (match-beginning 0))
 	 (pind (match-beginning 2))
 	 (vec (org-modern-indent--block-bracket-prefix lpf))
-	 (block-start (min (line-end-position) (point-max))))
+	 (block-start (min (1+ (line-end-position)) (point-max))))
     (with-silent-modifications
       (put-text-property pind (1+ pind) 'org-modern-indent-block-type 'flush)
       (when vec
@@ -104,11 +104,11 @@ returned."
 	(when (re-search-forward "^[ \t]*#\\+\\(?:end\\|END\\)_" nil 'noerror)
 	  (let ((b (line-beginning-position))
 		(p (line-beginning-position 2)))
-	    (add-text-properties (1+ block-start) p
-				 `(line-prefix ,(aref vec 1) wrap-prefix ,(aref vec 1)))
-	    (add-text-properties b (min (line-end-position) (point-max))
-				 `(line-prefix ,(aref vec 2) wrap-prefix ,(aref vec 2)))))))))
-				 `(line-prefix ,(aref vec 2) wrap-prefix ,(aref vec 3)))
+	    (when (> b block-start)
+	      (add-text-properties block-start b
+				   `(line-prefix ,(aref vec 1) wrap-prefix ,(aref vec 1))))
+	    (add-text-properties b p
+				 `(line-prefix ,(aref vec 2) wrap-prefix ,(aref vec 3)))))))))
 
 (defun org-modern-indent--block-bracket-indented ()
   "Insert brackets on space-indented org blocks, e.g. within plain lists."
