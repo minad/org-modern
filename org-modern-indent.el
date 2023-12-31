@@ -71,10 +71,11 @@ the block is flush left in the buffer."
 (defvar org-modern-indent--block-prefixes (make-hash-table :test 'eq))
 (defun org-modern-indent--block-bracket-prefix (prefix)
   "Return a vector of 3 prefix strings based on the length of the current PREFIX.
-The three returned prefixes include begin, end, and guide bracket
+The three returned prefixes include begin, guide, and end bracket
 indicators, and are cached by prefix length, for speed.
 Additionally, the original prefix string is included at the end
-of the returned vector.  If PREFIX is nil or empty, nil is returned."
+of the returned vector.  If PREFIX is nil or empty, nil is
+returned."
   (unless (or (not prefix) (string-empty-p prefix))
     (let* ((l (length prefix)))
       (or (gethash l org-modern-indent--block-prefixes)
@@ -107,6 +108,7 @@ of the returned vector.  If PREFIX is nil or empty, nil is returned."
 				 `(line-prefix ,(aref vec 1) wrap-prefix ,(aref vec 1)))
 	    (add-text-properties b (min (line-end-position) (point-max))
 				 `(line-prefix ,(aref vec 2) wrap-prefix ,(aref vec 2)))))))))
+				 `(line-prefix ,(aref vec 2) wrap-prefix ,(aref vec 3)))
 
 (defun org-modern-indent--block-bracket-indented ()
   "Insert brackets on space-indented org blocks, e.g. within plain lists."
