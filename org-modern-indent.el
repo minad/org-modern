@@ -170,8 +170,10 @@ returned."
       (if org-modern-indent--init
 	  (let ((cnt (cl-incf (cadr org-modern-indent--init))))
 	    (if (> cnt 5)
-		(user-error
-		 "org-modern-indent: Gave up waiting for %s to initialize" buf)
+		(progn
+		  (org-modern-indent-mode -1)
+		  (user-error
+		   "org-modern-indent: Gave up waiting for %s to initialize" buf))
 	      (timer-activate (timer-set-time (car org-modern-indent--init)
 					      (time-add (current-time) 0.2)))))
 	(setq
