@@ -57,8 +57,8 @@ As an important principle, `org-modern-indent` does not alter the contents of th
    ```
   you can simply use `M-S-left/right` at block start (or in fact anywhere on the block header/footer) to `org-indent-block`.  Note that `org-src-preserve-indentation=nil` is an important setting, to allow org to (re-)indent blocks to respect the local indentation inside list and other elements.  Also note that (from `org-indent-region`): 
 
-  > [!NOTE]
-  > The function will not indent contents of example blocks, verse blocks and export blocks as leading white spaces are assumed to be significant there.
+> [!NOTE]
+> The function will not indent contents of example blocks, verse blocks and export blocks as leading white spaces are assumed to be significant there.
 
 ### Font spacing
 
