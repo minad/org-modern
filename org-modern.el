@@ -211,6 +211,16 @@ all other blocks."
                         (string :tag "#+end_NAME replacement"))
                   (const :tag "Hide #+begin_ and #+end_ prefixes" t)))))
 
+(defcustom org-modern-block-line-spacing nil
+  "Values above 0.0 add space below liens in block text.
+This can also override a buffer-wide setting for line-spacing."
+  :type 'float)
+
+(defcustom org-modern-block-line-height nil
+  "Values over 1.0 add space above lines in block text.
+This can also override a buffer-wide setting for line-height."
+  :type 'float)
+
 (defcustom org-modern-block-fringe 2
   "Add a border to the blocks in the fringe.
 This variable can also be set to an integer between 0 and 16,
@@ -760,6 +770,13 @@ the font.")
    (when (and org-modern-block-fringe (not (bound-and-true-p org-indent-mode)))
      '(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-"
         (0 (org-modern--block-fringe)))))
+   (when (or org-modern-block-line-height org-modern-block-line-spacing)
+     (let ((line-height-rule
+            `(0 '(face nil line-height ,org-modern-block-line-height) append))
+           (line-spacing-rule
+            `(0 '(face nil line-spacing ,org-modern-block-line-spacing) append)))
+       `(("^[ \t]*#\\+\\(?:begin\\|BEGIN\\)_\\S-\\([^z-a]*\\)#\\+\\(?:end\\|END\\)_\\S-+\n"
+          ,line-height-rule ,line-spacing-rule))))
    (when org-modern-block-name
      (let* ((indent (and org-modern-block-fringe
                          (not (bound-and-true-p org-indent-mode))
