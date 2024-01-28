@@ -69,6 +69,16 @@ This uses `default-text-properties' so that it may be overridden."
 Set to nil to disable styling the headlines."
   :type '(repeat string))
 
+(defcustom org-modern-headline-line-spacing nil
+  "Values over 0.0 create space below headlines.
+This can also override a buffer-wide setting for line-spacing."
+  :type 'float)
+
+(defcustom org-modern-headline-line-height nil
+  "Values over 1.0 create space over headlines.
+This can also override a buffer-wide setting for line-height."
+  :type 'float)
+
 (defcustom org-modern-hide-stars 'leading
   "Changes the displays of the stars.
 Can be leading, t, or a string replacement for each leading star.
@@ -734,6 +744,10 @@ the font.")
      `((,(concat "^[ \t]*#\\+\\(?:filetags\\|FILETAGS\\):\\( +\\)\\(:\\(?:"
                  org-tag-re ":\\)+\\)[ \t]*$")
         (0 (org-modern--tag)))))
+   (when (or org-modern-headline-line-spacing org-modern-headline-line-height)
+     `(("^\\(?:\\*+ .*\\)\\(\n+\\)"
+        (1 '(face nil line-spacing ,org-modern-headline-line-spacing) t)
+        (1 '(face nil line-height ,org-modern-headline-line-height) t))))
    (when org-modern-keyword
      `(("^[ \t]*\\(#\\+\\)\\([^: \t\n]+\\):"
         ,@(pcase org-modern-keyword
