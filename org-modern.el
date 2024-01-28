@@ -35,6 +35,7 @@
 
 (require 'compat)
 (require 'org)
+(require 'map)
 (eval-when-compile
   (require 'cl-lib)
   (require 'subr-x))
@@ -52,6 +53,16 @@
 If set to `auto' the border width is computed based on the `line-spacing'.
 A value between 0.1 and 0.4 of `line-spacing' is recommended."
   :type '(choice (const nil) (const auto) integer))
+
+(defcustom org-modern-line-spacing nil
+  "Values over 0.0 will add space below all lines by default.
+This uses `default-text-properties' so that it may be overridden."
+  :type 'float)
+
+(defcustom org-modern-line-height nil
+  "Values over 1.0 will add space above all lines by default.
+This uses `default-text-properties' so that it may be overridden."
+  :type 'float)
 
 (defcustom org-modern-star '("◉" "○" "◈" "◇" "✳")
   "Replacement strings for headline stars for each level.
@@ -765,6 +776,15 @@ the font.")
   (cond
    (org-modern-mode
     (add-to-invisibility-spec 'org-modern)
+    (setq-local font-lock-extra-managed-props '(line-height line-spacing))
+    (when org-modern-line-height
+      (setq-local default-text-properties
+                  (plist-put default-text-properties 'line-height
+                             org-modern-line-height)))
+    (when org-modern-line-spacing
+      (setq-local default-text-properties
+                  (plist-put default-text-properties 'line-spacing
+                             org-modern-line-spacing)))
     (setq
      org-modern--star-cache
      (vconcat (mapcar #'org-modern--symbol org-modern-star))
@@ -791,6 +811,12 @@ the font.")
     (org-modern--update-label-face)
     (org-modern--update-fringe-bitmaps))
    (t
+    (when org-modern-line-height
+      (setq-local default-text-properties
+                  (map-delete default-text-properties 'line-height)))
+    (when org-modern-line-spacing
+      (setq-local default-text-properties
+                  (map-delete default-text-properties 'line-spacing)))
     (remove-from-invisibility-spec 'org-modern)
     (font-lock-remove-keywords nil org-modern--font-lock-keywords)
     (font-lock-add-keywords nil org-font-lock-keywords)
