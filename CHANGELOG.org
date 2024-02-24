@@ -2,6 +2,10 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- =org-modern-star=, =org-modern-progress=: Support string values.
+
 * Version 1.1 (2023-12-01)
 
 - Bugfix: Do not use zero line width for box face attribute. Zero line widths

@@ -53,10 +53,10 @@ If set to `auto' the border width is computed based on the `line-spacing'.
 A value between 0.1 and 0.4 of `line-spacing' is recommended."
   :type '(choice (const nil) (const auto) integer))
 
-(defcustom org-modern-star '("◉" "○" "◈" "◇" "✳")
+(defcustom org-modern-star "◉○◈◇✳"
   "Replacement strings for headline stars for each level.
 Set to nil to disable styling the headlines."
-  :type '(repeat string))
+  :type '(choice string (repeat string)))
 
 (defcustom org-modern-hide-stars 'leading
   "Changes the displays of the stars.
@@ -234,10 +234,10 @@ references."
   "Prettify todo statistics."
   :type 'boolean)
 
-(defcustom org-modern-progress '("○" "◔" "◑" "◕" "●")
+(defcustom org-modern-progress "○◔◑◕●"
   "Add a progress indicator to the todo statistics.
 Set to nil to disable the indicator."
-  :type '(repeat string))
+  :type '(choice string (repeat string)))
 
 (defgroup org-modern-faces nil
   "Faces used by `org-modern'."
@@ -639,7 +639,7 @@ the font.")
 
 (defun org-modern--symbol (str)
   "Add `org-modern-symbol' face to STR."
-  (setq str (copy-sequence str))
+  (setq str (if (stringp str) (copy-sequence str) (char-to-string str)))
   (add-face-text-property 0 (length str) 'org-modern-symbol 'append str)
   str)
 
