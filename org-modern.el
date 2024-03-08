@@ -60,10 +60,11 @@ Set to nil to disable styling the headlines."
 
 (defcustom org-modern-hide-stars 'leading
   "Changes the displays of the stars.
-Can be leading, t, or a string replacement for each leading star.
-Set to nil to disable."
+Can be leading, t, or a string/character replacement for each
+leading star.  Set to nil to disable."
   :type '(choice
           (string :tag "Replacement string for leading stars")
+          (character :tag "Replacement character for leading stars")
           (const :tag "Do not hide stars" nil)
           (const :tag "Hide all stars" t)
           (const :tag "Hide leading stars" leading)))
@@ -769,7 +770,7 @@ the font.")
      org-modern--star-cache
      (vconcat (mapcar #'org-modern--symbol org-modern-star))
      org-modern--hide-stars-cache
-     (and (stringp org-modern-hide-stars)
+     (and (char-or-string-p org-modern-hide-stars)
           (list (org-modern--symbol org-modern-hide-stars)
                 (org-modern--symbol org-modern-hide-stars)))
      org-modern--progress-cache
