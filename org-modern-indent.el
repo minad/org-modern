@@ -118,10 +118,10 @@ returned."
 	 (indent (current-indentation)) ; space up to #+begin_
 	 (block-indent (+ (point) indent))
 	 (search (concat "^[[:blank:]]\\{" (number-to-string indent) "\\}"))
-	 (wrap (concat (propertize
-			(make-string (if pf (+ indent (length pf) -1) indent) ?\s)
-			'face 'org-indent)
-		       org-modern-indent-guide))
+	 (wrap (concat
+		(if pf (propertize (make-string (length pf) ?\s) 'face 'org-indent))
+		(if (> indent 1) (make-string (1- indent) ?\s))
+		org-modern-indent-guide))
 	 orig-prefix)
     (with-silent-modifications
       (when flush		  ; formerly this block was flush left
@@ -131,7 +131,6 @@ returned."
 	  (add-text-properties (point) (min (line-beginning-position 2) (point-max))
 			       `(line-prefix ,pf wrap-prefix ,pf))) ; restore
 	(put-text-property pind (1+ pind) 'org-modern-indent-block-type 'indent))
-     
       (put-text-property (point) block-indent 'face nil)
       (put-text-property (1- block-indent) block-indent
 			 'display org-modern-indent-begin)
