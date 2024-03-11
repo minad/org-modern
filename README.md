@@ -45,7 +45,7 @@ As an important principle, `org-modern-indent` does not alter the contents of th
        - sublist, which holds a block:
 	     [C-c C-,] here
    ```
-- **Move flush left**: Note: `M-{` will get you to the start of a block quickly.  `M-\` at block start will move the block's first header line to column 0.  Then `M-S-left` (or `right`) will indent the full block.  
+- **Move flush left**: Note: `M-{` will get you to the start of a block quickly.  `M-\` at block start will move the block's first header line to column 0.  Then `M-S-left` (or `right`) will indent the full block.
 - **Indent rigidly**: `M-h` selects the entire block. Then `C-x TAB` enters "rigid indent" mode, after which left/right moves the entire block.
 - **Re-indent a block**: If you have a block that is partially aligned, perhaps with a "hanging end", like so:
    ```org
