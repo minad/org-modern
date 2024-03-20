@@ -163,13 +163,11 @@ returned."
 (defvar-local org-modern-indent--init nil)
 (defun org-modern-indent--wait-and-refresh (buf)
   "Wait for org-indent to finish initializing BUF, then refresh."
-  (when (buffer-live-p buf)
-    (if (or (not (bound-and-true-p org-indent-agentized-buffers))
-	    (not (memq buf org-indent-agentized-buffers)))
-	(with-current-buffer buf
-	  (font-lock-add-keywords nil org-modern-indent--font-lock-keywords t)
-	  (font-lock-flush))
-      ;; still waiting
+  (if (or (not (bound-and-true-p org-indent-agentized-buffers))
+	  (not (memq buf org-indent-agentized-buffers)))
+      (org-modern-indent--add-keywords buf)
+    ;; still waiting
+    (when (buffer-live-p buf)
       (with-current-buffer buf
 	(if org-modern-indent--init
 	    (let ((cnt (cl-incf (cadr org-modern-indent--init))))
@@ -184,6 +182,14 @@ returned."
 	   org-modern-indent--init
 	   (list (run-at-time 0.1 nil #'org-modern-indent--wait-and-refresh buf)
 		 1)))))))
+
+(defun org-modern-indent--add-keywords (buf)
+  "Add keywords to buffer BUF and refresh.
+To be added to `org-indent-post-buffer-init-functions'."
+  (when (buffer-live-p buf)	     ; org-capture buffers vanish fast
+    (with-current-buffer buf
+      (font-lock-add-keywords nil org-modern-indent--font-lock-keywords t)
+      (font-lock-flush))))
 
 (defun org-modern-indent--refresh ()
   "Unfontify entire buffer and refresh line prefix."
@@ -232,20 +238,28 @@ END, and R are its arguments."
   "Org-modern-like block brackets within org-indent."
   :global nil
   :group 'org-modern-indent
-  
   (if org-modern-indent-mode
       (progn
 	(advice-add 'org-indent-refresh-maybe :around
 		    #'org-modern-indent--refresh-watch)
 	(advice-add 'org-indent-add-properties :filter-args
 		    #'org-modern-indent--store-refresh-args)
-	(org-modern-indent--wait-and-refresh (current-buffer)))
+	(if (boundp 'org-indent-post-buffer-init-functions)
+	    (add-hook 'org-indent-post-buffer-init-functions
+		      #'org-modern-indent--add-keywords)
+	  ;; No hook available, use the less reliable method
+	  (org-modern-indent--wait-and-refresh (current-buffer))))
     ;; Disabling
     (advice-remove 'org-indent-refresh-maybe
 		   #'org-modern-indent--refresh-watch)
     (advice-remove 'org-indent-add-properties
 		   #'org-modern-indent--store-refresh-args)
     (font-lock-remove-keywords nil org-modern-indent--font-lock-keywords)
+    (if (boundp 'org-indent-post-buffer-init-functions)
+	(remove-hook 'org-indent-post-buffer-init-functions
+		     #'org-modern-indent--add-keywords)
+      (cancel-timer (car org-modern-indent--init))
+      (setq org-modern-indent--init nil))
     (org-modern-indent--refresh)))
 
 (provide 'org-modern-indent)
