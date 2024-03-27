@@ -657,7 +657,7 @@ the font.")
      `(("^\\*+.*? \\(\\(\\[\\)#.\\(\\]\\)\\) "
         (1 (org-modern--priority)))))
    (when org-modern-todo
-     `((,(format "^\\*+ +%s " (regexp-opt org-todo-keywords-1 t))
+     `((,(format "^\\*+ +%s\\(?: \\|$\\)" (regexp-opt org-todo-keywords-1 t))
         (0 (org-modern--todo)))))
    (when org-modern-checkbox
      `((,org-list-full-item-re
