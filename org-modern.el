@@ -348,7 +348,6 @@ the font.")
   "Face used for horizontal ruler.")
 
 (defvar-local org-modern--font-lock-keywords nil)
-(defvar-local org-modern--replace-star-cache nil)
 (defvar-local org-modern--folded-star-cache nil)
 (defvar-local org-modern--expanded-star-cache nil)
 (defvar-local org-modern--hide-stars-cache nil)
@@ -504,14 +503,13 @@ the font.")
         (put-text-property beg (1+ end) 'face (get-text-property end 'face)))
       (put-text-property
        (if (eq org-modern-hide-stars 'leading) beg end)
-       (1+ end)
-       'display
-       (let ((cache (or org-modern--replace-star-cache
-                        ;; `org-fold-folded-p' requires Emacs 29.1, but this
-                        ;; does essentially the same for our purposes.
-                        (if (get-char-property (pos-eol) 'invisible)
-                            org-modern--folded-star-cache
-                          org-modern--expanded-star-cache))))
+       (1+ end) 'display
+       ;; `org-fold-folded-p' requires Emacs 29.1, but this
+       ;; does essentially the same for our purposes.
+       (let ((cache (if (and org-modern--folded-star-cache
+                             (get-char-property (pos-eol) 'invisible))
+                        org-modern--folded-star-cache
+                      org-modern--expanded-star-cache)))
          (aref cache (min (1- (length cache)) level)))))))
 
 (defun org-modern--cycle (state)
@@ -798,15 +796,14 @@ whole buffer; otherwise, for the line at point."
    (org-modern-mode
     (add-to-invisibility-spec 'org-modern)
     (setq
-     org-modern--replace-star-cache
-     (and org-modern-star (not (eq org-modern-star 'fold))
-          (vconcat (mapcar #'org-modern--symbol org-modern-replace-stars)))
      org-modern--folded-star-cache
      (and (eq org-modern-star 'fold)
           (vconcat (mapcar #'org-modern--symbol (mapcar #'car org-modern-fold-stars))))
      org-modern--expanded-star-cache
-     (and (eq org-modern-star 'fold)
-          (vconcat (mapcar #'org-modern--symbol (mapcar #'cdr org-modern-fold-stars))))
+     (and org-modern-star
+          (vconcat (mapcar #'org-modern--symbol (if (eq org-modern-star 'fold)
+                                                    (mapcar #'cdr org-modern-fold-stars)
+                                                  org-modern-replace-stars))))
      org-modern--hide-stars-cache
      (and (char-or-string-p org-modern-hide-stars)
           (list (org-modern--symbol org-modern-hide-stars)
