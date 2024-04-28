@@ -69,6 +69,20 @@ leading star.  Set to nil to disable."
           (const :tag "Hide all stars" t)
           (const :tag "Hide leading stars" leading)))
 
+(defcustom org-modern-heading-folding-indicators nil
+  "Folding indicators for headings.
+Replace headings' stars with an indicator showing whether its
+tree is folded or expanded.  This option requires that
+`org-modern-hide-stars' be set to `leading'."
+  :type '(choice (const :tag "Don't show indicators" nil)
+                 (cons :tag "Show folded/expanded indicators"
+                       (string :tag "Folded" :value "⮞")
+                       (string :tag "Expanded " :value "⮟")))
+  :set (lambda (option value)
+         (unless (eq org-modern-hide-stars 'leading)
+           (user-error "Option `org-modern-heading-folding-indicators' requires that `org-modern-hide-stars' be set to `leading'"))
+         (set-default option value)))
+
 (defcustom org-modern-timestamp t
   "Prettify time stamps, e.g. <2022-03-01>.
 Set to nil to disable styling the time stamps.  In order to use
@@ -487,9 +501,27 @@ the font.")
         (put-text-property beg (1+ end) 'face (get-text-property end 'face)))
       (put-text-property
        (if (eq org-modern-hide-stars 'leading) beg end)
-       (1+ end) 'display
-       (aref org-modern--star-cache
-             (min (1- (length org-modern--star-cache)) level))))))
+       (cond (org-modern-heading-folding-indicators
+              (1+ end))
+             (t (+ 2 end)))
+       'display (cond (org-modern-heading-folding-indicators
+                       ;; `org-fold-folded-p' requires Emacs 29.1, but this
+                       ;; does essentially the same for our purposes.
+                       (if (get-char-property (pos-eol) 'invisible)
+                           (car org-modern-heading-folding-indicators)
+                         (cdr org-modern-heading-folding-indicators)))
+                      (t (aref org-modern--star-cache
+                               (min (1- (length org-modern--star-cache)) level))))))))
+
+(defun org-modern--org-cycle-hook (state)
+  "Flush font-lock for buffer or line at point.
+When STATE is `overview', `contents', or `all', flush for the
+whole buffer; otherwise, for the line at point.  For use in
+`org-cycle-hook', which see."
+  (pcase state
+    ((or 'overview 'contents 'all)
+     (font-lock-flush))
+    (_ (font-lock-flush (pos-bol) (pos-eol)))))
 
 (defun org-modern--table ()
   "Prettify vertical table lines."
@@ -789,6 +821,7 @@ the font.")
     (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
     (add-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line nil 'local)
     (add-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line nil 'local)
+    (add-hook 'org-cycle-hook #'org-modern--org-cycle-hook nil 'local)
     (org-modern--update-label-face)
     (org-modern--update-fringe-bitmaps))
    (t
@@ -798,7 +831,8 @@ the font.")
     (setq-local font-lock-unfontify-region-function #'org-unfontify-region)
     (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)
     (remove-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line 'local)
-    (remove-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line 'local)))
+    (remove-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line 'local)
+    (remove-hook 'org-cycle-hook #'org-modern--org-cycle-hook 'local)))
   (without-restriction
     (with-silent-modifications
       (org-modern--unfontify (point-min) (point-max)))
