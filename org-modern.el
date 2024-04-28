@@ -53,10 +53,25 @@ If set to `auto' the border width is computed based on the `line-spacing'.
 A value between 0.1 and 0.4 of `line-spacing' is recommended."
   :type '(choice (const nil) (const auto) integer))
 
-(defcustom org-modern-star "◉○◈◇✳"
-  "Replacement strings for headline stars for each level.
-Set to nil to disable styling the headlines."
+(defcustom org-modern-star 'fold
+  "Style heading stars.
+Can be nil, fold or replace.  See `org-modern-fold-stars' and
+`org-moder-replace-stars' for the respective configurations."
+  :type '(choice (const :tag "No styling" nil)
+                 (const :tag "Folding indicators" fold)
+                 (const :tag "Replace" replace)))
+
+(defcustom org-modern-replace-stars "◉○◈◇✳"
+  "Replacement strings for headline stars for each level."
   :type '(choice string (repeat string)))
+
+(defcustom org-modern-fold-stars
+  '(("⮞" . "⮟") ("⮚" . "⮛") ("▶" . "▼") ("▷" . "▽"))
+  "Folding indicators for headings.
+Replace headings' stars with an indicator showing whether its
+tree is folded or expanded."
+  :type '(repeat (cons (string :tag "Folded")
+                       (string :tag "Expanded"))))
 
 (defcustom org-modern-hide-stars 'leading
   "Changes the displays of the stars.
@@ -68,20 +83,6 @@ leading star.  Set to nil to disable."
           (const :tag "Do not hide stars" nil)
           (const :tag "Hide all stars" t)
           (const :tag "Hide leading stars" leading)))
-
-(defcustom org-modern-heading-folding-indicators nil
-  "Folding indicators for headings.
-Replace headings' stars with an indicator showing whether its
-tree is folded or expanded.  This option requires that
-`org-modern-hide-stars' be set to `leading'."
-  :type '(choice (const :tag "Don't show indicators" nil)
-                 (cons :tag "Show folded/expanded indicators"
-                       (string :tag "Folded" :value "⮞")
-                       (string :tag "Expanded " :value "⮟")))
-  :set (lambda (option value)
-         (unless (eq org-modern-hide-stars 'leading)
-           (user-error "Option `org-modern-heading-folding-indicators' requires that `org-modern-hide-stars' be set to `leading'"))
-         (set-default option value)))
 
 (defcustom org-modern-timestamp t
   "Prettify time stamps, e.g. <2022-03-01>.
@@ -347,7 +348,9 @@ the font.")
   "Face used for horizontal ruler.")
 
 (defvar-local org-modern--font-lock-keywords nil)
-(defvar-local org-modern--star-cache nil)
+(defvar-local org-modern--replace-star-cache nil)
+(defvar-local org-modern--folded-star-cache nil)
+(defvar-local org-modern--expanded-star-cache nil)
 (defvar-local org-modern--hide-stars-cache nil)
 (defvar-local org-modern--checkbox-cache nil)
 (defvar-local org-modern--progress-cache nil)
@@ -501,26 +504,22 @@ the font.")
         (put-text-property beg (1+ end) 'face (get-text-property end 'face)))
       (put-text-property
        (if (eq org-modern-hide-stars 'leading) beg end)
-       (cond (org-modern-heading-folding-indicators
-              (1+ end))
-             (t (+ 2 end)))
-       'display (cond (org-modern-heading-folding-indicators
-                       ;; `org-fold-folded-p' requires Emacs 29.1, but this
-                       ;; does essentially the same for our purposes.
-                       (if (get-char-property (pos-eol) 'invisible)
-                           (car org-modern-heading-folding-indicators)
-                         (cdr org-modern-heading-folding-indicators)))
-                      (t (aref org-modern--star-cache
-                               (min (1- (length org-modern--star-cache)) level))))))))
+       (1+ end)
+       'display
+       (let ((cache (or org-modern--replace-star-cache
+                        ;; `org-fold-folded-p' requires Emacs 29.1, but this
+                        ;; does essentially the same for our purposes.
+                        (if (get-char-property (pos-eol) 'invisible)
+                            org-modern--folded-star-cache
+                          org-modern--expanded-star-cache))))
+         (aref cache (min (1- (length cache)) level)))))))
 
-(defun org-modern--org-cycle-hook (state)
-  "Flush font-lock for buffer or line at point.
+(defun org-modern--cycle (state)
+  "Flush font-lock for buffer or line at point for `org-cycle-hook'.
 When STATE is `overview', `contents', or `all', flush for the
-whole buffer; otherwise, for the line at point.  For use in
-`org-cycle-hook', which see."
+whole buffer; otherwise, for the line at point."
   (pcase state
-    ((or 'overview 'contents 'all)
-     (font-lock-flush))
+    ((or 'overview 'contents 'all) (font-lock-flush))
     (_ (font-lock-flush (pos-bol) (pos-eol)))))
 
 (defun org-modern--table ()
@@ -799,8 +798,15 @@ whole buffer; otherwise, for the line at point.  For use in
    (org-modern-mode
     (add-to-invisibility-spec 'org-modern)
     (setq
-     org-modern--star-cache
-     (vconcat (mapcar #'org-modern--symbol org-modern-star))
+     org-modern--replace-star-cache
+     (and org-modern-star (not (eq org-modern-star 'fold))
+          (vconcat (mapcar #'org-modern--symbol org-modern-replace-stars)))
+     org-modern--folded-star-cache
+     (and (eq org-modern-star 'fold)
+          (vconcat (mapcar #'org-modern--symbol (mapcar #'car org-modern-fold-stars))))
+     org-modern--expanded-star-cache
+     (and (eq org-modern-star 'fold)
+          (vconcat (mapcar #'org-modern--symbol (mapcar #'cdr org-modern-fold-stars))))
      org-modern--hide-stars-cache
      (and (char-or-string-p org-modern-hide-stars)
           (list (org-modern--symbol org-modern-hide-stars)
@@ -821,7 +827,7 @@ whole buffer; otherwise, for the line at point.  For use in
     (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
     (add-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line nil 'local)
     (add-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line nil 'local)
-    (add-hook 'org-cycle-hook #'org-modern--org-cycle-hook nil 'local)
+    (add-hook 'org-cycle-hook #'org-modern--cycle nil 'local)
     (org-modern--update-label-face)
     (org-modern--update-fringe-bitmaps))
    (t
@@ -832,7 +838,7 @@ whole buffer; otherwise, for the line at point.  For use in
     (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)
     (remove-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line 'local)
     (remove-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line 'local)
-    (remove-hook 'org-cycle-hook #'org-modern--org-cycle-hook 'local)))
+    (remove-hook 'org-cycle-hook #'org-modern--cycle 'local)))
   (without-restriction
     (with-silent-modifications
       (org-modern--unfontify (point-min) (point-max)))

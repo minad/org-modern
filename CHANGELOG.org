@@ -2,6 +2,13 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- Add support for heading folding indicators. The option ~org-modern-star~ has
+  been changed to accept the values ~fold~, ~replace~ and ~nil~.
+- Add new customization options ~org-modern-replace-stars~ and
+  ~org-modern-fold-stars~.
+
 * Version 1.2 (2024-03-16)
 
 - =org-modern-star=, =org-modern-hide-stars=, =org-modern-progress=: Support string
