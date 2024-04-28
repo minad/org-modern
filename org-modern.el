@@ -504,10 +504,8 @@ the font.")
       (put-text-property
        (if (eq org-modern-hide-stars 'leading) beg end)
        (1+ end) 'display
-       ;; `org-fold-folded-p' requires Emacs 29.1, but this
-       ;; does essentially the same for our purposes.
        (let ((cache (if (and org-modern--folded-star-cache
-                             (get-char-property (pos-eol) 'invisible))
+                             (org-invisible-p (pos-eol)))
                         org-modern--folded-star-cache
                       org-modern--expanded-star-cache)))
          (aref cache (min (1- (length cache)) level)))))))
