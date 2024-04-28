@@ -255,6 +255,13 @@ references."
 Set to nil to disable the indicator."
   :type '(choice string (repeat string)))
 
+(defcustom org-modern-progress-bar-width 11
+  "Width in characters to draw progress bars.
+Set to nil to disable.  Overrides `org-modern-statistics' if
+non-nil."
+  :type '(choice (const :tag "Disable progress bar" nil)
+		 (natnum :tag "Bar width")))
+
 (defgroup org-modern-faces nil
   "Faces used by `org-modern'."
   :group 'org-modern
@@ -314,6 +321,18 @@ the font.")
 (defface org-modern-statistics
   '((t :inherit org-modern-done))
   "Face used for todo statistics labels.")
+
+(defface org-modern-progress-bar
+  '((default :inherit org-modern-label)
+    (((background light)) :foreground "black" :box t)
+    (t :foreground "white" :box t))
+  "Face used for empty section of progress bars.")
+
+(defface org-modern-progress-bar-done
+  '((default :inherit org-modern-progress-bar)
+    (((background light)) :background "gray70")
+    (t :background "gray40"))
+  "Face used for completed section of progress bars.")
 
 (defface org-modern-date-active
   '((t :inherit org-modern-done))
@@ -395,6 +414,44 @@ the font.")
                           (cdr (assq t org-modern-priority-faces)))))
            `(:inherit (,face org-modern-label))
          'org-modern-priority)))))
+
+(defun org-modern--progress-bar ()
+  "Prettify headline todo statistics as color-coded progress bar."
+  (let* ((beg (match-beginning 2))
+	 (end (match-end 2))
+	 (len (- end beg))
+	 (completed (string-to-number (or (match-string 3) (match-string 4))))
+	 (pad-left (max 0 (/ (- org-modern-progress-bar-width len) 2)))
+	 (pad-right (max 0 (- org-modern-progress-bar-width len pad-left)))
+	 (bars (min org-modern-progress-bar-width
+		    (/ (* completed org-modern-progress-bar-width)
+		       (if (match-beginning 3) 100 ; percentage
+			 (max 1 (string-to-number (match-string 5))))))))
+    (add-text-properties
+     (match-beginning 1) (match-end 1)
+     `( face org-modern-progress-bar display
+	,(concat
+	  (propertize (make-string (min bars pad-left) ?\s)
+		      'face 'org-modern-progress-bar-done)
+	  (propertize (make-string
+		       (- pad-left (min bars pad-left)) ?\s)
+		      'face 'org-modern-progress-bar))))
+    (setq bars (max 0 (- bars pad-left)))
+    (when (> bars 0)
+      (put-text-property beg (setq beg (+ beg (min len bars)))
+			 'face 'org-modern-progress-bar-done))
+    (when (< bars len)
+      (put-text-property beg end 'face 'org-modern-progress-bar))
+    (setq bars (max 0 (- bars len)))
+    (add-text-properties
+     (match-beginning 6) (match-end 6)
+     `(face org-modern-progress-bar display
+	    ,(concat
+	      (propertize (make-string (min bars pad-right) ?\s)
+			  'face 'org-modern-progress-bar-done :rear-nonsticky t )
+	      (propertize (make-string
+			   (- pad-right (min bars pad-right)) ?\s)
+			  'face 'org-modern-progress-bar :rear-nonsticky t ))))))
 
 (defun org-modern--progress ()
   "Prettify headline todo progress."
@@ -737,11 +794,17 @@ whole buffer; otherwise, for the line at point."
        ("<[^>]+>\\(-\\)\\(-\\)<[^>]+>\\|\\[[^]]+\\]\\(?1:-\\)\\(?2:-\\)\\[[^]]+\\]"
         (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
         (2 '(face org-modern-label display #("  " 0 1 (face (:strike-through t)))) t))))
-   (when org-modern-statistics
-     `((" \\(\\(\\[\\)\\(?:\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\(\\]\\)\\)"
-        (1 '(face org-modern-statistics) t)
-        (2 ,(if org-modern-progress '(org-modern--progress) ''(face nil display " ")))
-        (6 '(face nil display " ")))))
+   (if org-modern-progress-bar-width
+       `((,(rx ?\s (group ?\[)
+	       (group (or (and (group (+ num)) ?%)
+			  (and (group (+ num)) ?/ (group (+ num)))))
+	       (group ?\]))
+	  (0 (org-modern--progress-bar)))) 
+       (when org-modern-statistics
+	 `((" \\(\\(\\[\\)\\(?:\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\(\\]\\)\\)"
+            (1 '(face org-modern-statistics) t)
+            (2 ,(if org-modern-progress '(org-modern--progress) ''(face nil display " ")))
+            (6 '(face nil display " "))))))
    (when org-modern-tag
      `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
         (0 (org-modern--tag)))))
