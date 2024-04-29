@@ -66,12 +66,13 @@ Can be nil, fold or replace.  See `org-modern-fold-stars' and
   :type '(choice string (repeat string)))
 
 (defcustom org-modern-fold-stars
-  '(("▶" . "▼") ("▷" . "▽") ("⏵" . "⏷") ("▹" . "▿"))
+  '(("▶" "▼" "■") ("▷" "▽" "□") ("⏵" "⏷" "◼") ("▹" "▿" "▫"))
   "Folding indicators for headings.
 Replace headings' stars with an indicator showing whether its
 tree is folded or expanded."
-  :type '(repeat (cons (string :tag "Folded")
-                       (string :tag "Expanded"))))
+  :type '(repeat (list (string :tag "Folded")
+                       (string :tag "Expanded")
+                       (string :tag "Empty"))))
 
 (defcustom org-modern-hide-stars 'leading
   "Changes the displays of the stars.
@@ -360,6 +361,7 @@ the font.")
   "Face used for horizontal ruler.")
 
 (defvar-local org-modern--font-lock-keywords nil)
+(defvar-local org-modern--default-star-cache nil)
 (defvar-local org-modern--folded-star-cache nil)
 (defvar-local org-modern--expanded-star-cache nil)
 (defvar-local org-modern--hide-stars-cache nil)
@@ -522,10 +524,17 @@ the font.")
       (put-text-property
        (if (eq org-modern-hide-stars 'leading) beg end)
        (1+ end) 'display
-       (let ((cache (if (and org-modern--folded-star-cache
-                             (org-invisible-p (pos-eol)))
-                        org-modern--folded-star-cache
-                      org-modern--expanded-star-cache)))
+       (let ((cache (cond
+                     ((and org-modern--folded-star-cache (org-invisible-p (pos-eol)))
+                      org-modern--folded-star-cache)
+                     ((and org-modern--expanded-star-cache
+                           (save-excursion ;; Empty heading
+                             (save-match-data
+                               (goto-char (pos-eol))
+                               (or (not (looking-at "[\n\r]+\\(\\*+\\)\\s-"))
+                                   (> (- (match-end 1) (match-beginning 1) 1) level)))))
+                      org-modern--expanded-star-cache)
+                     (t org-modern--default-star-cache))))
          (aref cache (min (1- (length cache)) level)))))))
 
 (defun org-modern--cycle (state)
@@ -816,9 +825,12 @@ whole buffer; otherwise, for the line at point."
      (and (eq org-modern-star 'fold)
           (vconcat (mapcar #'org-modern--symbol (mapcar #'car org-modern-fold-stars))))
      org-modern--expanded-star-cache
+     (and (eq org-modern-star 'fold)
+          (vconcat (mapcar #'org-modern--symbol (mapcar #'cadr org-modern-fold-stars))))
+     org-modern--default-star-cache
      (and org-modern-star
           (vconcat (mapcar #'org-modern--symbol (if (eq org-modern-star 'fold)
-                                                    (mapcar #'cdr org-modern-fold-stars)
+                                                    (mapcar #'caddr org-modern-fold-stars)
                                                   org-modern-replace-stars))))
      org-modern--hide-stars-cache
      (and (char-or-string-p org-modern-hide-stars)
