@@ -262,6 +262,13 @@ non-nil."
   :type '(choice (const :tag "Disable progress bar" nil)
 		 (natnum :tag "Bar width")))
 
+(defcustom org-modern-progress-bar-align-pos 0.6
+  "Fraction of window width to align progress bar with.
+The left edge of progress bars are aligned with this position, if
+possible."
+  :type '(choice (const :tag "No alignment" nil)
+		 (float :tag "Fractional width")))
+
 (defgroup org-modern-faces nil
   "Faces used by `org-modern'."
   :group 'org-modern
@@ -427,6 +434,10 @@ the font.")
 		    (/ (* completed org-modern-progress-bar-width)
 		       (if (match-beginning 3) 100 ; percentage
 			 (max 1 (string-to-number (match-string 5))))))))
+    (when org-modern-progress-bar-align-pos
+      (put-text-property (match-beginning 0) beg 'display
+       `( space :align-to
+	  (+ left (,org-modern-progress-bar-align-pos . text)))))
     (add-text-properties
      (match-beginning 1) (match-end 1)
      `( face org-modern-progress-bar display
