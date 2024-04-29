@@ -56,7 +56,7 @@ A value between 0.1 and 0.4 of `line-spacing' is recommended."
 (defcustom org-modern-star 'fold
   "Style heading stars.
 Can be nil, fold or replace.  See `org-modern-fold-stars' and
-`org-moder-replace-stars' for the respective configurations."
+`org-modern-replace-stars' for the respective configurations."
   :type '(choice (const :tag "No styling" nil)
                  (const :tag "Folding indicators" fold)
                  (const :tag "Replace" replace)))
@@ -442,7 +442,7 @@ the font.")
             (put-text-property
              colon-end cbeg 'face
              (if-let ((faces org-modern-tag-faces)
-                      (face (or (cdr (assoc (buffer-substring-no-properties beg end) faces))
+                      (face (or (cdr (assoc (buffer-substring-no-properties colon-end cbeg) faces))
                                 (cdr (assq t faces)))))
                  `(:inherit (,face org-modern-tag))
                'org-modern-tag)))
