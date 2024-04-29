@@ -170,7 +170,7 @@ This is an alist, with tag the car and faces in the cdr.
 Example:
 
   (setq org-modern-tag-faces
-    (quote ((\"work\" :background \"red\" :foreground \"yellow\"))))"
+    (quote ((\"emacs\" :background \"red\" :foreground \"yellow\"))))"
   :type '(repeat
           (cons (choice
                   (string :tag "Keyword")
