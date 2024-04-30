@@ -361,9 +361,9 @@ the font.")
   "Face used for horizontal ruler.")
 
 (defvar-local org-modern--font-lock-keywords nil)
-(defvar-local org-modern--default-star-cache nil)
-(defvar-local org-modern--folded-star-cache nil)
 (defvar-local org-modern--expanded-star-cache nil)
+(defvar-local org-modern--folded-star-cache nil)
+(defvar-local org-modern--empty-star-cache nil)
 (defvar-local org-modern--hide-stars-cache nil)
 (defvar-local org-modern--checkbox-cache nil)
 (defvar-local org-modern--progress-cache nil)
@@ -521,29 +521,34 @@ the font.")
     (when org-modern-star
       (when (and (eq org-modern-hide-stars 'leading) org-hide-leading-stars)
         (put-text-property beg (1+ end) 'face (get-text-property end 'face)))
-      (put-text-property
-       (if (eq org-modern-hide-stars 'leading) beg end)
-       (1+ end) 'display
-       (let ((cache (cond
-                     ((and org-modern--folded-star-cache (org-invisible-p (pos-eol)))
-                      org-modern--folded-star-cache)
-                     ((and org-modern--expanded-star-cache
-                           (save-excursion ;; Empty heading
-                             (save-match-data
-                               (goto-char (pos-eol))
-                               (or (not (looking-at "[\n\r]+\\(\\*+\\)\\s-"))
-                                   (> (- (match-end 1) (match-beginning 1) 1) level)))))
-                      org-modern--expanded-star-cache)
-                     (t org-modern--default-star-cache))))
-         (aref cache (min (1- (length cache)) level)))))))
+      (let ((cache (cond
+                    ((and org-modern--folded-star-cache (org-invisible-p (pos-eol)))
+                     org-modern--folded-star-cache)
+                    ((and org-modern--empty-star-cache
+                          (save-excursion ;; Empty heading
+                            (save-match-data
+                              (goto-char (pos-eol))
+                              (and (looking-at "[\n\r]+\\(\\*+\\)\\s-")
+                                   (<= (- (match-end 1) (match-beginning 1) 1) level)))))
+                     org-modern--empty-star-cache)
+                    (t org-modern--expanded-star-cache))))
+        (when (eq cache org-modern--empty-star-cache)
+          (put-text-property (pos-bol) (pos-eol) 'org-modern--empty t))
+        (put-text-property (if (eq org-modern-hide-stars 'leading) beg end)
+                           (1+ end) 'display
+                           (aref cache (min (1- (length cache)) level)))))))
 
-(defun org-modern--cycle (state)
+(defun org-modern--star-cycle (state)
   "Flush font-lock for buffer or line at point for `org-cycle-hook'.
 When STATE is `overview', `contents', or `all', flush for the
 whole buffer; otherwise, for the line at point."
   (pcase state
     ((or 'overview 'contents 'all) (font-lock-flush))
     (_ (font-lock-flush (pos-bol) (pos-eol)))))
+
+(defun org-modern--star-change (_beg end _len)
+  (when (get-text-property end 'org-modern--empty)
+    (font-lock-flush)))
 
 (defun org-modern--table ()
   "Prettify vertical table lines."
@@ -824,13 +829,13 @@ whole buffer; otherwise, for the line at point."
      org-modern--folded-star-cache
      (and (eq org-modern-star 'fold)
           (vconcat (mapcar #'org-modern--symbol (mapcar #'car org-modern-fold-stars))))
-     org-modern--expanded-star-cache
+     org-modern--empty-star-cache
      (and (eq org-modern-star 'fold)
-          (vconcat (mapcar #'org-modern--symbol (mapcar #'cadr org-modern-fold-stars))))
-     org-modern--default-star-cache
+          (vconcat (mapcar #'org-modern--symbol (mapcar #'caddr org-modern-fold-stars))))
+     org-modern--expanded-star-cache
      (and org-modern-star
           (vconcat (mapcar #'org-modern--symbol (if (eq org-modern-star 'fold)
-                                                    (mapcar #'caddr org-modern-fold-stars)
+                                                    (mapcar #'cadr org-modern-fold-stars)
                                                   org-modern-replace-stars))))
      org-modern--hide-stars-cache
      (and (char-or-string-p org-modern-hide-stars)
@@ -852,7 +857,9 @@ whole buffer; otherwise, for the line at point."
     (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
     (add-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line nil 'local)
     (add-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line nil 'local)
-    (add-hook 'org-cycle-hook #'org-modern--cycle nil 'local)
+    (when (eq org-modern-star 'fold)
+      (add-hook 'org-cycle-hook #'org-modern--star-cycle nil 'local)
+      (add-hook 'after-change-functions #'org-modern--star-change nil 'local))
     (org-modern--update-label-face)
     (org-modern--update-fringe-bitmaps))
    (t
@@ -863,7 +870,8 @@ whole buffer; otherwise, for the line at point."
     (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)
     (remove-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line 'local)
     (remove-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line 'local)
-    (remove-hook 'org-cycle-hook #'org-modern--cycle 'local)))
+    (remove-hook 'org-cycle-hook #'org-modern--star-cycle 'local)
+    (remove-hook 'after-change-functions #'org-modern--star-change 'local)))
   (without-restriction
     (with-silent-modifications
       (org-modern--unfontify (point-min) (point-max)))
