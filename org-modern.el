@@ -262,6 +262,11 @@ non-nil."
   :type '(choice (const :tag "Disable progress bar" nil)
 		 (natnum :tag "Bar width")))
 
+(defcustom org-modern-progress-bar-height 0.8
+  "Height of progress bar, as fraction of default line height.
+Only has effect if `org-modern-progress-bar-width' is non-nil."
+  :type '(float :tag "Bar height"))
+
 (defgroup org-modern-faces nil
   "Faces used by `org-modern'."
   :group 'org-modern
@@ -323,16 +328,17 @@ the font.")
   "Face used for todo statistics labels.")
 
 (defface org-modern-progress-bar
-  '((default :inherit org-modern-label)
-    (((background light)) :foreground "black" :box t)
-    (t :foreground "white" :box t))
+  '((default :inherit fixed-pitch :inverse-video t
+	     :width condensed :weight semi-bold :extend nil)
+    (((background light)) :foreground "gray40")
+    (t :foreground "gray80"))
   "Face used for empty section of progress bars.")
 
-(defface org-modern-progress-bar-done
+(defface org-modern-progress-bar-incomplete
   '((default :inherit org-modern-progress-bar)
-    (((background light)) :background "gray70")
-    (t :background "gray40"))
-  "Face used for completed section of progress bars.")
+    (((background light)) :foreground "gray80")
+    (t :foreground "gray40"))
+  "Face used for empty section of progress bars.")
 
 (defface org-modern-date-active
   '((t :inherit org-modern-done))
@@ -419,39 +425,58 @@ the font.")
   "Prettify headline todo statistics as color-coded progress bar."
   (let* ((beg (match-beginning 2))
 	 (end (match-end 2))
+	 (str (match-string 2))
 	 (len (- end beg))
+	 (width org-modern-progress-bar-width)
+	 (height-frac org-modern-progress-bar-height)
+	 (default-height (frame-char-height))
+	 (font-info (font-info (font-at (point))))
+	 (descent (aref font-info 9))
+	 (line-height (aref font-info 3))
+	 (box-thickness (round (/ (- line-height (* height-frac default-height)) 2)))
+	 (box `(:box (:line-width (0 . ,(- box-thickness)))))
+	 (raise (max 0 (/ (- box-thickness (/ (float (or descent 0)) 2))
+			  line-height)))
 	 (completed (string-to-number (or (match-string 3) (match-string 4))))
-	 (pad-left (max 0 (/ (- org-modern-progress-bar-width len) 2)))
-	 (pad-right (max 0 (- org-modern-progress-bar-width len pad-left)))
-	 (bars (min org-modern-progress-bar-width
-		    (/ (* completed org-modern-progress-bar-width)
-		       (if (match-beginning 3) 100 ; percentage
-			 (max 1 (string-to-number (match-string 5))))))))
+	 (pad-left (max 0 (/ (- width len) 2)))
+	 (pad-right (max 0 (- width len pad-left)))
+	 (bars (min width (/ (float (* completed width))
+			     (if (match-beginning 3) 100 ; percentage
+			       (max 1 (string-to-number (match-string 5)))))))
+	 (sliver (- bars (setq bars (round bars))))
+	 (frac-p (and (display-graphic-p) (> (abs sliver) 0.02))))
+    ;; (message "PBAR with box=%d raise= %0.2f" box-thickness raise)
+    (when frac-p		 ; we split one space across each side
+      (when (< sliver 0) (setq sliver (1+ sliver) bars (1- bars)))
+      (if (= pad-left pad-right)
+	  (if (> sliver 0.5) (cl-decf pad-left) (cl-decf pad-right))
+	(if (> pad-right pad-left) (cl-decf pad-right) (cl-decf pad-left))))
     (add-text-properties
      (match-beginning 1) (match-end 1)
-     `( face org-modern-progress-bar display
-	,(concat
-	  (propertize (make-string (min bars pad-left) ?\s)
-		      'face 'org-modern-progress-bar-done)
-	  (propertize (make-string
-		       (- pad-left (min bars pad-left)) ?\s)
-		      'face 'org-modern-progress-bar))))
-    (setq bars (max 0 (- bars pad-left)))
-    (when (> bars 0)
-      (put-text-property beg (setq beg (+ beg (min len bars)))
-			 'face 'org-modern-progress-bar-done))
-    (when (< bars len)
-      (put-text-property beg end 'face 'org-modern-progress-bar))
-    (setq bars (max 0 (- bars len)))
+     `( display ,(if frac-p `(space :width ,sliver) "")
+	face ,(and frac-p `(org-modern-progress-bar ,@box))))
+    (let* ((cmp-start (min bars pad-left))
+	   (cmp-take (min len (max 0 (- bars cmp-start))))
+	   (cmp-end (max 0 (- bars cmp-take cmp-start)))
+	   (icmp-start (- pad-left cmp-start))
+	   (icmp-take (- len cmp-take))
+	   (icmp-end (- pad-right cmp-end))
+	   (cmp-str (concat (make-string cmp-start ?\s)
+			    (substring str 0 cmp-take)
+			    (make-string cmp-end ?\s)))
+	   (icmp-str (concat (make-string icmp-start ?\s)
+			     (substring str cmp-take (+ cmp-take icmp-take))
+			     (make-string icmp-end ?\s))))
+      (put-text-property
+       beg end 'display
+       (propertize
+	(concat (propertize cmp-str 'face `(org-modern-progress-bar ,@box))
+		(propertize icmp-str 'face `(org-modern-progress-bar-incomplete ,@box)))
+	'display `((raise ,raise) (height ,height-frac)))))
     (add-text-properties
      (match-beginning 6) (match-end 6)
-     `(face org-modern-progress-bar display
-	    ,(concat
-	      (propertize (make-string (min bars pad-right) ?\s)
-			  'face 'org-modern-progress-bar-done :rear-nonsticky t )
-	      (propertize (make-string
-			   (- pad-right (min bars pad-right)) ?\s)
-			  'face 'org-modern-progress-bar :rear-nonsticky t ))))))
+     `( display ,(if frac-p `(space :width ,(- 1. sliver)) "")
+	face ,(and frac-p `(org-modern-progress-bar-incomplete ,@box))))))
 
 (defun org-modern--progress ()
   "Prettify headline todo progress."
