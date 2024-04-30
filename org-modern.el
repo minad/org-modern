@@ -66,7 +66,7 @@ Can be nil, fold or replace.  See `org-modern-fold-stars' and
   :type '(choice string (repeat string)))
 
 (defcustom org-modern-fold-stars
-  '(("▶" . "▼") ("▷" . "▽") ("⏵" . "⏷") ("▹" . "▿"))
+  '(("▶" . "▼") ("▷" . "▽") ("⯈" . "⯆") ("▹" . "▿") ("▸" . "▾"))
   "Folding indicators for headings.
 Replace headings' stars with an indicator showing whether its
 tree is folded or expanded."
