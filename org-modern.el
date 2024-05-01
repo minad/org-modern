@@ -445,8 +445,7 @@ the font.")
 			       (max 1 (string-to-number (match-string 5)))))))
 	 (sliver (- bars (setq bars (round bars))))
 	 (frac-p (and (display-graphic-p) (> (abs sliver) 0.02))))
-    ;; (message "PBAR with box=%d raise= %0.2f" box-thickness raise)
-    (when frac-p		 ; we split one space across each side
+    (when frac-p  ; split one space across each side of the bar
       (when (< sliver 0) (setq sliver (1+ sliver) bars (1- bars)))
       (if (= pad-left pad-right)
 	  (if (> sliver 0.5) (cl-decf pad-left) (cl-decf pad-right))
