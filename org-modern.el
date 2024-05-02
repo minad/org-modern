@@ -449,7 +449,7 @@ display and face properties as a cons."
 	 (display `((raise ,raise) (height ,height))))
     (cons display box)))
 
-(defun org-modern--valign-box (pos height str &optional beg end disp-box)
+(defun org-modern--valign-box-props (pos height str &optional beg end disp-box)
   "Vertically align a centered text box of fractional HEIGHT.
 If STR is non-nil it has face and display properties added to it,
 by default over the entire string, unless BEG and END are 0-based
@@ -502,7 +502,7 @@ used instead."
       (add-text-properties (match-beginning 1) (match-end 1) ; initial [
        `( display ,(if frac-p `(space :width ,sliver) "")
 	  face ,(and frac-p `(org-modern-progress-bar ,@box))))
-      (org-modern--valign-box nil nil bar-str nil nil disp-box) ; xx/yy or zz%
+      (org-modern--valign-box-props nil nil bar-str nil nil disp-box) ; xx/yy or zz%
       (put-text-property (match-beginning 2) (match-end 2) 'display bar-str)
       (add-text-properties (match-beginning 6) (match-end 6) ; final ]
        `( display ,(if frac-p `(space :width ,(- 1. sliver)) "")
