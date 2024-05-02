@@ -433,22 +433,43 @@ the font.")
            `(:inherit (,face org-modern-label))
          'org-modern-priority)))))
 
-(defun org-modern--progress-bar ()
-  "Prettify headline todo statistics as color-coded progress bar."
-  (let* ((beg (match-beginning 2))
-	 (end (match-end 2))
-	 (str (match-string 2))
-	 (len (- end beg))
-	 (width org-modern-progress-bar-width)
-	 (height-frac org-modern-progress-bar-height)
-	 (default-height (frame-char-height))
-	 (font-info (font-info (font-at (match-beginning 0))))
+(defun org-modern--raise-box (pos height)
+  "Compute configuration for a vertically-centered box of height HEIGHT.
+POS is a buffer position at which font information is used, and
+should be a full height character on the line.  Returns the
+display and face properties as a cons."
+  (let* ((default-height (frame-char-height))
+	 (font-info (font-info (font-at pos)))
 	 (descent (aref font-info 9))
 	 (line-height (aref font-info 3))
-	 (box-thickness (round (/ (- line-height (* height-frac default-height)) 2)))
-	 (box `(:box (:line-width (0 . ,(- box-thickness)))))
+	 (box-thickness (round (/ (- line-height (* height default-height)) 2)))
 	 (raise (max 0 (/ (- box-thickness (/ (float (or descent 0)) 2))
 			  line-height)))
+	 (box `(:box (:line-width (0 . ,(- box-thickness)))))
+	 (display `((raise ,raise) (height ,height))))
+    (cons display box)))
+
+(defun org-modern--valign-box (pos height str &optional beg end disp-box)
+  "Vertically align a centered text box of fractional HEIGHT.
+If STR is non-nil it has face and display properties added to it,
+by default over the entire string, unless BEG and END are 0-based
+indices.  If STR is nil, BEG and END should specify a buffer
+range over which vertical centering properties will be applied.
+POS and HEIGHT are used to calculate the centering box and
+display properties, unless DISP-BOX is provided as a cons of
+display and face box property lists, in which case these will be
+used instead."
+  (pcase-let ((`(,display . ,box)
+	       (or disp-box (org-modern--raise-box pos height))))
+    (when str (setq beg (or beg 0) end (or end (length str))))
+    (add-face-text-property beg end box nil str)
+    (put-text-property beg end 'display display str)))
+
+(defun org-modern--progress-bar ()
+  "Prettify headline todo statistics as color-coded progress bar."
+  (let* ((str (match-string 2))
+	 (len (length str))
+	 (width org-modern-progress-bar-width)
 	 (completed (string-to-number (or (match-string 3) (match-string 4))))
 	 (pad-left (max 0 (/ (- width len) 2)))
 	 (pad-right (max 0 (- width len pad-left)))
@@ -457,15 +478,11 @@ the font.")
 			       (max 1 (string-to-number (match-string 5)))))))
 	 (sliver (- bars (setq bars (round bars))))
 	 (frac-p (and (display-graphic-p) (> (abs sliver) 0.02))))
-    (when frac-p  ; split one space across each side of the bar
+    (when frac-p	 ; split one space across each side of the bar
       (when (< sliver 0) (setq sliver (1+ sliver) bars (1- bars)))
       (if (= pad-left pad-right)
 	  (if (> sliver 0.5) (cl-decf pad-left) (cl-decf pad-right))
 	(if (> pad-right pad-left) (cl-decf pad-right) (cl-decf pad-left))))
-    (add-text-properties
-     (match-beginning 1) (match-end 1)
-     `( display ,(if frac-p `(space :width ,sliver) "")
-	face ,(and frac-p `(org-modern-progress-bar ,@box))))
     (let* ((cmp-start (min bars pad-left))
 	   (cmp-take (min len (max 0 (- bars cmp-start))))
 	   (cmp-end (max 0 (- bars cmp-take cmp-start)))
@@ -477,17 +494,19 @@ the font.")
 			    (make-string cmp-end ?\s)))
 	   (icmp-str (concat (make-string icmp-start ?\s)
 			     (substring str cmp-take (+ cmp-take icmp-take))
-			     (make-string icmp-end ?\s))))
-      (put-text-property
-       beg end 'display
-       (propertize
-	(concat (propertize cmp-str 'face `(org-modern-progress-bar ,@box))
-		(propertize icmp-str 'face `(org-modern-progress-bar-incomplete ,@box)))
-	'display `((raise ,raise) (height ,height-frac)))))
-    (add-text-properties
-     (match-beginning 6) (match-end 6)
-     `( display ,(if frac-p `(space :width ,(- 1. sliver)) "")
-	face ,(and frac-p `(org-modern-progress-bar-incomplete ,@box))))))
+			     (make-string icmp-end ?\s)))
+	   (bar-str (concat (propertize cmp-str 'face 'org-modern-progress-bar)
+			    (propertize icmp-str 'face 'org-modern-progress-bar-incomplete)))
+	   (disp-box (org-modern--raise-box (match-beginning 0) org-modern-progress-bar-height))
+	   (box (cdr disp-box)))
+      (add-text-properties (match-beginning 1) (match-end 1) ; initial [
+       `( display ,(if frac-p `(space :width ,sliver) "")
+	  face ,(and frac-p `(org-modern-progress-bar ,@box))))
+      (org-modern--valign-box nil nil bar-str nil nil disp-box) ; xx/yy or zz%
+      (put-text-property (match-beginning 2) (match-end 2) 'display bar-str)
+      (add-text-properties (match-beginning 6) (match-end 6) ; final ]
+       `( display ,(if frac-p `(space :width ,(- 1. sliver)) "")
+	  face ,(and frac-p `(org-modern-progress-bar-incomplete ,@box)))))))
 
 (defun org-modern--progress ()
   "Prettify headline todo progress."
