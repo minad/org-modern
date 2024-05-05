@@ -35,6 +35,7 @@
 
 (require 'compat)
 (require 'org)
+(require 'face-remap)
 (eval-when-compile
   (require 'cl-lib)
   (require 'subr-x))
@@ -274,10 +275,24 @@ non-nil."
   :type '(choice (const :tag "Disable progress bar" nil)
 		 (natnum :tag "Bar width")))
 
-(defcustom org-modern-progress-bar-height 0.8
-  "Height of progress bar, as fraction of default line height.
-Only has effect if `org-modern-progress-bar-width' is non-nil."
-  :type '(float :tag "Bar height"))
+(defcustom org-modern-fixed-height 0.8
+  "Height of fixed box labels, as a fraction of default line height.
+Fixed box labels have the same height, independent of the height
+of the line where they appear."
+  :type '(float :tag "Default line height fraction"))
+
+(defcustom org-modern-adaptive-height 0.8
+  "Height of adaptive box labels, as a fraction of the surrounding line height."
+  :type '(float :tag "Default line height fraction"))
+
+(defcustom org-modern-fixed-height-entities '(progress-bar tag)
+  "List of entities (symbols) to format as fixed height box labels.
+All entities not on this list are formatted using adaptive height."
+  :type '(options ((const :tag "TODO" todo)
+		   (const :tag "Progress Bars" progress-bar)
+		   (const :tag "Headline Timestamps" timestamp)
+		   (const :tag "Priority" priority)
+		   (const :tag "Tags" tag))))
 
 (defgroup org-modern-faces nil
   "Faces used by `org-modern'."
@@ -291,13 +306,30 @@ You can specify a font `:family'.  The font families `Iosevka', `Hack' and
 `DejaVu Sans' give decent results.")
 
 (defface org-modern-label
-  `((t :height 0.8 :width condensed :weight regular :underline nil))
+  `((t :width condensed :weight regular :underline nil))
   "Parent face for labels.
 The parameters of this face depend on typographical properties of
 the font and should therefore be adjusted by the user depending
 on their font, e.g., the :width or :height parameters.  Themes
 should not override this face, since themes usually don't control
 the font.")
+
+(defface org-modern-heading-label
+  '((t :inherit org-modern-label :weight semi-bold))
+  "Face for labels in headings, including progress-bar and TODO.")
+
+(defface org-modern-progress-bar
+  '((default :inherit (org-modern-heading-label fixed-pitch)
+	     :inverse-video t)
+    (((background light)) :foreground "gray40")
+    (t :foreground "gray80"))
+  "Face used for completed section of progress bars.")
+
+(defface org-modern-progress-bar-incomplete
+  '((default :inherit org-modern-progress-bar)
+    (((background light)) :foreground "gray80")
+    (t :foreground "gray40"))
+  "Face used for incomplete section of progress bars.")
 
 (defface org-modern-block-name
   '((t :height 0.8 :weight light))
@@ -309,6 +341,12 @@ the font.")
     (t :foreground "white"))
   "Face used for tag labels.")
 
+(defface org-modern-done
+  '((default :inherit org-modern-heading-label)
+    (((background light)) :background "gray90" :foreground "black")
+    (t :background "gray20" :foreground "white"))
+  "Face used for done labels.")
+
 (defface org-modern-internal-target
   '((t :inherit org-modern-done))
   "Face used for internal link targets.")
@@ -317,55 +355,40 @@ the font.")
   '((t :inherit org-modern-done))
   "Face used for radio link targets.")
 
-(defface org-modern-done
-  '((default :inherit org-modern-label)
-    (((background light)) :background "gray90" :foreground "black")
-    (t :background "gray20" :foreground "white"))
-  "Face used for done labels.")
-
 (defface org-modern-todo
   ;; `:inverse-video' to use todo foreground as label background
-  '((t :inherit (org-todo org-modern-label)
-       :weight semibold :inverse-video t))
+  '((t :inherit (org-todo org-modern-heading-label)
+       :inverse-video t))
   "Default face used for todo labels.")
 
 (defface org-modern-priority
   ;; `:inverse-video' to use priority foreground as label background
-  '((t :inherit (org-priority org-modern-label)
-       :weight semibold :inverse-video t))
+  '((t :inherit (org-priority org-modern-heading-label)
+       :inverse-video t))
   "Default face used for priority labels.")
 
 (defface org-modern-statistics
   '((t :inherit org-modern-done))
   "Face used for todo statistics labels.")
 
-(defface org-modern-progress-bar
-  '((default :inherit fixed-pitch :inverse-video t
-	     :width condensed :weight semi-bold :extend nil)
-    (((background light)) :foreground "gray40")
-    (t :foreground "gray80"))
-  "Face used for empty section of progress bars.")
-
-(defface org-modern-progress-bar-incomplete
-  '((default :inherit org-modern-progress-bar)
-    (((background light)) :foreground "gray80")
-    (t :foreground "gray40"))
-  "Face used for empty section of progress bars.")
+(defface org-modern-date-time
+  '((t))
+  "Parent face for all date and time faces.")
 
 (defface org-modern-date-active
-  '((t :inherit org-modern-done))
+  '((t :inherit org-modern-done org-modern-date-time))
   "Face used for active date labels.")
 
 (defface org-modern-time-active
   ;; Use `:distant-foreground' to ensure readability if `hl-line-mode' is used.
-  '((default :inherit org-modern-label :weight semibold)
+  '((default :inherit (org-modern-label org-modern-date-time) :weight semibold)
     (((background light))
      :background "gray35" :foreground "white" :distant-foreground "black")
     (t :background "gray75" :foreground "black" :distant-foreground "white"))
   "Face used for active time labels.")
 
 (defface org-modern-date-inactive
-  '((default :inherit org-modern-label)
+  '((default :inherit (org-modern-label org-modern-date-time))
     (((background light))
      :background "gray90" :foreground "gray30")
     (t :background "gray20" :foreground "gray70"))
@@ -373,7 +396,7 @@ the font.")
 
 (defface org-modern-time-inactive
   ;; Use `:distant-foreground' to ensure readability if `hl-line-mode' is used.
-  '((default :inherit org-modern-label :background "gray50")
+  '((default :inherit (org-modern-label org-modern-date-time) :background "gray50")
     (((background light)) :foreground "gray95" :distant-foreground "gray5")
     (t :foreground "gray5" :distant-foreground "gray95"))
   "Face used for inactive time labels.")
@@ -433,41 +456,131 @@ the font.")
            `(:inherit (,face org-modern-label))
          'org-modern-priority)))))
 
-(defun org-modern--raise-box (pos height)
-  "Compute configuration for a vertically-centered box of height HEIGHT.
-POS is a buffer position at which font information is used, and
-should be a full height character on the line.  Returns the
-display and face properties as a cons."
-  (let* ((default-height (frame-char-height))
-	 (font-info (font-info (font-at pos)))
-	 (descent (aref font-info 9))
-	 (line-height (aref font-info 3))
-	 (box-thickness (round (/ (- line-height (* height default-height)) 2)))
-	 (raise (max 0 (/ (- box-thickness (/ (float (or descent 0)) 2))
-			  line-height)))
-	 (box `(:box (:line-width (0 . ,(- box-thickness)))))
-	 (display `((raise ,raise) (height ,height))))
-    (cons display box)))
+(defvar-local org-modern--heading-label-face-remaps nil)
+(defvar-local org-modern--heading-label-raise-factors nil)
+(defun org-modern--update-heading-label-faces (&optional default)
+  "Update heading boxed label faces.
+Font measurements are taken from the `org-level-N' faces,
+consolidating a final sequence of equal faces into a single
+value.  If DEFAULT is non-nil, the unscaled boxed-label faces
+`org-modern--heading-label-N' faces are updated (creating them if
+necessary), and the vector
+`org-modern--heading-label-raise-factors' is set to a vector of
+the associated raise factors (relative to the default character
+height) necessary to center labels in a box.
+`org-modern-fixed-height-entities' is also consulted, and a
+height attribute is added to the relevant faces.
 
-(defun org-modern--valign-box-props (pos height str &optional beg end disp-box)
-  "Vertically align a centered text box of fractional HEIGHT.
-If STR is non-nil it has face and display properties added to it,
-by default over the entire string, unless BEG and END are 0-based
-indices.  If STR is nil, BEG and END should specify a buffer
-range over which vertical centering properties will be applied.
-POS and HEIGHT are used to calculate the centering box and
-display properties, unless DISP-BOX is provided as a cons of
-display and face box property lists, in which case these will be
-used instead."
-  (pcase-let ((`(,display . ,box)
-	       (or disp-box (org-modern--raise-box pos height))))
+If DEFAULT is omitted, text-scaling (if any) from the local
+buffer will first be applied prior to measuring font information,
+and local face-remaps updating the :box attribute for the
+relevant `org-modern--heading-label-N' faces are created.
+
+Note: the raise factors are assumed to be invariant with text
+scaling and are only (re-)computed if DEFAULT is non-nil."
+  (let* ((ld (window-font-height))	; may be scaled
+	 (s (cond ((floatp line-spacing) (* line-spacing ld)) (line-spacing) (t 0)))
+	 (level (and (not default) text-scale-mode text-scale-mode-amount))
+	 box-raise)
+    (when default
+      (pcase-dolist (`(,type . ,face)
+		     '((progress-bar . org-modern-progress-bar)
+		       (tag . org-modern-tag)
+		       (timestamp . org-modern-date-time)
+		       (todo . org-modern-todo)))
+	(set-face-attribute face nil :height
+			    (if (memq type org-modern-fixed-height-entities)
+				'unspecified
+			      org-modern-fixed-height))))
+    (when level
+      (dolist (remap org-modern--heading-label-face-remaps)
+	(face-remap-remove-relative remap)))
+    (save-window-excursion
+      (with-temp-buffer
+	(set-window-dedicated-p nil nil)
+	(set-window-buffer nil (current-buffer))
+	(when (and level (> level 0))
+	  (text-scale-mode 1)
+	  (text-scale-set level))
+	(insert "\n" (propertize "0/1" 'face 'org-modern-progress-bar))
+	(let* ((fi (font-info (font-at (line-beginning-position))))
+	       (ls (aref fi 3)) (ds (aref fi 9))
+	       (fonts (cl-loop for face in (reverse org-level-faces) do
+			       (insert "\n" (propertize "HL0" 'face face))
+			       (add-face-text-property (1- (point)) (point)
+						       'org-modern-heading-label)
+			       collect (font-at (line-beginning-position))))
+	       (deepest (car fonts)))
+	  (while (equal (car fonts) deepest) (setq fonts (cdr fonts)))
+	  (setq box-raise
+		(cl-loop ;; core centering algorithm
+		 for font in (reverse (cons deepest fonts))
+		 for fi = (font-info font) for lt = (aref fi 3) for dt = (aref fi 9)
+		 for eps = (max 1 (* .15 (- ls ds))) ; box gap fraction f
+		 for b = (round (/ (float (+ lt s (- ds ls) (* -2 eps))) 2))
+		 ;;  XXX face-based height is relative to the
+		 ;;  "underlying text" which here is the headline.  So
+		 ;;  the raise value depends on display (height h)
+		 ;;  vs. face :height h.  
+		 for r = (/ (float (- (+ b eps) s dt)) ls) ; raise 
+		 collect (list b r))))))
+    ;; back in original buffer
+    (set (if level 'org-modern--heading-label-face-remaps
+	   'org-modern--heading-label-raise-factors)
+	 (cl-loop
+	  for (box-width . raise) in box-raise
+	  for i upfrom 1
+	  for face = (intern (format "org-modern--heading-label-%d" i))
+	  if level
+	  collect (face-remap-add-relative face `(:box (0 . ,(- box-width))))
+	  else vconcat raise and do
+	  (face-spec-set face `((t :inherit org-modern-heading-label
+				   :box (0 . ,(- box-width)))))))))
+
+(defun org-modern--heading-level ()
+  "Return the current heading level.
+For efficiency, first checks the face at point."
+  (if-let ((f (get-text-property (point) 'face))
+	   ((symbolp f))
+	   (name (symbol-name f))
+	   ((string-match "org-level-\\([0-9+]\\)" name)))
+      (string-to-number (match-string 1 name))
+    (save-match-data (org-current-level))))
+
+(defun org-modern--heading-label-raise-face ()
+  "Return face and raise factor needed for a label in heading at point.
+The return value is (raise . face)."
+  (let ((lvl (min 
+	      (length org-modern--heading-label-raise-factors))))
+    (cons (aref org-modern--heading-label-raise-factors (1- lvl))
+	  (intern (format "org-modern--heading-label-%d" lvl)))))
+
+(defun org-modern--heading-label-box (str &optional beg end raise-face fixed-type)
+  "Box and vertically align a label in the heading at point.
+If STR is non-nil it has the requisite face and display
+properties added to it, by default over the entire string, unless
+BEG and END are provided (as 0-based indices).  If STR is nil,
+BEG and END should instead specify a buffer range over which the
+properties will be applied.  The raise factor and face will be
+determined from the org heading level, unless a precomputed
+RAISE-FACE is provided as a cons (RAISE . FACE).  If FIXED-TYPE
+is a type symbol present in `org-modern-fixed-height-entities', a
+display height property is added using the value of
+`org-modern-fixed-height'."
+  (pcase-let ((`(,raise . ,face)
+	       (or raise-face (org-modern--heading-label-raise-face))))
     (when str (setq beg (or beg 0) end (or end (length str))))
-    (add-face-text-property beg end box nil str)
-    (put-text-property beg end 'display display str)))
+    (add-face-text-property beg end face nil str)
+    (put-text-property beg end 'display
+		       `((raise ,raise)
+			 ,@(and fixed-type
+				(memq fixed-type org-modern-fixed-height-entities)
+				`((height ,org-modern-fixed-height))))
+		       str)))
 
 (defun org-modern--progress-bar ()
   "Prettify headline todo statistics as color-coded progress bar."
-  (let* ((str (match-string 2))
+  (let* ((str (substring-no-properties (match-string 2)))
 	 (len (length str))
 	 (width org-modern-progress-bar-width)
 	 (completed (string-to-number (or (match-string 3) (match-string 4))))
@@ -497,16 +610,16 @@ used instead."
 			     (make-string icmp-end ?\s)))
 	   (bar-str (concat (propertize cmp-str 'face 'org-modern-progress-bar)
 			    (propertize icmp-str 'face 'org-modern-progress-bar-incomplete)))
-	   (disp-box (org-modern--raise-box (match-beginning 0) org-modern-progress-bar-height))
-	   (box (cdr disp-box)))
+	   (raise-face (org-modern--heading-label-raise-face))
+	   (lbl-face (cdr raise-face)))
       (add-text-properties (match-beginning 1) (match-end 1) ; initial [
-       `( display ,(if frac-p `(space :width ,sliver) "")
-	  face ,(and frac-p `(org-modern-progress-bar ,@box))))
-      (org-modern--valign-box-props nil nil bar-str nil nil disp-box) ; xx/yy or zz%
-      (put-text-property (match-beginning 2) (match-end 2) 'display bar-str)
+			   `( display ,(if frac-p `(space :width ,sliver) "")
+			      face ,(and frac-p `(org-modern-progress-bar ,lbl-face))))
+      (org-modern--heading-label-box bar-str nil nil raise-face 'progress-bar) 
+      (put-text-property (match-beginning 2) (match-end 2) 'display bar-str) ; xx/yy
       (add-text-properties (match-beginning 6) (match-end 6) ; final ]
-       `( display ,(if frac-p `(space :width ,(- 1. sliver)) "")
-	  face ,(and frac-p `(org-modern-progress-bar-incomplete ,@box)))))))
+			   `( display ,(if frac-p `(space :width ,(- 1. sliver)) "")
+			      face ,(and frac-p `(org-modern-progress-bar-incomplete ,lbl-face)))))))
 
 (defun org-modern--progress ()
   "Prettify headline todo progress."
@@ -948,7 +1061,9 @@ whole buffer; otherwise, for the line at point."
     (add-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line nil 'local)
     (add-hook 'org-cycle-hook #'org-modern--cycle nil 'local)
     (org-modern--update-label-face)
-    (org-modern--update-fringe-bitmaps))
+    (org-modern--update-fringe-bitmaps)
+    (org-modern--update-heading-label-faces 'default)
+    (add-hook 'text-scale-mode-hook #'org-modern--update-heading-label-faces nil 'local))
    (t
     (remove-from-invisibility-spec 'org-modern)
     (font-lock-remove-keywords nil org-modern--font-lock-keywords)
@@ -957,7 +1072,8 @@ whole buffer; otherwise, for the line at point."
     (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)
     (remove-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line 'local)
     (remove-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line 'local)
-    (remove-hook 'org-cycle-hook #'org-modern--cycle 'local)))
+    (remove-hook 'org-cycle-hook #'org-modern--cycle 'local)
+    (remove-hook 'text-scale-mode-hook #'org-modern--update-heading-label-faces 'local)))
   (without-restriction
     (with-silent-modifications
       (org-modern--unfontify (point-min) (point-max)))
