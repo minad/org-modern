@@ -275,7 +275,8 @@ non-nil."
   :type '(choice (const :tag "Disable progress bar" nil)
 		 (natnum :tag "Bar width")))
 
-(defvar org-modern--label-types)
+(defconst org-modern--label-types '( todo-done progress-bar priority tag
+				     timestamp-active timestamp-inactive))
 (defcustom org-modern-fixed-height-types '(progress-bar tag)
   "Fixed height types.
 A list of label types which should be formatted as fixed height,
@@ -424,8 +425,6 @@ the child fonts `org-modern-\[type]' for all label types (see
 (defconst org-modern--table-overline '(:overline t))
 (defconst org-modern--table-sp '((space :width (org-modern--table-sp-width))
                                  (space :width (org-modern--table-sp-width))))
-(defconst org-modern--label-types '( todo-done progress-bar priority tag
-				     timestamp-active timestamp-inactive))
 
 (defun org-modern--checkbox ()
   "Prettify checkboxes according to `org-modern-checkbox'."
