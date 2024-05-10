@@ -259,19 +259,9 @@ references."
   "Prettify radio link targets, e.g., <<<radio>>>."
   :type '(choice (const nil) (list string boolean string)))
 
-(defcustom org-modern-statistics t
-  "Prettify todo statistics."
-  :type 'boolean)
-
-(defcustom org-modern-progress "○◔◑◕●"
-  "Add a progress indicator to the todo statistics.
-Set to nil to disable the indicator."
-  :type '(choice string (repeat string)))
-
 (defcustom org-modern-progress-bar-width 11
   "Width in characters to draw progress bars.
-Set to nil to disable.  Overrides `org-modern-statistics' if
-non-nil."
+Set to nil to disable bars."
   :type '(choice (const :tag "Disable progress bar" nil)
 		 (natnum :tag "Bar width")))
 
@@ -336,7 +326,7 @@ the child fonts `org-modern-\[type]' for all label types (see
     (t :foreground "gray40"))
   "Face used for incomplete section of progress bars.")
 
-(defface org-modern-tag ; label type face
+(defface org-modern-tag			; label type face
   '((default :inherit (secondary-selection org-modern-label))
     (((background light)) :foreground "black")
     (t :foreground "white"))
@@ -405,10 +395,6 @@ the child fonts `org-modern-\[type]' for all label types (see
   '((t :inherit org-modern-done))
   "Face used for radio link targets.")
 
-(defface org-modern-statistics
-  '((t :inherit org-modern-done))
-  "Face used for todo statistics labels.")
-
 (defface org-modern-horizontal-rule
   '((default :inherit org-hide)
     (((background light)) :strike-through "gray70")
@@ -420,7 +406,6 @@ the child fonts `org-modern-\[type]' for all label types (see
 (defvar-local org-modern--expanded-star-cache nil)
 (defvar-local org-modern--hide-stars-cache nil)
 (defvar-local org-modern--checkbox-cache nil)
-(defvar-local org-modern--progress-cache nil)
 (defvar-local org-modern--table-sp-width 0)
 (defconst org-modern--table-overline '(:overline t))
 (defconst org-modern--table-sp '((space :width (org-modern--table-sp-width))
@@ -588,23 +573,24 @@ temporarily updating the `:box' attribute for the relevant faces."
     (unless (and (not default) (not scale)) ; fall back on defaults
       (org-modern--apply-font-sets font-sets (not default)))))
 
-(defun org-modern--heading-level ()
-  "Return the current heading level.
-For efficiency, first checks the face at point."
-  (if-let ((f (get-text-property (point) 'face))
+(defun org-modern--heading-level (&optional pos)
+  "Return the heading level at POS.
+POS defaults to point.  For efficiency, first checks the face."
+  (if-let ((f (get-text-property (or pos (point)) 'face))
 	   ((symbolp f))
 	   (name (symbol-name f))
 	   ((string-match "org-level-\\([0-9+]\\)" name)))
       (string-to-number (match-string 1 name))
-    (save-match-data (or (and (org-at-heading-p) (org-current-level)) 0))))
+    (or (and (org-at-heading-p) (org-current-level)) 0)))
 
-(defun org-modern--box-label-face (type)
-  "Return face for a boxed label of type TYPE.
+(defun org-modern--box-label-face (type &optional pos)
+  "Return face for a boxed label of type TYPE at POS.
 TYPE is the entity type being formatted as a label (see
 `org-modern-fixed-height-types').  If in an org heading, select a
 box face based on the current heading depth.  Otherwise, use the
 type face for normal text."
-  (let ((lvl (min (org-modern--heading-level) org-modern--num-headline-labels)))
+  (let ((lvl (min (org-modern--heading-level pos)
+		  org-modern--num-headline-labels)))
     (intern (format "org-modern--box-label-%S-%d" type lvl))))
 
 (defun org-modern--box-label(type &optional str beg end box-face)
@@ -647,7 +633,11 @@ heading level (if any), unless BOX-FACE is passed."
       (if (= pad-left pad-right)
 	  (if (> sliver 0.5) (cl-decf pad-left) (cl-decf pad-right))
 	(if (> pad-right pad-left) (cl-decf pad-right) (cl-decf pad-left))))
-    (let* ((cmp-start (min bars pad-left))
+    (let* ((beg (match-beginning 0))
+	   (beg-brac1 (match-beginning 1)) (end-brac1 (match-end 1))
+	   (beg-stat (match-beginning 2)) (end-stat (match-end 2))
+	   (beg-brac2 (match-beginning 6)) (end-brac2 (match-end 6))
+	   (cmp-start (min bars pad-left))
 	   (cmp-take (min len (max 0 (- bars cmp-start))))
 	   (cmp-end (max 0 (- bars cmp-take cmp-start)))
 	   (icmp-start (- pad-left cmp-start))
@@ -661,29 +651,15 @@ heading level (if any), unless BOX-FACE is passed."
 			     (make-string icmp-end ?\s)))
 	   (bar-str (concat (propertize cmp-str 'face 'org-modern-progress-bar)
 			    (propertize icmp-str 'face 'org-modern-progress-bar-incomplete)))
-	   (box-face (org-modern--box-label-face 'progress-bar)))
-      (add-text-properties (match-beginning 1) (match-end 1) ; initial [
-			   `( display ,(if frac-p `(space :width ,sliver) "")
-			      face ,(and frac-p `(,box-face org-modern-progress-bar))))
+	   (box-face (org-modern--box-label-face 'progress-bar beg)))
+      (add-text-properties beg-brac1 end-brac1
+       `( display ,(if frac-p `(space :width ,sliver) "")
+	  face ,(and frac-p `(,box-face org-modern-progress-bar))))
       (org-modern--box-label nil bar-str nil nil box-face) ; xx/yy or zz%
-      (put-text-property (match-beginning 2) (match-end 2) 'display bar-str)
-      (add-text-properties (match-beginning 6) (match-end 6) ; final ]
-			   `( display ,(if frac-p `(space :width ,(- 1. sliver)) "")
-			      face ,(and frac-p `(,box-face org-modern-progress-bar-incomplete)))))))
-
-(defun org-modern--progress ()
-  "Prettify headline todo progress."
-  (put-text-property
-   (match-beginning 2) (match-end 2) 'display
-   (aref org-modern--progress-cache
-         (floor
-          (* (1- (length org-modern--progress-cache))
-             (if (match-beginning 3)
-                 (* 0.01 (string-to-number (match-string 3)))
-               (let ((q (string-to-number (match-string 5))))
-                 (if (= q 0)
-                     1.0
-                   (/ (* 1.0 (string-to-number (match-string 4))) q)))))))))
+      (put-text-property beg-stat end-stat 'display bar-str)
+      (add-text-properties beg-brac2 end-brac2
+       `( display ,(if frac-p `(space :width ,(- 1. sliver)) "")
+	  face ,(and frac-p `(,box-face org-modern-progress-bar-incomplete)))))))
 
 (defun org-modern--tag ()
   "Prettify headline tags."
@@ -1016,17 +992,12 @@ whole buffer; otherwise, for the line at point."
        ("<[^>]+>\\(-\\)\\(-\\)<[^>]+>\\|\\[[^]]+\\]\\(?1:-\\)\\(?2:-\\)\\[[^]]+\\]"
         (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
         (2 '(face org-modern-label display #("  " 0 1 (face (:strike-through t)))) t))))
-   (if org-modern-progress-bar-width
-       `((,(rx ?\s (group ?\[)
-	       (group (or (and (group (+ num)) ?%)
-			  (and (group (+ num)) ?/ (group (+ num)))))
-	       (group ?\]))
-	  (0 (org-modern--progress-bar))))
-       (when org-modern-statistics
-	 `((" \\(\\(\\[\\)\\(?:\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)\\(\\]\\)\\)"
-            (1 '(face org-modern-statistics) t)
-            (2 ,(if org-modern-progress '(org-modern--progress) ''(face nil display " ")))
-            (6 '(face nil display " "))))))
+   (when org-modern-progress-bar-width
+     `((,(rx ?\s (group ?\[)
+	     (group (or (and (group (+ num)) ?%)
+			(and (group (+ num)) ?/ (group (+ num)))))
+	     (group ?\]))
+	(0 (org-modern--progress-bar)))))
    (when org-modern-tag
      `((,(concat "^\\*+.*?\\( \\)\\(:\\(?:" org-tag-re ":\\)+\\)[ \t]*$")
         (0 (org-modern--tag)))))
@@ -1093,10 +1064,6 @@ whole buffer; otherwise, for the line at point."
      (and (char-or-string-p org-modern-hide-stars)
           (list (org-modern--symbol org-modern-hide-stars)
                 (org-modern--symbol org-modern-hide-stars)))
-     org-modern--progress-cache
-     (vconcat (mapcar
-               (lambda (x) (concat " " (org-modern--symbol x) " "))
-               org-modern-progress))
      org-modern--checkbox-cache
      (mapcar (pcase-lambda (`(,k . ,v)) (cons k (org-modern--symbol v)))
              org-modern-checkbox)
