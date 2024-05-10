@@ -469,7 +469,8 @@ the child fonts `org-modern-\[type]' for all label types (see
 Consults `org-modern-fixed-height-types'."
   (cl-loop for type in org-modern-fixed-height-types
 	   for face = (intern (format "org-modern-%s" type))
-	   if (numberp (face-attribute face :height nil t)) do
+	   for height = (face-attribute face :height nil t)
+	   if (and (numberp height) (/= height 1.0)) do ; a height of 1.0 is innocuous
 	   (warn "%s is designated fixed-height, but has a :height attribute: removing" type)
 	   (set-face-attribute face nil :height 'unspecified)))
 
