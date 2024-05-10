@@ -532,12 +532,12 @@ and set their raise and fixed values.  For more information, see
 `org-modern--update-box-label-faces'."
   (cl-loop
    for fonts-at-lvl in font-sets
-   for i upfrom 0			; level 0 = default text
+   for i upfrom 0  ; level 0 = default text
    with ld = (frame-char-height)
    with s = (cond ((floatp line-spacing) (* line-spacing ld))
 		  (line-spacing)
 		  (t 0))
-   for fi = (font-info (car fonts-at-lvl)) ; surrounding font
+   for fi = (font-info (car fonts-at-lvl)) ; surrounding text font
    for lt = (aref fi 3) for dt = (aref fi 9) do
    (cl-loop
     for font in (cdr fonts-at-lvl)
