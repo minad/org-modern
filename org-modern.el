@@ -585,7 +585,7 @@ temporarily updating the `:box' attribute for the relevant faces."
       (dolist (remap org-modern--box-label-face-remaps)
 	(face-remap-remove-relative remap))
       (setq org-modern--box-label-face-remaps nil))
-    (unless (and scale (= scale 0)) ; fall back on defaults
+    (unless (and (not default) (not scale)) ; fall back on defaults
       (org-modern--apply-font-sets font-sets (not default)))))
 
 (defun org-modern--heading-level ()
