@@ -578,13 +578,13 @@ scaling and are only (re-)computed if DEFAULT is non-nil.
 If DEFAULT is omitted, text-scaling (if any) from the local
 buffer will be applied, and local face remappings are created
 temporarily updating the `:box' attribute for the relevant faces."
+  
+  (dolist (remap org-modern--box-label-face-remaps)
+    (face-remap-remove-relative remap))
+  (setq org-modern--box-label-face-remaps nil)
   (let* ((scale (and (not default) text-scale-mode text-scale-mode-amount))
 	 (font-sets (org-modern--font-sets scale)))
     (setq org-modern--num-headline-labels (1- (length font-sets)))
-    (when scale
-      (dolist (remap org-modern--box-label-face-remaps)
-	(face-remap-remove-relative remap))
-      (setq org-modern--box-label-face-remaps nil))
     (unless (and (not default) (not scale)) ; fall back on defaults
       (org-modern--apply-font-sets font-sets (not default)))))
 
