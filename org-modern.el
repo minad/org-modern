@@ -507,10 +507,10 @@ deepest heading depth beyond which the face repeats."
 		for type in (cons nil org-modern--label-types) ; nil = default
 		for fixed = (memq type org-modern-fixed-height-types)
 		for type-face = (and type (intern (format "org-modern-%s" type)))
-		for face = (if type (list type-face surround-face) surround-face) do
-		(when fixed (setq face (append `((:height ,org-modern-fixed-height))
-					       (ensure-list face))))
-		(insert (propertize "@" 'face face))
+		for face = (cond (fixed `(:height ,org-modern-fixed-height))
+				 (type (list type-face surround-face))
+				 (t surround-face))
+		do (insert (propertize "@" 'face face))
 		collect (font-at (1- (point))))))
 	     (hdfonts (reverse (cdr sets))) ; deepest scale first
 	     (deepest (caar hdfonts)))
