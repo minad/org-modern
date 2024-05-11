@@ -637,7 +637,7 @@ heading level (if any), unless BOX-FACE is passed."
 	 (face-right 'org-modern-progress-bar-incomplete))
     (when (or (= bar-width 0) (= bar-width width)) ; empty or full bar: special case
       (setq pad-left ideal-pad pad-right ideal-pad)
-      (if (= bar-width 0) (setq face-right face-left) (setq face-left face-right)))
+      (if (= bar-width 0) (setq face-left face-right) (setq face-right face-left)))
     (add-text-properties beg-lbrac end-lbrac `( display (space :width ,pad-left)
 						face (,box-face ,face-left)))
     (put-text-property beg-stat end-complete 'face face-left)
