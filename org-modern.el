@@ -638,12 +638,12 @@ heading level (if any), unless BOX-FACE is passed."
     (when (or (= bar-width 0) (= bar-width width)) ; empty or full bar: special case
       (setq pad-left ideal-pad pad-right ideal-pad)
       (if (= bar-width 0) (setq face-left face-right) (setq face-right face-left)))
-    (add-text-properties beg-lbrac end-lbrac `( display (space :width ,pad-left)
+    (add-text-properties beg-lbrac end-lbrac `( display (space :width (,pad-left . width))
 						face (,box-face ,face-left)))
     (put-text-property beg-stat end-complete 'face face-left)
     (put-text-property end-complete end-stat 'face face-right)
     (org-modern--box-label 'progress-bar nil beg-stat end-stat box-face)
-    (add-text-properties beg-rbrac end-rbrac `( display (space :width ,pad-right)
+    (add-text-properties beg-rbrac end-rbrac `( display (space :width (,pad-right . width))
 						face (,box-face ,face-right)))))
 
 (defun org-modern--tag ()
