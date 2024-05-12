@@ -349,7 +349,7 @@ the child fonts `org-modern-\[type]' for all label types (see
 
 (defface org-modern-priority ; label type face
   ;; `:inverse-video' to use priority foreground as label background
-  '((t :inherit (org-priority org-modern-heading-label) :inverse-video t))
+  '((t :inherit (org-priority org-modern-label) :inverse-video t))
   "Default face used for priority labels.")
 
 (defface org-modern-timestamp-active ; label type face
