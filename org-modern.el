@@ -683,7 +683,7 @@ whole buffer; otherwise, for the line at point."
    :box
    (when org-modern-label-border
      (let ((border (if (eq org-modern-label-border 'auto)
-                       (max 3 (cond
+                       (max 2 (cond
                                ((integerp line-spacing)
                                 line-spacing)
                                ((floatp line-spacing)
@@ -694,7 +694,7 @@ whole buffer; otherwise, for the line at point."
              :line-width
              ;; Emacs 28 supports different line horizontal and vertical line widths
              (if (eval-when-compile (>= emacs-major-version 28))
-                 (cons -1 (- border))
+                 (cons 0 (- border))
                (- border)))))))
 
 (defun org-modern--update-fringe-bitmaps ()
