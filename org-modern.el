@@ -265,24 +265,6 @@ Set to nil to disable bars."
   :type '(choice (const :tag "Disable progress bar" nil)
 		 (natnum :tag "Bar width")))
 
-(defconst org-modern--label-types '( todo-done progress-bar priority tag
-				     timestamp-active timestamp-inactive))
-(defcustom org-modern-fixed-height-types '(progress-bar tag)
-  "Fixed height types.
-A list of label types which should be formatted as fixed height,
-independent of the headline in which they appear.  Any omitted
-type adapts to the height of the surrounding text (e.g. in org
-headings).  See also `org-modern-fixed-height'.
-
-Note: the associated label face (`org-modern-\[type]') for fixed
-height types should not have a `:height' attribute set; if it is,
-a warning will be issued and it will be removed."
-  :type `(set ,@(mapcar (lambda (x) `(const ,x)) org-modern--label-types)))
-
-(defcustom org-modern-fixed-height 0.8
-  "Height of fixed height box labels, as a fraction of default line height."
-  :type '(float :tag "Default line height fraction"))
-
 (defgroup org-modern-faces nil
   "Faces used by `org-modern'."
   :group 'org-modern
@@ -305,17 +287,11 @@ The parameters of this face depend on typographical properties of
 the font and should therefore be adjusted by the user depending
 on their font, e.g., the :width or :height parameters.  Themes
 should not override this face, since themes usually don't control
-the font.  For entities in `org-modern-fixed-height-types', no
-`:height' attribute should be applied to the associated
-`org-modern-\[type]' face (or any which inherit from it).  Note
-that all attributes which affect font selection (‘:family’,
-‘:weight’, ‘:slant’, and ‘:width’) should only be set directly on
-the child fonts `org-modern-\[type]' for all label types (see
-`org-modern-fixed-height-types' for options).")
+the font.")
 
 (defface org-modern-progress-bar ; label type face
   '((default :inherit (fixed-pitch org-modern-label) :weight semi-bold
-	     :width condensed :inverse-video t)
+	     :height 0.8 :inverse-video t)
     (((background light)) :foreground "gray40")
     (t :foreground "gray80"))
   "Face used for completed section of progress bars.")
@@ -327,7 +303,7 @@ the child fonts `org-modern-\[type]' for all label types (see
   "Face used for incomplete section of progress bars.")
 
 (defface org-modern-tag			; label type face
-  '((default :inherit (secondary-selection org-modern-label))
+  '((default :inherit (secondary-selection org-modern-label) :height 0.9)
     (((background light)) :foreground "black")
     (t :foreground "white"))
   "Face used for tag labels.")
@@ -449,176 +425,9 @@ the child fonts `org-modern-\[type]' for all label types (see
            `(:inherit (,face org-modern-label))
          'org-modern-priority)))))
 
-(defun org-modern--check-label-faces ()
-  "Check the label type faces for compatibility.
-Consults `org-modern-fixed-height-types'."
-  (cl-loop for type in org-modern-fixed-height-types
-	   for face = (intern (format "org-modern-%s" type))
-	   for height = (face-attribute face :height nil t)
-	   if (and (numberp height) (/= height 1.0)) do ; a height of 1.0 is innocuous
-	   (warn "%s is designated fixed-height, but has a :height attribute: removing" type)
-	   (set-face-attribute face nil :height 'unspecified)))
-
-(defvar-local org-modern--box-label-face-remaps nil)
-(defvar-local org-modern--box-label-raise nil)
-
-(defun org-modern--font-sets (scale)
-  "Return font-sets for all heading levels and label types.
-If SCALE is non-nil, it is the text-scaling amount (an integer)
-to apply.  Levels begin with default text, then
-all (non-repeating) org heading levels.  Types are as mention in
-`org-modern--label-types'.
-
-The returned value is a list of lists, ordered by depth, where
-each list contains first the font for the surrounding face text,
-followed by fonts for all types mentioned in
-`org-modern--label-types', when appearing within that text.  The
-first list includes the fonts relevant for default text,
-followed, if needed, by a list for each org level down to the
-deepest heading depth beyond which the face repeats."
-  (save-window-excursion
-    (with-temp-buffer
-      (set-window-dedicated-p nil nil)
-      (set-window-buffer nil (current-buffer))
-      (when (and scale (/= scale 0))
-	(text-scale-mode 1)
-	(text-scale-set scale))
-      (let* ((sets  ; collect fonts at each level for each entity type
-	      (cl-loop
-	       for surround-face in (cons 'default org-level-faces) do
-	       (insert "\n")
-	       collect
-	       (cl-loop
-		for type in (cons nil org-modern--label-types) ; nil = default
-		for fixed = (memq type org-modern-fixed-height-types)
-		for type-face = (and type (intern (format "org-modern-%s" type)))
-		for face = (cond (fixed `(:height ,org-modern-fixed-height))
-				 (type (list type-face surround-face))
-				 (t surround-face))
-		do (insert (propertize "@" 'face face))
-		collect (font-at (1- (point))))))
-	     (hdfonts (reverse (cdr sets))) ; deepest scale first
-	     (deepest (caar hdfonts)))
-	(while (and hdfonts (equal (caadr hdfonts) deepest))
-	  (setq hdfonts (cdr hdfonts)))
-	;; Trim the tail headline fonts, potentially removing them entirely
-	(setcdr sets (unless (and (= (length hdfonts) 1)
-				  (equal (caar sets) (caar hdfonts)))
-		       (nreverse hdfonts)))
-	sets))))
-
-(defun org-modern--apply-font-sets (font-sets &optional remap)
-  "Apply the FONT-SETS by setting or remapping box label fonts.
-Compute the box width and raise values necessary to vertically
-center text with the associated fonts, and apply the box values
-to the faces `org-modern--box-label-type-N'.  If REMAP is
-non-nil, add face remaps.  Otherwise, update the box label faces
-and set their raise and fixed values.  For more information, see
-`org-modern--update-box-label-faces'."
-  (cl-loop
-   for fonts-at-lvl in font-sets
-   for i upfrom 0  ; level 0 = default text
-   with ld = (frame-char-height)
-   with s = (cond ((floatp line-spacing) (* line-spacing ld))
-		  (line-spacing)
-		  (t 0))
-   for fi = (font-info (car fonts-at-lvl)) ; surrounding text font
-   for lt = (aref fi 3) for dt = (aref fi 9) do
-   (cl-loop
-    for font in (cdr fonts-at-lvl)
-    for type in org-modern--label-types
-    for fixed = (memq type org-modern-fixed-height-types)
-    for face = (intern (format "org-modern--box-label-%s-%d" type i))
-    for fi = (font-info font)
-    for ls = (aref fi 3) for ds = (aref fi 9)
-    for eps = (max 1 (* .15 (- ls ds))) ; box gap fraction f
-    for box-width = (round (/ (float (+ lt s (- ds ls) (* -2 eps))) 2))
-    if remap do
-    (push (face-remap-add-relative face `(:box (0 . ,(- box-width))))
-	  org-modern--box-label-face-remaps)
-    else do ; define the box face
-    (face-spec-set face `((t :box (0 . ,(- box-width)))))
-    (put face 'org-modern-raise
-	 (/ (float (- (+ box-width eps) s dt)) (if fixed ld ls)))
-    (put face 'org-modern-fixed (not (not fixed))))))
-
-(defvar org-modern--num-headline-labels nil)
-(defun org-modern--update-box-label-faces (&optional default)
-  "Update box label faces based on the associated fonts.
-Font measurements are taken relative to default text as well as
-all the `org-level-N' faces, consolidating a final sequence of
-repeating faces into a single value.  The faces
-`org-modern--box-label-type-N' are then updated or remapped for
-each entity type and depth N, with N=0 corresponding to default
-text.
-
-If DEFAULT is non-nil, the faces are directly updated (creating
-them if necessary), and each face symbol has the property
-`org-modern-fixed' set to its fixed-height status, and
-`org-modern-raise' set to the raise factor (relative to the
-default character height) necessary to center labels in their
-box.  Note: raise factors are assumed to be invariant with text
-scaling and are only (re-)computed if DEFAULT is non-nil.
-
-If DEFAULT is omitted, text-scaling (if any) from the local
-buffer will be applied, and local face remappings are created
-temporarily updating the `:box' attribute for the relevant faces."
-  
-  (dolist (remap org-modern--box-label-face-remaps)
-    (face-remap-remove-relative remap))
-  (setq org-modern--box-label-face-remaps nil)
-  (let* ((scale (and (not default) text-scale-mode text-scale-mode-amount))
-	 (font-sets (org-modern--font-sets scale)))
-    (setq org-modern--num-headline-labels (1- (length font-sets)))
-    (unless (and (not default) (not scale)) ; fall back on defaults
-      (org-modern--apply-font-sets font-sets (not default)))))
-
-(defun org-modern--heading-level (&optional pos)
-  "Return the heading level at POS.
-POS defaults to point.  For efficiency, first checks the face."
-  (if-let ((f (get-text-property (or pos (point)) 'face))
-	   ((symbolp f))
-	   (name (symbol-name f))
-	   ((string-match "org-level-\\([0-9+]\\)" name)))
-      (string-to-number (match-string 1 name))
-    (or (and (org-at-heading-p) (org-current-level)) 0)))
-
-(defun org-modern--box-label-face (type &optional pos)
-  "Return face for a boxed label of type TYPE at POS.
-TYPE is the entity type being formatted as a label (see
-`org-modern-fixed-height-types').  If in an org heading, select a
-box face based on the current heading depth.  Otherwise, use the
-type face for normal text."
-  (let ((lvl (min (org-modern--heading-level pos)
-		  org-modern--num-headline-labels)))
-    (intern (format "org-modern--box-label-%S-%d" type lvl))))
-
-(defun org-modern--box-label(type &optional str beg end box-face)
-  "Surround a label of type TYPE by a box, and vertically align it.
-Note the box has zero horizontal width.  TYPE should be one of
-the allowable types (a symbol) in
-`org-modern-fixed-height-types'.
-
-Apply face and display properties to STR if non-nil, by default
-over the entire string, unless BEG and END are provided (as
-0-based indices).  If STR is nil, BEG and END should instead
-specify a buffer range over which properties will be applied.
-
-The box-face will be determined based on the type, position and
-heading level (if any), unless BOX-FACE is passed."
-  (let ((box-face (or box-face (org-modern--box-label-face type))))
-    (when str (setq beg (or beg 0) end (or end (length str))))
-    (add-face-text-property beg end box-face nil str)
-    (put-text-property beg end 'display
-		       `((raise ,(get box-face 'org-modern-raise))
-			 ,@(and (get box-face 'org-modern-fixed)
-				`((height ,org-modern-fixed-height))))
-		       str)))
-
 (defun org-modern--progress-bar ()
   "Prettify headline todo statistics as color-coded progress bars."
-  (let* ((beg (match-beginning 0))
-	 (beg-lbrac (match-beginning 1)) (end-lbrac (match-end 1))
+  (let* ((beg-lbrac (match-beginning 1)) (end-lbrac (match-end 1))
 	 (beg-stat (match-beginning 2)) (end-stat (match-end 2))
 	 (len (- end-stat beg-stat))
 	 (beg-rbrac (match-beginning 6)) (end-rbrac (match-end 6))
@@ -632,19 +441,17 @@ heading level (if any), unless BOX-FACE is passed."
 	 (end-complete (+ beg-stat complete-chars))
 	 (pad-left (- bar-width complete-chars))
 	 (pad-right (- width pad-left len))
-	 (box-face (org-modern--box-label-face 'progress-bar beg))
 	 (face-left 'org-modern-progress-bar)
 	 (face-right 'org-modern-progress-bar-incomplete))
     (when (or (= bar-width 0) (= bar-width width)) ; empty or full bar: special case
       (setq pad-left ideal-pad pad-right ideal-pad)
       (if (= bar-width 0) (setq face-left face-right) (setq face-right face-left)))
     (add-text-properties beg-lbrac end-lbrac `( display (space :width (,pad-left . width))
-						face (,box-face ,face-left)))
-    (put-text-property beg-stat end-complete 'face face-left)
-    (put-text-property end-complete end-stat 'face face-right)
-    (org-modern--box-label 'progress-bar nil beg-stat end-stat box-face)
+						face (org-modern-label ,face-left)))
+    (add-face-text-property beg-stat end-complete face-left)
+    (add-face-text-property end-complete end-stat face-right)
     (add-text-properties beg-rbrac end-rbrac `( display (space :width (,pad-right . width))
-						face (,box-face ,face-right)))))
+						face (org-modern-label ,face-right)))))
 
 (defun org-modern--tag ()
   "Prettify headline tags."
@@ -1063,10 +870,7 @@ whole buffer; otherwise, for the line at point."
     (add-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line nil 'local)
     (add-hook 'org-cycle-hook #'org-modern--cycle nil 'local)
     (org-modern--update-label-face)
-    (org-modern--update-fringe-bitmaps)
-    (org-modern--check-label-faces)
-    (org-modern--update-box-label-faces 'default)
-    (add-hook 'text-scale-mode-hook #'org-modern--update-box-label-faces nil 'local))
+    (org-modern--update-fringe-bitmaps))
    (t
     (remove-from-invisibility-spec 'org-modern)
     (font-lock-remove-keywords nil org-modern--font-lock-keywords)
@@ -1075,8 +879,7 @@ whole buffer; otherwise, for the line at point."
     (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)
     (remove-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line 'local)
     (remove-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line 'local)
-    (remove-hook 'org-cycle-hook #'org-modern--cycle 'local)
-    (remove-hook 'text-scale-mode-hook #'org-modern--update-box-label-faces 'local)))
+    (remove-hook 'org-cycle-hook #'org-modern--cycle 'local)))
   (without-restriction
     (with-silent-modifications
       (org-modern--unfontify (point-min) (point-max)))
