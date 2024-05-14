@@ -309,7 +309,7 @@ the font.")
   '((default :inherit org-modern-label)
     (((background light)) :background "gray90" :foreground "black")
     (t :background "gray20" :foreground "white"))
-  "Face used for done labels.")
+  "Default face used for done labels.")
 
 (defface org-modern-todo
   ;; `:inverse-video' to use todo foreground as label background
@@ -328,7 +328,9 @@ the font.")
   "Face used for todo statistics labels.")
 
 (defface org-modern-date-active
-  '((t :inherit org-modern-done))
+  '((default :inherit org-modern-label)
+    (((background light)) :background "gray90" :foreground "black")
+    (t :background "gray20" :foreground "white"))
   "Face used for active date labels.")
 
 (defface org-modern-time-active
@@ -383,7 +385,8 @@ the font.")
   (let ((beg (match-beginning 0))
         (end (match-end 0))
         (rep (and (listp org-modern-keyword)
-                  (cdr (assoc (downcase (match-string 2)) org-modern-keyword)))))
+                  (cdr (assoc (downcase (match-string-no-properties 2))
+                              org-modern-keyword)))))
     (unless rep
       (setq rep (cdr (assq t org-modern-keyword)) end (match-end 1)))
     (pcase rep
@@ -451,7 +454,7 @@ the font.")
 
 (defun org-modern--todo ()
   "Prettify headline todo keywords."
-  (let ((todo (match-string 1))
+  (let ((todo (match-string-no-properties 1))
         (beg (match-beginning 1))
         (end (match-end 1)))
     (put-text-property beg (1+ beg) 'display
@@ -584,7 +587,7 @@ whole buffer; otherwise, for the line at point."
          (beg-name (match-beginning 3))
          (end-name (match-end 3))
          (names (and (listp org-modern-block-name) org-modern-block-name))
-         (rep (cdr (assoc (downcase (match-string 3)) names)))
+         (rep (cdr (assoc (downcase (match-string-no-properties 3)) names)))
          (fringe (and org-modern-block-fringe (not (bound-and-true-p org-indent-mode)))))
     (unless rep
       (setq rep (cdr (assq t names)) end-rep beg-name))
@@ -652,7 +655,7 @@ whole buffer; otherwise, for the line at point."
    :box
    (when org-modern-label-border
      (let ((border (if (eq org-modern-label-border 'auto)
-                       (max 3 (cond
+                       (max 2 (cond
                                ((integerp line-spacing)
                                 line-spacing)
                                ((floatp line-spacing)
