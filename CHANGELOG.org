@@ -9,6 +9,8 @@
 - Add new customization options ~org-modern-replace-stars~ and
   ~org-modern-fold-stars~.
 - Add ~org-modern-tag-faces~.
+- Add colored coded progress bars. The variable ~org-modern-progress~ specifies
+  the width of the bars.
 
 * Version 1.2 (2024-03-16)
 
