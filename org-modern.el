@@ -288,10 +288,6 @@ the font.")
   '((t :height 0.8 :weight light))
   "Face used for block keywords.")
 
-(defface org-modern-progress
-  '((t :inherit org-modern-label))
-  "Face used for progress bars.")
-
 (defface org-modern-progress-complete
   '((((background light))
      :background "gray35" :foreground "white" :distant-foreground "black")
