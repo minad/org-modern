@@ -435,30 +435,33 @@ the font.")
          (end-cmpl (+ beg 1 cmpl-chars))
          (pad-left (- bar-width cmpl-chars))
          (pad-right (- org-modern-progress pad-left stat-len))
-         (shift-right 0) (shift-left 0))
-    (cond ((= cmpl-chars 0)        ; pulled left?
+         (face-left 'org-modern-progress-complete)
+         (face-right 'org-modern-progress-incomplete)
+         (shift-left 0) (shift-right 0))
+    (cond ((or (= bar-width 0) (= bar-width org-modern-progress)) ;empty or full
+           (setq pad-left ideal-pad pad-right ideal-pad) ; precisely center
+           (if (= bar-width 0) (setq face-left face-right) (setq face-right face-left)))
+          ((= cmpl-chars 0)             ; pulled left?
            (setq shift-right (max 0 (round (- ideal-pad pad-left)))
                  pad-right (- pad-right shift-right)))
-          ((= cmpl-chars stat-len) ; pulled right?
+          ((= cmpl-chars stat-len)      ; pulled right?
            (setq shift-left (max 0 (round (- ideal-pad pad-right)))
                  pad-left (- pad-left shift-left))))
     (add-text-properties beg beg-stat                       ; [
-     `( display (space :width (,pad-left . width))
-        face org-modern-progress-complete))
+     `(display (space :width (,pad-left . width)) face ,face-left))
     (if (= shift-right 0)
-        (put-text-property beg-stat end-cmpl 'face 'org-modern-progress-complete)
+        (put-text-property beg-stat end-cmpl 'face face-left)
       (add-text-properties beg-stat (1+ beg-stat)
-			   `(display ,(concat (make-string shift-right ?\s)
-					      (propertize (string (char-after beg-stat)) 'cursor t))
-				     face org-modern-progress-incomplete)))
+       `( display ,(concat (make-string shift-right ?\s)
+			   (propertize (string (char-after beg-stat)) 'cursor t))
+	  face org-modern-progress-incomplete)))
     (if (= shift-left 0)
-        (put-text-property end-cmpl end-stat 'face 'org-modern-progress-incomplete)
+        (put-text-property end-cmpl end-stat 'face face-right)
       (add-text-properties (1- end-stat) end-stat
-       `(display ,(concat (string (char-before end-stat)) (make-string shift-left ?\s))
+       `( display ,(concat (string (char-before end-stat)) (make-string shift-left ?\s))
           face org-modern-progress-complete)))
     (add-text-properties end-stat end                       ; ]
-     `( display (space :width (,pad-right . width))
-	face org-modern-progress-incomplete))))
+     `(display (space :width (,pad-right . width)) face ,face-right))))
 
 (defun org-modern--tag ()
   "Prettify headline tags."
