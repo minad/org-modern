@@ -288,15 +288,21 @@ the font.")
   '((t :height 0.8 :weight light))
   "Face used for block keywords.")
 
+(defface org-modern-progress
+  '((t :height 0.8 :weight bold :inherit fixed-pitch ))
+  "Face used for entire progress bars.")
+
 (defface org-modern-progress-complete
-  '((((background light))
+  '((default :inherit org-modern-progress)
+    (((background light))
      :background "gray35" :foreground "white")
     (t :background "gray75" :foreground "black"))
   "Face used for completed section of progress bars (colors only).")
 
 (defface org-modern-progress-incomplete
-  '((((background light)) :background "gray90" :foreground "black")
-    (t :background "gray20" :foreground "white"))
+  '((default :inherit org-modern-progress)
+    (((background light)) :background "gray90" :foreground "black")
+    (t :background "gray25" :foreground "white"))
   "Face used for incomplete section of progress bars (colors only).")
 
 (defface org-modern-tag
