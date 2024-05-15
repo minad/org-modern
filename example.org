@@ -117,3 +117,19 @@ radio link
 
 [fn:1] This is footnote 1
 [fn:foo] This is the foonote
+
+* Progress bars
+
+- progress [1/13]
+- progress [2/13]
+- progress [3/13]
+- progress [4/13]
+- progress [5/13]
+- progress [6/13]
+- progress [7/13]
+- progress [8/13]
+- progress [9/13]
+- progress [10/13]
+- progress [11/13]
+- progress [12/13]
+- progress [13/13]

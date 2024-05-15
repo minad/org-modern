@@ -289,13 +289,20 @@ the font.")
   "Face used for block keywords.")
 
 (defface org-modern-progress
-  '((t :inherit org-modern-time-active :weight regular))
-  "Face used for completed section of progress bars.")
+  '((t :inherit org-modern-label))
+  "Face used for progress bars.")
+
+(defface org-modern-progress-complete
+  '((((background light))
+     :background "gray35" :foreground "white" :distant-foreground "black")
+    (t :background "gray75" :foreground "black" :distant-foreground "white"))
+  "Face used for completed section of progress bars (colors only).")
 
 (defface org-modern-progress-incomplete
-  '((((background light)) :background "gray90" :foreground "black")
-    (t :background "gray20" :foreground "white"))
-  "Face used for incomplete section of progress bars.")
+  '((default :background "gray50")
+    (((background light)) :foreground "gray95" :distant-foreground "gray5")
+    (t :foreground "gray5" :distant-foreground "gray95"))
+  "Face used for incomplete section of progress bars (colors only).")
 
 (defface org-modern-tag
   '((default :inherit (secondary-selection org-modern-label))
@@ -423,13 +430,15 @@ the font.")
                       1.0
                     (/ (* 1.0 (string-to-number (match-string-no-properties 3))) q)))))
          (w org-modern-progress)
+         (complete (floor (* w val)))
          (w0 (- end beg 2))
          (w1 (/ (- w w0) 2))
          (bar (concat (make-string w1 ?\s)
                       (buffer-substring-no-properties (1+ beg) (1- end))
                       (make-string (- w w1 w0) ?\s))))
-    (put-text-property (floor (* w val)) w 'face 'org-modern-progress-incomplete bar)
-    (put-text-property beg end 'face 'org-modern-progress)
+    (put-text-property 0 complete 'face 'org-modern-progress-complete bar)
+    (put-text-property complete w 'face 'org-modern-progress-incomplete bar)
+    (put-text-property beg end 'face 'org-modern-label)
     (put-text-property beg (1+ beg) 'display (substring bar 0 w1))
     (put-text-property (1- end) end 'display (substring bar (- w w1) w))
     (dotimes (i w0)
