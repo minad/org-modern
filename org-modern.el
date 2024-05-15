@@ -290,14 +290,13 @@ the font.")
 
 (defface org-modern-progress-complete
   '((((background light))
-     :background "gray35" :foreground "white" :distant-foreground "black")
-    (t :background "gray75" :foreground "black" :distant-foreground "white"))
+     :background "gray35" :foreground "white")
+    (t :background "gray75" :foreground "black"))
   "Face used for completed section of progress bars (colors only).")
 
 (defface org-modern-progress-incomplete
-  '((default :background "gray50")
-    (((background light)) :foreground "gray95" :distant-foreground "gray5")
-    (t :foreground "gray5" :distant-foreground "gray95"))
+  '((((background light)) :background "gray90" :foreground "black")
+    (t :background "gray20" :foreground "white"))
   "Face used for incomplete section of progress bars (colors only).")
 
 (defface org-modern-tag
