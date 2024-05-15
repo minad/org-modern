@@ -289,7 +289,8 @@ the font.")
   "Face used for block keywords.")
 
 (defface org-modern-progress
-  '((t :height 0.8 :weight bold :inherit fixed-pitch ))
+  '((default :inherit (fixed-pitch org-modern-label))
+    (t :weight semi-bold))
   "Face used for entire progress bars.")
 
 (defface org-modern-progress-complete
