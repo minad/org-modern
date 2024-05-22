@@ -191,6 +191,10 @@ the cdr.  Example:
                  (const :tag "Default" t))
                 (sexp :tag "Face   "))))
 
+(defcustom org-modern-justify-tags t
+  "Justify tags"
+  :type 'boolean)
+
 (defcustom org-modern-tag t
   "Prettify tags in headlines, e.g., :tag1:tag2:."
   :type 'boolean)
@@ -440,6 +444,34 @@ the font.")
     (dotimes (i w0)
       (put-text-property (+ 1 beg i) (+ 2 beg i)
                          'display (substring bar (+ w1 i) (+ w1 i 1))))))
+
+(defun org-modern-align-tags (&optional line)
+  "Align all tags in agenda items to `org-agenda-tags-column'.
+When optional argument LINE is non-nil, align tags only on the
+current line."
+  (let ((inhibit-read-only t)
+	(org-agenda-tags-column (if (eq 'auto org-agenda-tags-column)
+			  (-(window-max-chars-per-line))
+			org-agenda-tags-column))
+	(end (and line (line-end-position)))
+	l c)
+    (org-fold-core-ignore-modifications
+      (save-excursion
+        (goto-char (if line (line-beginning-position) (point-min)))
+        (while (re-search-forward org-tag-group-re end 'noerror)
+	  (setq l (string-width (match-string 1))
+	        c (if (< org-agenda-tags-column 0)
+		      (- (abs org-agenda-tags-column) l)
+		    org-agenda-tags-column))
+	  (goto-char (match-beginning 1))
+	  (delete-region (save-excursion (skip-chars-backward " \t") (point))
+		         (point))
+	  (let (
+                (spaces (make-string (max 1 (- c (current-column))) ?\s)))
+            (insert spaces))
+        (goto-char (line-end-position)))
+        ))))
+
 
 (defun org-modern--tag ()
   "Prettify headline tags."
@@ -914,7 +946,10 @@ whole buffer; otherwise, for the line at point."
             ;; For some reason the org-agenda-fontify-priorities adds overlays?!
             (when-let ((ov (overlays-at (match-beginning 0))))
               (overlay-put (car ov) 'face nil))
-            (org-modern--priority)))))))
+            (org-modern--priority)))
+	(when org-modern-justify-tags
+	  (org-modern-align-tags)
+	)))))
 
 ;;;###autoload
 (define-globalized-minor-mode global-org-modern-mode
