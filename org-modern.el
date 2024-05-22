@@ -445,10 +445,19 @@ the font.")
       (put-text-property (+ 1 beg i) (+ 2 beg i)
                          'display (substring bar (+ w1 i) (+ w1 i 1))))))
 
+(defun org-calculate-tag-length (tags)
+  "Calculate the total length of the TAGS list, including colons and spaces."
+  (let ((tags-length (apply '+ (mapcar #'string-width tags))))
+    (+ tags-length ; sum of tag lengths
+       (* 2 (length tags)) ; 2 space) for each tag
+       1
+       )))
+
 (defun org-modern-align-tags (&optional line)
   "Align all tags in agenda items to `org-agenda-tags-column'.
 When optional argument LINE is non-nil, align tags only on the
 current line."
+
   (let ((inhibit-read-only t)
 	(org-agenda-tags-column (if (eq 'auto org-agenda-tags-column)
 			  (-(window-max-chars-per-line))
@@ -459,7 +468,7 @@ current line."
       (save-excursion
         (goto-char (if line (line-beginning-position) (point-min)))
         (while (re-search-forward org-tag-group-re end 'noerror)
-	  (setq l (string-width (match-string 1))
+	  (setq l (org-calculate-tag-length (get-text-property 0 'tags (match-string 1)))
 	        c (if (< org-agenda-tags-column 0)
 		      (- (abs org-agenda-tags-column) l)
 		    org-agenda-tags-column))
