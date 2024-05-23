@@ -853,7 +853,8 @@ whole buffer; otherwise, for the line at point."
     (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
     (add-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line nil 'local)
     (add-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line nil 'local)
-    (add-hook 'org-cycle-hook #'org-modern--cycle nil 'local)
+    (when (eq org-modern-star 'fold)
+      (add-hook 'org-cycle-hook #'org-modern--cycle nil 'local))
     (org-modern--update-label-face)
     (org-modern--update-fringe-bitmaps))
    (t
@@ -864,7 +865,8 @@ whole buffer; otherwise, for the line at point."
     (remove-hook 'pre-redisplay-functions #'org-modern--pre-redisplay 'local)
     (remove-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line 'local)
     (remove-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line 'local)
-    (remove-hook 'org-cycle-hook #'org-modern--cycle 'local)))
+    (when (eq org-modern-star 'fold)
+      (remove-hook 'org-cycle-hook #'org-modern--cycle 'local))))
   (without-restriction
     (with-silent-modifications
       (org-modern--unfontify (point-min) (point-max)))
