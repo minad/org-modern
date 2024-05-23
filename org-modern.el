@@ -191,7 +191,7 @@ the cdr.  Example:
                  (const :tag "Default" t))
                 (sexp :tag "Face   "))))
 
-(defcustom org-modern-justify-tags t
+(defcustom org-modern-justify-tags nil
   "Justify tags"
   :type 'boolean)
 
