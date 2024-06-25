@@ -88,6 +88,7 @@ screenshot above.
  org-pretty-entities t
 
  ;; Agenda styling
+ org-agenda-tags-column 0
  org-agenda-block-separator ?─
  org-agenda-time-grid
  '((daily today require-timed)
