@@ -909,11 +909,12 @@ whole buffer; otherwise, for the line at point."
           (goto-char (point-min))
           (let ((re (concat "\\( \\)\\(:\\(?:" org-tag-re "::?\\)+\\)[ \t]*$")))
             (while (re-search-forward re nil 'noerror)
-              ;; Hack to handle `org-agenda-align-tags-to-column'
-              (when (and (eq 'auto (bound-and-true-p org-agenda-align-tags-to-column))
-                         (eq ?\s (char-before (match-beginning 0))))
-                (put-text-property (1- (match-beginning 0)) (match-beginning 0) 'invisible t))
-              (org-modern--tag))))
+              (let ((beg (- (match-beginning 0) 3)))
+                (org-modern--tag)
+                ;; Handle `org-agenda-tags-column' set to `auto'
+                (when (and (eq 'auto (bound-and-true-p org-agenda-tags-column))
+                           (save-excursion (goto-char beg) (looking-at-p "   ")))
+                  (delete-region beg (+ beg 3)))))))
         (when org-modern-priority
           (goto-char (point-min))
           (while (re-search-forward "\\(\\[#.\\]\\)" nil 'noerror)
