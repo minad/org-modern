@@ -766,12 +766,6 @@ whole buffer; otherwise, for the line at point."
            (3 '(face nil display ,(org-modern--symbol (caddr org-modern-radio-target))))
            ,@(unless (cadr org-modern-radio-target)
                '((2 '(face nil invisible org-modern)))))))))
-   (when org-modern-timestamp
-     '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\.?\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
-        (0 (org-modern--timestamp)))
-       ("<[^>]+>\\(-\\)\\(-\\)<[^>]+>\\|\\[[^]]+\\]\\(?1:-\\)\\(?2:-\\)\\[[^]]+\\]"
-        (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
-        (2 '(face org-modern-label display #("  " 0 1 (face (:strike-through t)))) t))))
    (when (integerp org-modern-progress)
      `((" \\(\\[\\(?:\\([0-9]+\\)%\\|\\([0-9]+\\)/\\([0-9]+\\)\\)]\\)"
         (0 (org-modern--progress)))))
@@ -792,6 +786,12 @@ whole buffer; otherwise, for the line at point."
             ('t '(1 '(face nil invisible org-modern)))
             ((pred stringp) `(1 '(face nil display ,org-modern-keyword)))
             (_ '(0 (org-modern--keyword)))))))
+   (when org-modern-timestamp
+     '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\.?\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
+        (0 (org-modern--timestamp)))
+       ("<[^>]+>\\(-\\)\\(-\\)<[^>]+>\\|\\[[^]]+\\]\\(?1:-\\)\\(?2:-\\)\\[[^]]+\\]"
+        (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
+        (2 '(face org-modern-label display #("  " 0 1 (face (:strike-through t)))) t))))
    ;; Do not add source block fringe markers if org-indent-mode is
    ;; enabled. org-indent-mode uses line prefixes for indentation.
    ;; Therefore we cannot have both.
