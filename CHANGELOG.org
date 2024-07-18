@@ -2,6 +2,11 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- Fix date formatting after #+date keyword.
+- Bump Compat dependency to Compat 30.
+
 * Version 1.3 (2024-06-02)
 
 - Add support for heading folding indicators. The option ~org-modern-star~ has
