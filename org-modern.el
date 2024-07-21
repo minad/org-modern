@@ -903,9 +903,9 @@ whole buffer; otherwise, for the line at point."
           (goto-char (point-min))
           (while (< (point) (point-max))
             (when-let ((todo (get-text-property (point) 'todo-state))
+                       (org-not-done-regexp (get-text-property (point) 'org-not-done-regexp))
                        (re (concat " \\(" todo "\\) "))
-                       (pos (re-search-forward re (pos-eol) 'noerror))
-                       (org-not-done-regexp (get-text-property (point) 'org-not-done-regexp)))
+                       ((re-search-forward re (pos-eol) 'noerror)))
               (org-modern--todo))
             (goto-char (min (1+ (pos-eol)) (point-max)))))
         (when org-modern-tag
