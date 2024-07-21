@@ -61,12 +61,12 @@ Can be nil, fold or replace.  See `org-modern-fold-stars' and
                  (const :tag "Folding indicators" fold)
                  (const :tag "Replace" replace)))
 
-(defcustom org-modern-replace-stars "◉○◈◇✳"
+(defcustom org-modern-replace-stars "◉○◈◇"
   "Replacement strings for headline stars for each level."
   :type '(choice string (repeat string)))
 
 (defcustom org-modern-fold-stars
-  '(("▶" . "▼") ("▷" . "▽") ("⯈" . "⯆") ("▹" . "▿") ("▸" . "▾"))
+  '(("▶" . "▼") ("▷" . "▽") ("▹" . "▿") ("▸" . "▾"))
   "Folding indicators for headings.
 Replace headings' stars with an indicator showing whether its
 tree is folded or expanded."
