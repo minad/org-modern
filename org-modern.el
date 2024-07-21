@@ -661,8 +661,12 @@ whole buffer; otherwise, for the line at point."
     (unless (equal (and (listp box) (plist-get box :color))
                    (face-attribute 'default :background nil t))
       (org-modern--update-label-face)))
-  (setf org-modern--table-sp-width (default-font-width)
-        (cadr org-modern--table-overline) (face-attribute 'org-table :foreground nil t)))
+  (let ((face-remapping-alist
+         (if-let (h (cadr (assq :height (assq 'default face-remapping-alist))))
+             `((default (:inherit org-table :height ,h)))
+           '((default (:inherit org-table))))))
+    (setq org-modern--table-sp-width (default-font-width)))
+  (setf (cadr org-modern--table-overline) (face-attribute 'org-table :foreground nil t)))
 
 (defun org-modern--update-label-face ()
   "Update border of the `org-modern-label' face."
