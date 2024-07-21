@@ -6,6 +6,7 @@
 
 - Fix date formatting after #+date keyword.
 - Fix table divider line scaling.
+- Fix TODO state formatting in custom agendas.
 - Bump Compat dependency to Compat 30.
 
 * Version 1.3 (2024-06-02)
