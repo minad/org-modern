@@ -661,7 +661,7 @@ whole buffer; otherwise, for the line at point."
                    (face-attribute 'default :background nil t))
       (org-modern--update-label-face)))
   (let ((face-remapping-alist
-         (if-let ((d (cdr (assq 'default face-remapping-alist))))
+         (if-let ((d (ensure-list (cdr (assq 'default face-remapping-alist)))))
              `((default org-table ,@d default))
            '((default org-table default)))))
     (setq org-modern--table-sp-width (default-font-width)))
