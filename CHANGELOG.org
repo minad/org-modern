@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.4 (2024-07-25)
 
 - Fix date formatting after #+date keyword.
 - Fix table divider line scaling.
