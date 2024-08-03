@@ -2,6 +2,10 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Version 1.5 (2024-08-03)
+
+- Bugfixes.
+
 * Version 1.4 (2024-07-25)
 
 - Fix date formatting after #+date keyword.
