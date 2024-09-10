@@ -2,6 +2,10 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- Require Emacs 28.1.
+
 * Version 1.5 (2024-08-03)
 
 - Bugfixes.

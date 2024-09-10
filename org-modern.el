@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2022
 ;; Version: 1.5
-;; Package-Requires: ((emacs "27.1") (compat "30"))
+;; Package-Requires: ((emacs "28.1") (compat "30"))
 ;; Homepage: https://github.com/minad/org-modern
 ;; Keywords: outlines, hypermedia, text
 
@@ -683,11 +683,7 @@ whole buffer; otherwise, for the line at point."
                                (t (/ (frame-char-height) 10))))
                      org-modern-label-border)))
        (list :color (face-attribute 'default :background nil t)
-             :line-width
-             ;; Emacs 28 supports different line horizontal and vertical line widths
-             (static-if (>= emacs-major-version 28)
-                 (cons -1 (- border))
-               (- border)))))))
+             :line-width (cons -1 (- border)))))))
 
 (defun org-modern--update-fringe-bitmaps ()
   "Update fringe bitmaps."
