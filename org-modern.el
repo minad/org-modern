@@ -486,7 +486,7 @@ the font.")
 
 (defun org-modern--timestamp ()
   "Prettify timestamps."
-  (let* ((beg (match-beginning 0))
+  (let* ((beg (1- (match-beginning 1)))
          (end (match-end 0))
          (tbeg (match-beginning 2))
          (tend (match-end 2))
@@ -787,7 +787,7 @@ whole buffer; otherwise, for the line at point."
             ((pred stringp) `(1 '(face nil display ,org-modern-keyword)))
             (_ '(0 (org-modern--keyword)))))))
    (when org-modern-timestamp
-     '(("\\(?:<\\|\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\.?\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
+     '(("\\(?:<\\|^\\[\\|[^]]\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\.?\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
         (0 (org-modern--timestamp)))
        ("<[^>]+>\\(-\\)\\(-\\)<[^>]+>\\|\\[[^]]+\\]\\(?1:-\\)\\(?2:-\\)\\[[^]]+\\]"
         (1 '(face org-modern-label display #("  " 1 2 (face (:strike-through t) cursor t))) t)
