@@ -856,7 +856,8 @@ whole buffer; otherwise, for the line at point."
     (when (eq org-modern-star 'fold)
       (add-hook 'org-cycle-hook #'org-modern--cycle nil 'local))
     (org-modern--update-label-face)
-    (org-modern--update-fringe-bitmaps))
+    (org-modern--update-fringe-bitmaps)
+    (setq-local which-func-cleanup-function #'substring-no-properties))
    (t
     (remove-from-invisibility-spec 'org-modern)
     (font-lock-remove-keywords nil org-modern--font-lock-keywords)
