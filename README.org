@@ -104,6 +104,14 @@ screenshot above.
 (global-org-modern-mode)
 #+end_src
 
+* Incompatibilities
+
+- =org-indent-mode= is not compatible with the block prettification in the fringe.
+  If =org-indent-mode= is enabled, =org-modern= will disable the block prettification.
+- =org-num-mode= interferes with the =org-modern= prettification of TODO keywords.
+- =visual-wrap-prefix-mode= relies on the =wrap-prefix= text property which is also
+  used by =org-modern=.
+
 * Alternatives
 
 The tag style of =org-modern= is inspired by Nicholas Rougier's beautiful
