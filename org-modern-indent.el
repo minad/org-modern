@@ -89,10 +89,10 @@ returned."
 
 (defun org-modern-indent--block-bracket-flush ()
   "Insert brackets for org blocks flush with the line prefix."
-  (let* ((lpf (get-text-property (point) 'line-prefix))
+  (let* ((line-pref (get-text-property (point) 'line-prefix))
 	 (beg (match-beginning 0))
 	 (pind (match-beginning 2))
-	 (vec (org-modern-indent--block-bracket-prefix lpf))
+	 (vec (org-modern-indent--block-bracket-prefix line-pref))
 	 (block-start (min (1+ (line-end-position)) (point-max))))
     (with-silent-modifications
       (put-text-property pind (1+ pind) 'org-modern-indent-block-type 'flush)
@@ -141,8 +141,8 @@ returned."
              `(wrap-prefix ,wrap ,@orig-prefix))
 	    (forward-line)
 	    (setq block-indent (+ (point) indent))
-	    (let ((lep (line-beginning-position 2)))
-	      (when (< block-indent lep)
+	    (let ((next-line-beg (line-beginning-position 2)))
+	      (when (< block-indent next-line-beg)
 		(put-text-property (point) block-indent 'face nil))
 	      (cond
 	       ((eobp) nil)
@@ -155,7 +155,7 @@ returned."
 		   (point) (min (line-beginning-position 2) (point-max))
 		   `(wrap-prefix ,pf ,@orig-prefix)))
 		nil)
-	       (t (if (and (<= block-indent lep) (looking-at-p search))
+	       (t (if (and (<= block-indent next-line-beg) (looking-at-p search))
 		      (put-text-property (1- block-indent) block-indent
 					 'display org-modern-indent-guide))
 		  t))))))))
