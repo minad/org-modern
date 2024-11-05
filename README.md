@@ -29,7 +29,9 @@ This small package approximately reproduces the block styling of `org-modern` wh
   :config ; add late to hook
   (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 ```
-Also, be sure to enable `org-indent` (see the variable `org-startup-indented`).
+
+>[!IMPORTANT]
+> `org-modern-indent` uses and expects `org-indent` is enabled to achieve its formatting.  To activate `org-indent-mode` by default in all org files, set `org-startup-indented=t`.
 
 ## Hints
 
