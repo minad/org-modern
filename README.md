@@ -31,7 +31,7 @@ This small package approximately reproduces the block styling of `org-modern` wh
 ```
 
 >[!IMPORTANT]
-> `org-modern-indent` uses and expects `org-indent` is enabled to achieve its formatting.  To activate `org-indent-mode` by default in all org files, set `org-startup-indented=t`.
+> `org-modern-indent` uses `org-indent`, and expects it to be enabled to achieve its formatting.  To activate `org-indent-mode` by default in all org files, set `org-startup-indented=t`.
 
 ## Hints
 
