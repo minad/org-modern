@@ -407,8 +407,8 @@ the font.")
         (put-text-property beg end 'display rep)
       (put-text-property beg (1+ beg) 'display " ")
       (put-text-property (1- end) end 'display " ")
-      (put-text-property
-       beg end 'face
+      (add-face-text-property
+       beg end
        (if-let ((face (or (cdr (assq prio org-modern-priority-faces))
                           (cdr (assq t org-modern-priority-faces)))))
            `(:inherit (,face org-modern-label))
@@ -432,9 +432,9 @@ the font.")
          (bar (concat (make-string w1 ?\s)
                       (buffer-substring-no-properties (1+ beg) (1- end))
                       (make-string (- w w1 w0) ?\s))))
-    (put-text-property 0 complete 'face 'org-modern-progress-complete bar)
-    (put-text-property complete w 'face 'org-modern-progress-incomplete bar)
-    (put-text-property beg end 'face 'org-modern-label)
+    (add-face-text-property 0 complete 'org-modern-progress-complete nil bar)
+    (add-face-text-property complete w 'org-modern-progress-incomplete nil bar)
+    (add-face-text-property beg end 'org-modern-label)
     (put-text-property beg (1+ beg) 'display (substring bar 0 w1))
     (put-text-property (1- end) end 'display (substring bar (+ w1 w0) w))
     (dotimes (i w0)
@@ -444,9 +444,7 @@ the font.")
 (defun org-modern--tag ()
   "Prettify headline tags."
   (save-excursion
-    (let* ((default-face (get-text-property (match-beginning 1) 'face))
-           (colon-props `(display #(":" 0 1 (face org-hide)) face ,default-face))
-           (beg (match-beginning 2))
+    (let* ((beg (match-beginning 2))
            (end (match-end 2))
            colon-beg colon-end)
       (goto-char beg)
@@ -458,14 +456,14 @@ the font.")
                                (format #(" %c" 1 3 (cursor t)) (char-after colon-end)))
             (put-text-property (1- cbeg) cbeg 'display
                                (string (char-before cbeg) ?\s))
-            (put-text-property
-             colon-end cbeg 'face
+            (add-face-text-property
+             colon-end cbeg
              (if-let ((faces org-modern-tag-faces)
                       (face (or (cdr (assoc (buffer-substring-no-properties colon-end cbeg) faces))
                                 (cdr (assq t faces)))))
                  `(:inherit (,face org-modern-tag))
                'org-modern-tag)))
-          (add-text-properties cbeg cend colon-props)
+	  (add-face-text-property cbeg cend 'org-hide)
           (setq colon-beg cbeg colon-end cend))))))
 
 (defun org-modern--todo ()
@@ -476,8 +474,8 @@ the font.")
     (put-text-property beg (1+ beg) 'display
                        (format #(" %c" 1 3 (cursor t)) (char-after beg)))
     (put-text-property (1- end) end 'display (string (char-before end) ?\s))
-    (put-text-property
-     beg end 'face
+    (add-face-text-property
+     beg end
      (if-let ((face (or (cdr (assoc todo org-modern-todo-faces))
                         (cdr (assq t org-modern-todo-faces)))))
          `(:inherit (,face org-modern-label))
@@ -509,20 +507,23 @@ the font.")
                (time-str (format-time-string (cdr fmt) time)))
           ;; year-month-day
           (add-text-properties beg (if (eq tbeg tend) end tbeg)
-                               `(face ,date-face display ,date-str))
+                               `(display ,date-str))
+	  (add-face-text-property beg (if (eq tbeg tend) end tbeg)
+				  date-face)
           ;; hour:minute
           (unless (eq tbeg tend)
             (add-text-properties tbeg end
-                                 `(face ,time-face display ,time-str))))
+                                 `(display ,time-str))
+	    (add-face-text-property tbeg end time-face)))
       (put-text-property beg (1+ beg) 'display " ")
       (put-text-property (1- end) end 'display " ")
       ;; year-month-day
-      (put-text-property beg (if (eq tbeg tend) end tbeg) 'face date-face)
+      (add-face-text-property beg (if (eq tbeg tend) end tbeg) date-face)
       ;; hour:minute
       (unless (eq tbeg tend)
         (put-text-property (1- tbeg) tbeg 'display
                            (string (char-before tbeg) ?\s))
-        (put-text-property tbeg end 'face time-face)))))
+        (add-face-text-property tbeg end time-face)))))
 
 (defun org-modern--star ()
   "Prettify headline stars."
