@@ -71,7 +71,7 @@ The default `fixed-pitch` font (from which `org-meta-line` inherits) has line sp
 ```
 ### The bracket style 
 
-If you'd like a different face than `org-meta-line` for the "bracket", configure the `org-modern-bracket-line` face.
+If you'd like a different face than `org-meta-line` for the "bracket", configure the `org-modern-indent-bracket-line` face.
 
 ### Related config
 
