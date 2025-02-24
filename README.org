@@ -16,8 +16,8 @@
 
 This package implements a modern style for your Org buffers using font locking
 and text properties. The package styles headlines, keywords, tables and source
-blocks. The styling is configurable, you can enable, disable or modify the style
-of each syntax element individually via the =org-modern= customization group.
+blocks. The styling is configurable, you can disable or modify the style of each
+syntax element individually via the =org-modern= customization group.
 
 [[https://github.com/minad/org-modern/blob/screenshots/example.gif?raw=true]]
 
@@ -30,7 +30,8 @@ harmonically and have approximately the same height. As default font, I
 recommend variants of the [[https://github.com/be5invis/Iosevka][Iosevka]] font, e.g., Iosevka Term Curly.
 =org-modern-mode= tries to adjust the tag label display based on the value of
 =line-spacing=. This looks best if =line-spacing= has a value between 0.1 and 0.4 in
-the Org buffer.
+the Org buffer. Larger values of =line-spacing= are not recommended, since Emacs
+does not center the text vertically (see Emacs [[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=76390][bug#76390]]).
 
 * Configuration
 
@@ -49,7 +50,7 @@ buffers, add =org-modern-mode= to the Org mode hooks.
 #+end_src
 
 Try the following more extensive setup in =emacs -Q= to reproduce the looks of the
-screenshot above.
+screenshot above after the installation of =org-modern=.
 
 #+begin_src emacs-lisp
 ;; Minimal UI
