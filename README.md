@@ -87,7 +87,6 @@ Optionally, if you want to use [org-modern](https://github.com/minad/org-modern)
    '(;; (?- . "-")
      (?* . "•")
      (?+ . "‣")))
-  (org-modern-block-name '("" . "")) ; or other chars; so top bracket is drawn promptly
   :hook
   (org-mode . org-modern-mode)
   (org-agenda-finalize . org-modern-agenda))
