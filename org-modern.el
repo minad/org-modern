@@ -674,14 +674,14 @@ whole buffer; otherwise, for the line at point."
    'org-modern-label nil
    :box
    (when org-modern-label-border
-     (let ((border (if (eq org-modern-label-border 'auto)
-                       (max 2 (cond
-                               ((integerp line-spacing)
-                                line-spacing)
-                               ((floatp line-spacing)
-                                (ceiling (* line-spacing (frame-char-height))))
-                               (t (/ (frame-char-height) 10))))
-                     org-modern-label-border)))
+     (let ((border (if (integerp org-modern-label-border)
+                       org-modern-label-border
+                     (max 2 (cond
+                             ((integerp line-spacing)
+                              line-spacing)
+                             ((floatp line-spacing)
+                              (ceiling (* line-spacing (frame-char-height))))
+                             (t (/ (frame-char-height) 10)))))))
        (list :color (face-attribute 'default :background nil t)
              :line-width (cons -1 (- border)))))))
 
