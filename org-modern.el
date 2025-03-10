@@ -786,6 +786,7 @@ whole buffer; otherwise, for the line at point."
             ('t '(1 '(face nil invisible org-modern)))
             ((pred stringp) `(1 '(face nil display ,org-modern-keyword)))
             (_ '(0 (org-modern--keyword)))))))
+   ;; Timestamps can come after keywords
    (when org-modern-timestamp
      '(("\\(?:<\\|^\\[\\|[^]]\\[\\)\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\(?: [[:word:]]+\\.?\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(\\(?: [0-9:-]+\\)?\\(?: [.+-]+[0-9ymwdh/]+\\)*\\)\\(?:>\\|\\]\\)"
         (0 (org-modern--timestamp)))
@@ -816,7 +817,9 @@ whole buffer; otherwise, for the line at point."
        `(("^\\([ \t]*\\)\\(#\\+\\(?:begin\\|BEGIN\\)_\\)\\(\\S-+\\).*"
           ,@(car specs))
          ("^\\([ \t]*\\)\\(#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
-          ,@(cdr specs)))))))
+          ,@(cdr specs)))))
+   (when (fboundp 'org-activate-folds)
+     '(org-activate-folds))))
 
 ;;;###autoload
 (define-minor-mode org-modern-mode
@@ -845,7 +848,9 @@ whole buffer; otherwise, for the line at point."
      (mapcar (pcase-lambda (`(,k . ,v)) (cons k (org-modern--symbol v)))
              org-modern-checkbox)
      org-modern--font-lock-keywords
-     (append (remove '(org-fontify-meta-lines-and-blocks) org-font-lock-keywords)
+     (append (remove '(org-fontify-meta-lines-and-blocks)
+                     (remove '(org-activate-folds)
+                             org-font-lock-keywords))
              (org-modern--make-font-lock-keywords)))
     (font-lock-remove-keywords nil org-font-lock-keywords)
     (font-lock-add-keywords nil org-modern--font-lock-keywords)

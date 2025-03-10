@@ -87,11 +87,8 @@ screenshot above after the installation of =org-modern=.
  ;; Org styling, hide markup etc.
  org-hide-emphasis-markers t
  org-pretty-entities t
- org-agenda-tags-column 0)
-
-;; Ellipsis styling
-(setq org-ellipsis "…")
-(set-face-attribute 'org-ellipsis nil :inherit 'default :box nil)
+ org-agenda-tags-column 0
+ org-ellipsis "…")
 
 (global-org-modern-mode)
 #+end_src
