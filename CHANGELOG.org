@@ -2,6 +2,11 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- Fix fontification of ellipsis.
+- Check that ~org-modern-label-border~ is an integer.
+
 * Version 1.6 (2024-12-22)
 
 - Require Emacs 28.1.
