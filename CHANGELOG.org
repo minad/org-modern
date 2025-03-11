@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.7 (2025-03-11)
 
 - Fix fontification of ellipsis.
 - Check that ~org-modern-label-border~ is an integer.
