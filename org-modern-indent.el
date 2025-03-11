@@ -87,6 +87,10 @@ returned."
 			      finally return (vconcat prefix-brackets (list prefix)))
 		   org-modern-indent--block-prefixes)))))
 
+(defvar org-modern-indent--end-re
+	(rx bol (group (* space)) (* any)
+	    "#+" (or "end" "END") ?_ (* (not space)) eol))
+
 (defun org-modern-indent--block-bracket-flush ()
   "Insert brackets for org blocks flush with the line prefix."
   (let* ((line-pref (get-text-property (point) 'line-prefix))
@@ -101,7 +105,7 @@ returned."
 			     `( line-prefix ,(aref vec 0)
 				wrap-prefix ,(aref vec 1)))
 	(goto-char (match-end 0))
-	(when (re-search-forward "^[ \t]*#\\+\\(?:end\\|END\\)_" nil 'noerror)
+	(when (re-search-forward org-modern-indent--end-re nil 'noerror)
 	  (let ((b (line-beginning-position))
 		(p (line-beginning-position 2)))
 	    (when (> b block-start)
@@ -146,7 +150,7 @@ returned."
 		(put-text-property (point) block-indent 'face nil))
 	      (cond
 	       ((eobp) nil)
-	       ((looking-at "^\\([ \t]*\\)#\\+\\(?:end\\|END\\)_")
+	       ((looking-at org-modern-indent--end-re)
 		(if (>= (length (match-string 1)) indent)
 		    (put-text-property (1- block-indent) block-indent
 				       'display org-modern-indent-end))
@@ -212,7 +216,7 @@ To be added as :filter-args advice."
   (setq org-modern-indent--refresh-args args))
 
 (defun org-modern-indent--refresh-watch (fun beg end &rest r)
-  "Watch for org-indent heading refreshes and rebuild prefixes as needed.
+  "Watch for org-indent heading refreshes and rebuild indent prefixes as needed.
 FUN is the wrapped function `org-indent-refresh-maybe', and BEG,
 END, and R are its arguments."
   (let ((hmod org-indent-modified-headline-flag) p end2 is-flush)
