@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2022
 ;; Version: 1.7
-;; Package-Requires: ((emacs "28.1") (compat "30"))
+;; Package-Requires: ((emacs "28.1") (org "9.5") (compat "30"))
 ;; URL: https://github.com/minad/org-modern
 ;; Keywords: outlines, hypermedia, text
 
@@ -818,7 +818,7 @@ whole buffer; otherwise, for the line at point."
           ,@(car specs))
          ("^\\([ \t]*\\)\\(#\\+\\(?:end\\|END\\)_\\)\\(\\S-+\\).*"
           ,@(cdr specs)))))
-   (when (fboundp 'org-activate-folds)
+   (when (fboundp 'org-activate-folds) ;; Since Org 9.7.25
      '(org-activate-folds))))
 
 ;;;###autoload
