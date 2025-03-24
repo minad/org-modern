@@ -295,9 +295,9 @@ To be added after `org-indent-refresh-maybe' on
 	(org-indent-add-properties beg end)))
     ;; If we had a level change, extend down to the next heading
     (when omi/-level-change-end (setq end (max end omi/-level-change-end)))
-    (remove-text-properties (omi/-lbp beg) (omi/-lbp end 2) '(omi/display nil))
-    (omi/-walk-blocks
-     beg end
+    (setq beg (omi/-lbp beg) end (omi/-lbp end 2))
+    (remove-text-properties beg end '(omi/display nil))
+    (omi/-walk-blocks beg end
      (lambda (bl-beg bl-end)
        (let ((beg0 bl-beg) (end0 bl-end)
 	     (pf (get-text-property bl-beg 'line-prefix))
