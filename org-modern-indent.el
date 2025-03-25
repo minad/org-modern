@@ -120,11 +120,10 @@ affiliated content like title as part of the block."
 BEG is at the beginning of the #+BEGIN line, and END is at the end of
 the #+END line."
   (let* ((bbeg (org-element-property :post-affiliated node)) ; on #+begin
-	 (blank-lines (org-element-property :post-blank node))
 	 (bend (save-excursion
 		 (goto-char (org-element-property :end node))
-		 (if (eobp) (point)
-		   (line-end-position (- blank-lines))))))
+		 (skip-chars-backward "\n\t ")
+		 (point))))
     (cons bbeg bend)))
 
 (defun omi/-walk-blocks (beg end fun)
