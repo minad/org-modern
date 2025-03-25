@@ -335,8 +335,8 @@ To be added to `org-indent-post-buffer-init-functions'."
 		     if (eq (car func) 'org-indent-refresh-maybe) do
 		     (setcdr func (cons #'omi/-after-change (cdr func))) and return t)
 	    (add-hook 'after-change-functions #'omi/-after-change 98 t))
-	(setq omi/-init t)
-	(org-with-wide-buffer (omi/-after-change (point-min) (point-max) nil))))))
+	(org-with-wide-buffer (omi/-after-change (point-min) (point-max) nil))
+	(setq omi/-init t)))))
 
 ;;;###autoload
 (define-minor-mode omi/mode
@@ -349,7 +349,7 @@ To be added to `org-indent-post-buffer-init-functions'."
 		    #'omi/-refresh-maybe-watch)
 	(cond
 	 ;; already registered before, just toggle
-	 (omi/-init (omi/init))
+	 ((or (called-interactively-p 'any) omi/-init) (omi/init))
 	 ;; Register with buffer init
 	 ((boundp 'org-indent-post-buffer-init-functions)
 	  (add-hook 'org-indent-post-buffer-init-functions #'omi/init nil t))
