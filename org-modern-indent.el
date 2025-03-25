@@ -57,7 +57,7 @@
 ;;;; Utility
 (defsubst omi/-lbp (p &optional n)
   "Return the line beginning position N at point P."
-  (save-excursion (goto-char p) (line-beginning-position n)))
+  (save-excursion (goto-char p) (pos-bol n)))
 
 ;;;; Block prefix cache
 (defvar omi/-prefixes (make-hash-table :test #'equal)
@@ -149,50 +149,50 @@ partially overlaps the region."
 	   (setq finished t)))))))
 
 ;;;; Drawing block brackets
-(defun omi/-draw-block (beg end beg0 end0 org-indent real-block-indent)
+(defun omi/-draw-block (beg end beg0 end0 org-indent real-indent)
   "Insert brackets for block between BEG and END.
 BEG0 and END0 represents the block's full range, corresponding to the
 line beginning/end positions of the block's #+BEGIN/END header/footer
 lines.  The `org-indent' prefix length at block header is ORG-INDENT,
-and REAL-BLOCK-INDENT is the amount of \"real\" (hard space) block
-indentation.  REAL-BLOCK-INDENT may be zero."
+and REAL-INDENT is the amount of \"real\" (hard space) block
+indentation.  REAL-INDENT may be zero."
   (with-silent-modifications
-    (pcase-let*
-	(((seq beg-str guide-str end-str)
-	  (omi/-prefix org-indent real-block-indent))
-	 ((seq beg-ind-str guide-ind-str end-ind-str)
-	  (and (> real-block-indent 0) (omi/-prefix real-block-indent 0)))
-	 (beg-bol (omi/-lbp beg))
-	 (body-start (max (omi/-lbp beg0 2) beg-bol))
-	 (lp-begin (and (= real-block-indent 0) `(line-prefix ,beg-str)))
-	 (lp-guide (and (= real-block-indent 0) `(line-prefix ,guide-str))))
-      (when (> body-start beg) ;; BEGIN
-	(add-text-properties beg-bol body-start
-			     `(,@lp-begin wrap-prefix ,guide-str))
-	(when (> real-block-indent 0)
-	  (put-text-property beg-bol (+ beg-bol real-block-indent)
-			     'omi/display beg-ind-str)))
-      (when (> end body-start)
-	(let* ((end-bol (omi/-lbp end))
-	       (end0-bol (omi/-lbp end0))
-	       (after-end (omi/-lbp end 2))
-	       (body-final (if (= end-bol end0-bol) end-bol after-end)))
-	  (add-text-properties body-start body-final ;; GUIDE BODY
-			       `(,@lp-guide wrap-prefix ,guide-str))
-	  (when (> real-block-indent 0)
-	    (goto-char body-start)
-	    (while (< (point) body-final)
-	      (when (>= (current-indentation) real-block-indent)
-		(put-text-property (point) (+ (point) real-block-indent)
-				   'omi/display guide-ind-str))
-	      (forward-line)))
-	  (when (= end-bol end0-bol) ;; END
-	    (if (= real-block-indent 0)
-		(put-text-property end-bol after-end 'line-prefix end-str)
-	      (goto-char end-bol)
-	      (when (>= (current-indentation) real-block-indent)
-		(put-text-property end-bol (+ end-bol real-block-indent)
-				   'omi/display end-ind-str)))))))))
+    (pcase-let* (((seq beg-prefix guide-prefix end-prefix)
+		  (omi/-prefix org-indent real-indent))
+		 ((seq beg-display guide-display end-display)
+		  (and (> real-indent 0) (omi/-prefix real-indent 0)))
+		 (beg-bol (omi/-lbp beg))
+		 (body-start (max (omi/-lbp beg0 2) beg-bol)))
+      (cl-macrolet ((add-prefixes (pbeg pend line-prefix wrap-prefix)
+		      `(add-text-properties ,pbeg ,pend
+			`(,@(and (= real-indent 0) `(line-prefix ,,line-prefix))
+			  wrap-prefix ,,wrap-prefix)))
+		    (add-guides (pbeg pend display-str)
+		      `(add-text-properties ,pbeg ,pend
+			`( omi/display ,,display-str field org-modern-indent
+			   rear-nonsticky t))))
+	(when (> body-start beg)  ;; BEGIN
+	  (add-prefixes beg-bol body-start beg-prefix guide-prefix)
+	  (when (> real-indent 0)
+	    (add-guides beg-bol (+ beg-bol real-indent) beg-display)))
+	(when (> end body-start)  ;; GUIDE BODY
+	  (let* ((end-bol (omi/-lbp end))
+		 (end0-bol (omi/-lbp end0))
+		 (after-end (omi/-lbp end 2))
+		 (body-final (if (= end-bol end0-bol) end-bol after-end)))
+	    (add-prefixes body-start body-final guide-prefix guide-prefix)
+	    (when (> real-indent 0)
+	      (goto-char body-start)
+	      (while (< (point) body-final)
+		(when (>= (current-indentation) real-indent)
+		  (add-guides (point) (+ (point) real-indent) guide-display))
+		(forward-line)))
+	    (when (= end-bol end0-bol) ;; END
+	      (if (= real-indent 0)
+		  (add-prefixes end-bol after-end end-prefix end-prefix)
+		(goto-char end-bol)
+		(when (>= (current-indentation) real-indent)
+		  (add-guides end-bol (+ end-bol real-indent) end-display))))))))))
 
 ;;;; org-indent interfacing
 (defvar-local omi/-level-change-end nil)
