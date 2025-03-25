@@ -169,8 +169,7 @@ indentation.  REAL-INDENT may be zero."
 			  wrap-prefix ,,wrap-prefix)))
 		    (add-guides (pbeg pend display-str)
 		      `(add-text-properties ,pbeg ,pend
-			`( omi/display ,,display-str field org-modern-indent
-			   rear-nonsticky t))))
+			`( omi/display ,,display-str rear-nonsticky t))))
 	(when (> body-start beg)  ;; BEGIN
 	  (add-prefixes beg-bol body-start beg-prefix guide-prefix)
 	  (when (> real-indent 0)
