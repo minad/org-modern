@@ -346,7 +346,6 @@ To be added to `org-indent-post-buffer-init-functions'."
       (progn
 	(advice-add 'org-indent-refresh-maybe :around
 		    #'omi/-refresh-maybe-watch)
-	(advice-add 'org-indent-region :before #'omi/-strip-display)
 	(cond
 	 ;; already registered before, just toggle
 	 (omi/-init (omi/-init (current-buffer)))
@@ -358,7 +357,6 @@ To be added to `org-indent-post-buffer-init-functions'."
 	(cl-pushnew 'omi/display
 		    (alist-get 'display char-property-alias-alist)))
     ;; Disabling
-    (advice-remove 'org-indent-region #'omi/-strip-display)
     (advice-remove 'org-indent-refresh-maybe #'omi/-refresh-maybe-watch)
     (remove-hook 'before-change-functions #'omi/-before-change t)
     (remove-hook 'after-change-functions #'omi/-after-change t)
