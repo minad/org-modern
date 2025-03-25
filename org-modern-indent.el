@@ -141,6 +141,7 @@ partially overlaps the region."
        (when node
 	 (cl-destructuring-bind (bbeg . bend) (omi/-block-beg-end node)
 	   (funcall fun bbeg bend)
+	   (goto-char bend)
 	   (when (>= bend end) (setq finished t)))) ; last block
        (unless finished
 	 (if (re-search-forward omi/begin-re end t)
