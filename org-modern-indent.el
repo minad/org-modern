@@ -217,7 +217,7 @@ END, and R are its arguments."
   "Wait for org-indent to finish initializing BUF, then refresh."
   (if (or (not (bound-and-true-p org-indent-agentized-buffers))
 	  (not (memq buf org-indent-agentized-buffers)))
-      (omi/-init buf)
+      (omi/init buf)
     ;; still waiting
     (when (buffer-live-p buf)
       (with-current-buffer buf
@@ -322,21 +322,22 @@ To be added after `org-indent-refresh-maybe' on
 	     (remove-text-properties bl-beg bl-end '(omi/display nil))))
 	 (omi/-draw-block bl-beg bl-end beg0 end0 (length pf) ci))))))
 
-
 ;;;; Mode/setup
-(defun omi/-init (buf)
+(defun omi/init (&optional buf)
   "Register buffer BUF and refresh.
 To be added to `org-indent-post-buffer-init-functions'."
-  (when (buffer-live-p buf)	     ; org-capture buffers vanish fast
-    (with-current-buffer buf
-      (add-hook 'before-change-functions #'omi/-before-change nil t)
-      (or (memq #'omi/-after-change after-change-functions)
-	  (cl-loop for func on after-change-functions
-		   if (eq (car func) 'org-indent-refresh-maybe) do
-		   (setcdr func (cons #'omi/-after-change (cdr func))) and return t)
-	  (add-hook 'after-change-functions #'omi/-after-change 98 t))
-      (setq omi/-init t)
-      (org-with-wide-buffer (omi/-after-change (point-min) (point-max) nil)))))
+  (interactive)
+  (let ((buf (or buf (current-buffer))))
+    (when (buffer-live-p buf)	     ; org-capture buffers vanish fast
+      (with-current-buffer buf
+	(add-hook 'before-change-functions #'omi/-before-change nil t)
+	(or (memq #'omi/-after-change after-change-functions)
+	    (cl-loop for func on after-change-functions
+		     if (eq (car func) 'org-indent-refresh-maybe) do
+		     (setcdr func (cons #'omi/-after-change (cdr func))) and return t)
+	    (add-hook 'after-change-functions #'omi/-after-change 98 t))
+	(setq omi/-init t)
+	(org-with-wide-buffer (omi/-after-change (point-min) (point-max) nil))))))
 
 ;;;###autoload
 (define-minor-mode omi/mode
@@ -349,10 +350,10 @@ To be added to `org-indent-post-buffer-init-functions'."
 		    #'omi/-refresh-maybe-watch)
 	(cond
 	 ;; already registered before, just toggle
-	 (omi/-init (omi/-init (current-buffer)))
+	 (omi/-init (omi/init))
 	 ;; Register with buffer init
 	 ((boundp 'org-indent-post-buffer-init-functions)
-	  (add-hook 'org-indent-post-buffer-init-functions #'omi/-init nil t))
+	  (add-hook 'org-indent-post-buffer-init-functions #'omi/init nil t))
 	 ;; No hook available, use the less reliable method
 	 (t (omi/-wait-and-refresh (current-buffer))))
 	(cl-pushnew 'omi/display
@@ -362,7 +363,7 @@ To be added to `org-indent-post-buffer-init-functions'."
     (remove-hook 'before-change-functions #'omi/-before-change t)
     (remove-hook 'after-change-functions #'omi/-after-change t)
     (if (boundp 'org-indent-post-buffer-init-functions)
-	(remove-hook 'org-indent-post-buffer-init-functions #'omi/-init t)
+	(remove-hook 'org-indent-post-buffer-init-functions #'omi/init t)
       (cancel-timer (car omi/-init))
       (setq omi/-init nil))
     (omi/-refresh)))
