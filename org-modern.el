@@ -284,6 +284,9 @@ on their font, e.g., the :width or :height parameters.  Themes
 should not override this face, since themes usually don't control
 the font.")
 
+(defface org-modern-habit nil
+  "Parent face for habits.")
+
 (defface org-modern-block-name
   '((t :height 0.8 :weight light))
   "Face used for block keywords.")
@@ -659,7 +662,7 @@ whole buffer; otherwise, for the line at point."
                        (face-attribute 'org-modern-label :box nil t))))
     (unless (equal (and (listp box) (plist-get box :color))
                    (face-attribute 'default :background nil t))
-      (org-modern--update-label-face)))
+      (org-modern--update-faces)))
   (let ((face-remapping-alist
          `((default org-table
             ,@(or (ensure-list (cdr (assq 'default face-remapping-alist)))
@@ -668,24 +671,22 @@ whole buffer; otherwise, for the line at point."
     (setq org-modern--table-sp-width (default-font-width)))
   (setf (cadr org-modern--table-overline) (face-attribute 'org-table :foreground nil t)))
 
-(defun org-modern--update-label-face ()
+(defun org-modern--update-faces ()
   "Update border of the `org-modern-label' face."
-  (set-face-attribute
-   'org-modern-label nil
-   :box
-   (when org-modern-label-border
-     (let ((border (if (integerp org-modern-label-border)
-                       org-modern-label-border
-                     (max 2 (cond
-                             ((integerp line-spacing)
-                              line-spacing)
-                             ((floatp line-spacing)
-                              (ceiling (* line-spacing (frame-char-height))))
-                             (t (/ (frame-char-height) 10)))))))
-       (list :color (face-attribute 'default :background nil t)
-             :line-width (cons -1 (- border)))))))
+  (let* ((border (if (integerp org-modern-label-border)
+                     org-modern-label-border
+                   (max 2 (cond
+                           ((integerp line-spacing)
+                            line-spacing)
+                           ((floatp line-spacing)
+                            (ceiling (* line-spacing (frame-char-height))))
+                           (t (/ (frame-char-height) 10))))))
+         (box (list :color (face-attribute 'default :background nil t)
+                    :line-width (cons -1 (- border)))))
+    (set-face-attribute 'org-modern-label nil :box box)
+    (set-face-attribute 'org-modern-habit nil :box box)))
 
-(defun org-modern--update-fringe-bitmaps ()
+(defun org-modern--update-bitmaps ()
   "Update fringe bitmaps."
   (when (and org-modern-block-fringe
              (fboundp 'fringe-bitmap-p)
@@ -860,8 +861,8 @@ whole buffer; otherwise, for the line at point."
     (add-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line nil 'local)
     (when (eq org-modern-star 'fold)
       (add-hook 'org-cycle-hook #'org-modern--cycle nil 'local))
-    (org-modern--update-label-face)
-    (org-modern--update-fringe-bitmaps))
+    (org-modern--update-faces)
+    (org-modern--update-bitmaps))
    (t
     (remove-from-invisibility-spec 'org-modern)
     (font-lock-remove-keywords nil org-modern--font-lock-keywords)
@@ -898,6 +899,12 @@ whole buffer; otherwise, for the line at point."
   (remove-from-invisibility-spec 'org-modern)
   (add-to-invisibility-spec 'org-modern) ;; Not idempotent?!
   (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
+  (setq-local face-remapping-alist (copy-tree face-remapping-alist))
+  (maphash (lambda (face _spec)
+             (when (string-prefix-p "org-habit-" (symbol-name face))
+               (setf (alist-get face face-remapping-alist nil 'remove)
+                     (and org-modern-label-border `(org-modern-habit ,face)))))
+           face--new-frame-defaults)
   (save-excursion
     (save-match-data
       (let (case-fold-search)
