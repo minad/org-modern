@@ -2,11 +2,14 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- Add ~org-modern-habit~ face to improve habit progress fontification.
+
 * Version 1.7 (2025-03-11)
 
 - Fix fontification of ellipsis.
 - Check that ~org-modern-label-border~ is an integer.
-- Add ~org-modern-habit~ face to improve habit progress fontification.
 
 * Version 1.6 (2024-12-22)
 
