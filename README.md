@@ -10,9 +10,11 @@ This small package approximately reproduces the block styling of `org-modern` wh
 
 
 ## Updates
-- v0.5 Another complete rewrite which dramatically improves
-  performance and accuracy.  Now based on `org-element` and
-  implemented via `before/after-change-functions`. Benefits include:
+- **v0.5.1**: Small simplifications for block drawing.
+- **v0.5**: Another complete rewrite which substantially improves
+  performance and accuracy.  Now block detection uses `org-element`
+  and the block styling is implemented in
+  `before/after-change-functions`. Benefits include:
   1. Higher performance and more reliable fontification.
   2. Ability to detect and correctly treat _damaged_ blocks
      (header/footer line altered or removed) as well as _merged_ blocks.
@@ -23,7 +25,7 @@ This small package approximately reproduces the block styling of `org-modern` wh
   Note that v0.5 implements indented block styling using display
   properties on the indentation text, so navigation will "skip over"
   it.
-- v0.1 features a complete re-write to use font-lock directly.  This
+- **v0.1**: features a complete re-write to use font-lock directly.  This
   has a few benefits:
   1. No longer relies on org-mode face names for recognizing
      blocks, so `org-src-block-faces` can have arbitrary faces
