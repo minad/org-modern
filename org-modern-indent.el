@@ -1,33 +1,34 @@
-;;; org-modern-indent.el --- Indent blocks like org-modern -*- lexical-binding: t -*-
+;;; org-modern-indent.el --- Style indented blocks -*- lexical-binding: t -*-
+
 ;; Copyright (C) 2022-2025  J.D. Smith
 
 ;; Author: J.D. Smith
-;; Homepage: https://github.com/jdtsmith/org-modern-indent
-;; Package-Requires: ((emacs "27.1") (org "9.6.1") (compat "30.0"))
-;; Version: 0.5.1
-;; Keywords: convenience
-;; Prefix: org-modern-indent
-;; Separator: -
+;; Created 2022
+;; Version: 0.6
+;; Package-Requires: ((emacs "27.1") (org "9.6") (compat "30"))
+;; URL: https://github.com/jdtsmith/org-modern-indent
+;; Keywords: convenience, text
 
-;; org-modern-indent is free software: you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License as
-;; published by the Free Software Foundation, either version 3 of the
-;; License, or (at your option) any later version.
+;; This file is part of GNU Emacs.
 
-;; org-modern-indent is distributed in the hope that it will be useful,
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-;; General Public License for more details.
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
-;; org-modern-indent approximates the block highlighting style of
-;; org-modern, when org-indent is enabled.
-;;   
-;; Can be used with or without org-modern.
+;; `org-modern-indent' is an `org-modern' extension which approximates
+;; the block highlighting style of `org-modern'.  By default, it is
+;; activated when `org-indent' is is active in the buffer.
 
 ;;; Code:
 (require 'compat)
