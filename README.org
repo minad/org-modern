@@ -22,7 +22,9 @@ syntax element individually via the =org-modern= customization group.
 [[https://github.com/minad/org-modern/blob/screenshots/example.gif?raw=true]]
 
 The screenshots shows [[file:example.org][example.org]] with =org-modern-mode= turned on and off. The
-elegant theme featured in the screenshot is [[https://protesilaos.com/emacs/modus-themes][modus-operandi]].
+elegant theme featured in the screenshot is [[https://protesilaos.com/emacs/modus-themes][modus-operandi]].  Since version 2.0,
+this package incorporates ~org-modern-indent~; see [[./README-INDENT.md][its README]] for more information
+and a screenshot.
 
 Since this package adjusts text styling, it depends on your font settings. You
 should ensure that your =variable-pitch= and =fixed-pitch= fonts combine
@@ -93,10 +95,35 @@ screenshot above after the installation of =org-modern=.
 (global-org-modern-mode)
 #+end_src
 
+An alternative setup, using ~use-package~:
+
+#+begin_src emacs-lisp
+  (use-package org-modern
+    :custom
+    (org-modern-hide-stars nil)
+    (org-modern-todo-faces
+     '(("STARTED" :foreground "yellow")
+       ("CANCELED" org-special-keyword :inverse-video t :weight bold)))
+    (org-modern-list
+     '((?* . "•")
+       (?+ . "‣")))
+    (org-modern-fold-stars
+     '(("▶" . "▼")
+       ("▷" . "▽")
+       ("▸" . "▾")
+       ("▹" . "▿")))
+    (org-modern-checkbox
+     '((?X . "✔")
+       (?- . "┅")
+       (?\s . " ")))
+    (org-modern-label-border 1)
+    :hook
+    (org-mode . org-modern-mode)
+    (org-agenda-finalize . org-modern-agenda))
+#+end_src
+
 * Incompatibilities
 
-- =org-indent-mode= is not compatible with the block prettification in the fringe.
-  If =org-indent-mode= is enabled, =org-modern= will disable the block prettification.
 - =org-num-mode= interferes with the =org-modern= prettification of TODO keywords.
 - =visual-wrap-prefix-mode= relies on the =wrap-prefix= text property which is also
   used by =org-modern=.

@@ -4,12 +4,15 @@ Modern block styling with `org-indent`.
 
 [`org-modern`](https://github.com/minad/org-modern) provides a clean and efficient org style.  The blocks (e.g. source, example) are particularly nicely decorated.  But when `org-indent` is enabled, the block "bracket", which uses the fringe area, is disabled.
 
-This small package approximately reproduces the block styling of `org-modern` when using `org-indent`.  It can be used with or without `org-modern`.  Recent versions support "bulk-indented" blocks nested within lists:
+This small package reproduces the block styling of `org-modern` when using `org-indent`. Recent versions support "bulk-indented" blocks nested within lists:
 
 <img width="716" alt="image" src="https://github.com/user-attachments/assets/7ca42ce7-dcfb-4c66-b5f4-1798a4fd4df5" />
 
+>[!NOTE]
+> Non-nil `line-spacing` is not recommended with this extension, as it leads to gap in the vertical bars drawn alongside blocks.
 
 ## Updates
+- **v0.6**: Merged as an `org-modern` extension.
 - **v0.5.1**: Small simplifications for block drawing.
 - **v0.5**: Another complete rewrite which substantially improves
   performance and accuracy.  Now block detection uses `org-element`
@@ -33,17 +36,6 @@ This small package approximately reproduces the block styling of `org-modern` wh
   2. Eliminates the "race" between font-locking and applying the prefix text properties.
   3. Enables in-text bracket decorations for "bulk-indented" blocks, for example blocks situated
      in an arbitrarily-nested plain list item.
-
-## Configure
-
-```elisp
-(use-package org-modern-indent
-  :load-path "~/code/emacs/org-modern-indent/"
-  ; or
-  ; :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent"))
-  :config ; add late to hook
-  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
-```
 
 >[!IMPORTANT]
 > `org-modern-indent` uses `org-indent`, and expects it to be enabled to achieve its formatting.  To activate `org-indent-mode` by default in all org files, set `org-startup-indented=t`.
@@ -88,26 +80,9 @@ The default `fixed-pitch` font (from which `org-meta-line` inherits) has line sp
 
 If you'd like a different face than `org-meta-line` for the "bracket", configure the `org-modern-indent-bracket-line` face.
 
-### Related config
+### Related configuration
 
-Optionally, if you want to use [org-modern](https://github.com/minad/org-modern) too (I do), a suggested config:
-
-```elisp
-(use-package org-modern
-  :ensure t
-  :custom
-  (org-modern-hide-stars nil)		; adds extra indentation
-  (org-modern-table nil)
-  (org-modern-list 
-   '(;; (?- . "-")
-     (?* . "•")
-     (?+ . "‣")))
-  :hook
-  (org-mode . org-modern-mode)
-  (org-agenda-finalize . org-modern-agenda))
-```
-
-Also optional; use org-bullets instead for nicely aligned bullet stars. 
+Optional; use org-bullets instead for nicely aligned bullet stars. 
 
 ```elisp
 (use-package org-bullets-mode
@@ -116,9 +91,7 @@ Also optional; use org-bullets instead for nicely aligned bullet stars.
   :hook org-mode)
 ```
 
-
 ## Related packages
 
-- [`org-modern`](https://github.com/minad/org-modern): A modern org styling.  Works best without org-indent.
 - [`org-bullets`](https://github.com/sabof/org-bullets): Unicode heading bullet replacement.
 - [`org-superstar`](https://github.com/integral-dw/org-superstar-mode): Prettify headings and plain lists.
