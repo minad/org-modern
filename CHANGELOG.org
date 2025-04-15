@@ -2,7 +2,7 @@
 #+author: Daniel Mendler & J.D. Smith
 #+language: en
 
-* Version 2.0 (2020-04-16)
+* Development
 
 - Merged [[https://github.com/jdtsmith/org-modern-indent][org-modern-indent]] as a new extension: Provides code block bracket
   styling when ~org-indent-mode~ is enabled.
