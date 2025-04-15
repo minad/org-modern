@@ -33,6 +33,16 @@ recommend variants of the [[https://github.com/be5invis/Iosevka][Iosevka]] font,
 the Org buffer. Larger values of =line-spacing= are not recommended, since Emacs
 does not center the text vertically (see Emacs [[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=76390][bug#76390]]).
 
+* Indent
+
+Since version 2.0, this package also incorporates ~org-modern-indent~, which provides block bracket styling when ~org-indent~ is enabled, including support for "bulk-indented" blocks nested within plain lists:
+
+#+html: <img width="716" alt="image" src="https://github.com/user-attachments/assets/7ca42ce7-dcfb-4c66-b5f4-1798a4fd4df5" />
+
+~org-modern-indent~ is enabled by ~org-modern~ by default if you use ~org-indent~; configure ~org-modern-indent-block=nil~ to disable this behavior. To activate ~org-indent-mode~ in all org files, set ~org-startup-indented=t~.  
+
+*Note*: Non-nil ~line-spacing~ is not recommended with ~org-modern-indent~, as it leads to gaps in the vertical bars drawn to indicate blocks.  
+
 * Configuration
 
 The package is available on GNU ELPA and MELPA. You can install the package with
@@ -93,13 +103,88 @@ screenshot above after the installation of =org-modern=.
 (global-org-modern-mode)
 #+end_src
 
+An alternative setup, using ~use-package~ and modifying some of the display entities:
+
+#+begin_src emacs-lisp
+  (use-package org-modern
+    :custom
+    (org-modern-hide-stars nil)
+    (org-modern-todo-faces
+     '(("STARTED" :foreground "yellow")
+       ("CANCELED" org-special-keyword :inverse-video t :weight bold)))
+    (org-modern-list
+     '((?* . "•")
+       (?+ . "‣")))
+    (org-modern-fold-stars
+     '(("▶" . "▼")
+       ("▷" . "▽")
+       ("▸" . "▾")
+       ("▹" . "▿")))
+    (org-modern-checkbox
+     '((?X . "✔")
+       (?- . "┅")
+       (?\s . " ")))
+    (org-modern-label-border 1)
+    :hook
+    (org-mode . org-modern-mode)
+    (org-agenda-finalize . org-modern-agenda))
+#+end_src
+
+
 * Incompatibilities
 
-- =org-indent-mode= is not compatible with the block prettification in the fringe.
-  If =org-indent-mode= is enabled, =org-modern= will disable the block prettification.
 - =org-num-mode= interferes with the =org-modern= prettification of TODO keywords.
 - =visual-wrap-prefix-mode= relies on the =wrap-prefix= text property which is also
   used by =org-modern=.
+
+* Block Indentation Hints
+
+A few hints for managing indented blocks.
+
+** Bulk-indented blocks (e.g. within plain lists):
+
+Bulk-indented blocks have "real" (space/tab) indentation applied and managed by org.  This extra indentation is applied by org on _top_ of the (fake, prefix-based) indentation used by org-indent.  To nest blocks properly within such indented content, e.g. in plain list items, you only have to begin the ~#+begin~ at the same level as the list element's text.
+
+As an important principle, ~org-modern-indent~ does not alter the contents of the text in your org documents, not even indentation.  It just styles what is there.  To help achieve proper block bulk-indented alignment, here are a few ways to alter blocks indentation using org and other commands:
+
+- **Start things right**: Hit return after your last line of text (e.g in a list item), then immediately hit =C-c C,= to create the desired block.  It will be indented at the right level:
+  
+  #+begin_src org
+     - This list item contains a:
+       - sublist, which holds a block:
+         [C-c C-,] here
+  #+end_src
+   
+- *Move flush left*: Note: =M-{= will get you to the start of a block quickly.  =M-\= at block start will move the block's first header line to column 0.  Then =M-S-left= (or =right=) will indent the full block.
+- *Indent rigidly*: =M-h= selects the entire block. Then =C-x TAB= enters "rigid indent" mode, after which left/right moves the entire block.
+- *Re-indent a block*: If you have a block that is partially aligned, perhaps with a "hanging end", like so:
+  
+  #+begin_src org
+   
+   - List 1
+       - List 2
+         ,#+begin_src lang
+            foo_lang(x)
+         ,#+end_src
+  #+end_src
+   
+  you can simply use =M-S-left/right= at block start (or in fact anywhere on the block header/footer) to ~org-indent-block~.  Note that ~org-src-preserve-indentation=nil~ is an important setting, to allow org to (re-)indent blocks to respect the local indentation inside list and other elements.  Also note that (from ~org-indent-region~): 
+
+  #+begin_quote
+  The function will not indent contents of example blocks, verse blocks and export blocks as leading white spaces are assumed to be significant there.
+  #+end_quote
+
+** Font spacing and faces
+
+The default ~fixed-pitch~ font (from which ~org-meta-line~ inherits) has line spacing >1.0 on some systems. This will introduce gaps _even if your default font is changed_, and ~line-space~ is nil.  To correct it, add: 
+
+#+begin_src emacs-lisp
+(set-face-attribute 'fixed-pitch nil :family "Hack" :height 1.0) ; or whatever font family
+#+end_src
+
+*** The bracket style 
+
+If you'd like a different face than ~org-meta-line~ for the "bracket", configure the ~org-modern-indent-bracket-line~ face.
 
 * Alternatives
 
@@ -116,7 +201,7 @@ table and block styling from =org-modern=. If you are interested in further
 tweaks, Emacs comes with the builtin =prettify-symbols-mode= which can be used for
 individual styling of custom keywords.
 
-Alternatives are the older =org-superstar= and =org-bullets= packages, which are
+Alternatives are the older [[https://github.com/integral-dw/org-superstar-mode][=org-superstar=]] and [[https://github.com/sabof/org-bullets][=org-bullets=]] packages, which are
 more limited and mainly adjust headlines and lists. =org-superstar= relies on
 character composition, while =org-modern= uses text properties, which are
 considered more future-proof. Note that =org-modern= is a full replacement for
