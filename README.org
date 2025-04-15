@@ -93,7 +93,7 @@ screenshot above after the installation of =org-modern=.
 (global-org-modern-mode)
 #+end_src
 
-An alternative setup, using ~use-package~:
+An alternative setup, using ~use-package~ and modifying some of the display entities:
 
 #+begin_src emacs-lisp
   (use-package org-modern
@@ -125,9 +125,11 @@ An alternative setup, using ~use-package~:
 
 Since version 2.0, this package incorporates ~org-modern-indent~, which provides block bracket styling when ~org-indent~ is enabled, including support for "bulk-indented" blocks nested within plain lists:
 
-https://github.com/user-attachments/assets/7ca42ce7-dcfb-4c66-b5f4-1798a4fd4df5
+#+html: <img width="716" alt="image" src="https://github.com/user-attachments/assets/7ca42ce7-dcfb-4c66-b5f4-1798a4fd4df5" />
 
-*Note*: non-nil ~line-spacing~ is not recommended with ~org-modern-indent~, as it leads to gaps in the vertical bars drawn to indicate blocks.
+~org-modern-indent~ is enabled by ~org-modern~ by default if you use ~org-indent~; configure ~org-modern-indent-block=nil~ to disable this behavior. To activate ~org-indent-mode~ in all org files, set ~org-startup-indented=t~.  
+
+*Note*: Non-nil ~line-spacing~ is not recommended with ~org-modern-indent~, as it leads to gaps in the vertical bars drawn to indicate blocks.  
 
 * Incompatibilities
 
@@ -135,7 +137,7 @@ https://github.com/user-attachments/assets/7ca42ce7-dcfb-4c66-b5f4-1798a4fd4df5
 - =visual-wrap-prefix-mode= relies on the =wrap-prefix= text property which is also
   used by =org-modern=.
 
-* Indentation Hints
+* Block Indentation Hints
 
 A few hints for managing indented blocks.
 
@@ -150,20 +152,20 @@ As an important principle, ~org-modern-indent~ does not alter the contents of th
   #+begin_src org
      - This list item contains a:
        - sublist, which holds a block:
-	        [C-c C-,] here
+         [C-c C-,] here
   #+end_src
    
-- **Move flush left**: Note: =M-{= will get you to the start of a block quickly.  =M-\= at block start will move the block's first header line to column 0.  Then =M-S-left= (or =right=) will indent the full block.
-- **Indent rigidly**: =M-h= selects the entire block. Then =C-x TAB= enters "rigid indent" mode, after which left/right moves the entire block.
-- **Re-indent a block**: If you have a block that is partially aligned, perhaps with a "hanging end", like so:
+- *Move flush left*: Note: =M-{= will get you to the start of a block quickly.  =M-\= at block start will move the block's first header line to column 0.  Then =M-S-left= (or =right=) will indent the full block.
+- *Indent rigidly*: =M-h= selects the entire block. Then =C-x TAB= enters "rigid indent" mode, after which left/right moves the entire block.
+- *Re-indent a block*: If you have a block that is partially aligned, perhaps with a "hanging end", like so:
   
   #+begin_src org
    
    - List 1
        - List 2
-	     ,#+begin_src lang
-		      foo_lang(x)
-	     ,#+end_src
+         ,#+begin_src lang
+            foo_lang(x)
+         ,#+end_src
   #+end_src
    
   you can simply use =M-S-left/right= at block start (or in fact anywhere on the block header/footer) to ~org-indent-block~.  Note that ~org-src-preserve-indentation=nil~ is an important setting, to allow org to (re-)indent blocks to respect the local indentation inside list and other elements.  Also note that (from ~org-indent-region~): 
@@ -180,7 +182,7 @@ The default ~fixed-pitch~ font (from which ~org-meta-line~ inherits) has line sp
 (set-face-attribute 'fixed-pitch nil :family "Hack" :height 1.0) ; or whatever font family
 #+end_src
 
-### The bracket style 
+*** The bracket style 
 
 If you'd like a different face than ~org-meta-line~ for the "bracket", configure the ~org-modern-indent-bracket-line~ face.
 
