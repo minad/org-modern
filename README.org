@@ -39,9 +39,9 @@ Since version 2.0, this package also incorporates ~org-modern-indent~, which pro
 
 #+html: <img width="716" alt="image" src="https://github.com/user-attachments/assets/7ca42ce7-dcfb-4c66-b5f4-1798a4fd4df5" />
 
-~org-modern-indent~ is enabled by ~org-modern~ by default if you use ~org-indent~; configure ~org-modern-indent-block=nil~ to disable this behavior. To activate ~org-indent-mode~ in all org files, set ~org-startup-indented=t~.  
+~org-modern-indent~ is enabled by ~org-modern~ by default if you use ~org-indent~; configure ~org-modern-block-indent=nil~ to disable this behavior. To activate ~org-indent-mode~ in all org files, set ~org-startup-indented=t~.
 
-*Note*: Non-nil ~line-spacing~ is not recommended with ~org-modern-indent~, as it leads to gaps in the vertical bars drawn to indicate blocks.  
+*Note*: Non-nil ~line-spacing~ is not recommended with ~org-modern-indent~, as it leads to gaps in the vertical bars drawn to indicate blocks.
 
 * Configuration
 
@@ -148,27 +148,27 @@ Bulk-indented blocks have "real" (space/tab) indentation applied and managed by 
 As an important principle, ~org-modern-indent~ does not alter the contents of the text in your org documents, not even indentation.  It just styles what is there.  To help achieve proper block bulk-indented alignment, here are a few ways to alter blocks indentation using org and other commands:
 
 - **Start things right**: Hit return after your last line of text (e.g in a list item), then immediately hit =C-c C,= to create the desired block.  It will be indented at the right level:
-  
+
   #+begin_src org
      - This list item contains a:
        - sublist, which holds a block:
          [C-c C-,] here
   #+end_src
-   
+
 - *Move flush left*: Note: =M-{= will get you to the start of a block quickly.  =M-\= at block start will move the block's first header line to column 0.  Then =M-S-left= (or =right=) will indent the full block.
 - *Indent rigidly*: =M-h= selects the entire block. Then =C-x TAB= enters "rigid indent" mode, after which left/right moves the entire block.
 - *Re-indent a block*: If you have a block that is partially aligned, perhaps with a "hanging end", like so:
-  
+
   #+begin_src org
-   
+
    - List 1
        - List 2
          ,#+begin_src lang
             foo_lang(x)
          ,#+end_src
   #+end_src
-   
-  you can simply use =M-S-left/right= at block start (or in fact anywhere on the block header/footer) to ~org-indent-block~.  Note that ~org-src-preserve-indentation=nil~ is an important setting, to allow org to (re-)indent blocks to respect the local indentation inside list and other elements.  Also note that (from ~org-indent-region~): 
+
+  you can simply use =M-S-left/right= at block start (or in fact anywhere on the block header/footer) to ~org-indent-block~.  Note that ~org-src-preserve-indentation=nil~ is an important setting, to allow org to (re-)indent blocks to respect the local indentation inside list and other elements.  Also note that (from ~org-indent-region~):
 
   #+begin_quote
   The function will not indent contents of example blocks, verse blocks and export blocks as leading white spaces are assumed to be significant there.
@@ -176,13 +176,13 @@ As an important principle, ~org-modern-indent~ does not alter the contents of th
 
 ** Font spacing and faces
 
-The default ~fixed-pitch~ font (from which ~org-meta-line~ inherits) has line spacing >1.0 on some systems. This will introduce gaps _even if your default font is changed_, and ~line-space~ is nil.  To correct it, add: 
+The default ~fixed-pitch~ font (from which ~org-meta-line~ inherits) has line spacing >1.0 on some systems. This will introduce gaps _even if your default font is changed_, and ~line-space~ is nil.  To correct it, add:
 
 #+begin_src emacs-lisp
 (set-face-attribute 'fixed-pitch nil :family "Hack" :height 1.0) ; or whatever font family
 #+end_src
 
-*** The bracket style 
+*** The bracket style
 
 If you'd like a different face than ~org-meta-line~ for the "bracket", configure the ~org-modern-indent-bracket-line~ face.
 

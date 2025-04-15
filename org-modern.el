@@ -225,8 +225,8 @@ which specifies the offset of the block border from the edge of
 the window."
   :type '(choice boolean natnum))
 
-(defcustom org-modern-indent-block t
-  "Whether to style indented blocks when using `org-indent'.
+(defcustom org-modern-block-indent t
+  "Whether to style indented blocks when using `org-indent-mode'.
 See `org-modern-indent-mode'."
   :type 'boolean)
 
@@ -383,8 +383,7 @@ the font.")
 (defconst org-modern--table-sp '((space :width (org-modern--table-sp-width))
                                  (space :width (org-modern--table-sp-width))))
 (defvar org-indent-mode)
-(defvar org-modern-indent-mode)
-(declare-function org-modern-indent-mode "org-modern-indent")
+(declare-function org-modern-indent-mode "ext:org-modern-indent")
 
 (defun org-modern--checkbox ()
   "Prettify checkboxes according to `org-modern-checkbox'."
@@ -871,7 +870,7 @@ whole buffer; otherwise, for the line at point."
       (add-hook 'org-cycle-hook #'org-modern--cycle nil 'local))
     (org-modern--update-faces)
     (org-modern--update-bitmaps)
-    (when (and org-indent-mode org-modern-indent-block)
+    (when (and org-indent-mode org-modern-block-indent)
       (org-modern-indent-mode 1)))
    (t
     (remove-from-invisibility-spec 'org-modern)
@@ -883,7 +882,8 @@ whole buffer; otherwise, for the line at point."
     (remove-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line 'local)
     (when (eq org-modern-star 'fold)
       (remove-hook 'org-cycle-hook #'org-modern--cycle 'local))
-    (when org-modern-indent-mode (org-modern-indent-mode 0))))
+    (when (bound-and-true-p org-modern-indent-mode)
+      (org-modern-indent-mode 0))))
   (without-restriction
     (with-silent-modifications
       (org-modern--unfontify (point-min) (point-max)))
