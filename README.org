@@ -23,7 +23,7 @@ syntax element individually via the =org-modern= customization group.
 
 The screenshots shows [[file:example.org][example.org]] with =org-modern-mode= turned on and off. The
 elegant theme featured in the screenshot is [[https://protesilaos.com/emacs/modus-themes][modus-operandi]].  Since version 2.0,
-this package incorporates ~org-modern-indent~; see [[./README-INDENT.md][its README]] for more information
+this package incorporates ~org-modern-indent~; see [[./README-indent.md][its README]] for more information
 and a screenshot.
 
 Since this package adjusts text styling, it depends on your font settings. You
