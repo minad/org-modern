@@ -86,7 +86,7 @@
   2. Caches all prefix strings for lower memory usage/GC churn.
   3. No more "runaway" formatting when partial blocks are created:
      only _real_ blocks (according to ~org-element~) are
-     
+
   Note that v0.5 implements indented block styling using display
   properties on the indentation text, so navigation will "skip over"
   it.
@@ -98,5 +98,3 @@
   2. Eliminates the "race" between font-locking and applying the prefix text properties.
   3. Enables in-text bracket decorations for "bulk-indented" blocks, for example blocks situated
      in an arbitrarily-nested plain list item.
-
-

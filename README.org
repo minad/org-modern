@@ -33,6 +33,16 @@ recommend variants of the [[https://github.com/be5invis/Iosevka][Iosevka]] font,
 the Org buffer. Larger values of =line-spacing= are not recommended, since Emacs
 does not center the text vertically (see Emacs [[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=76390][bug#76390]]).
 
+* Indent
+
+Since version 2.0, this package also incorporates ~org-modern-indent~, which provides block bracket styling when ~org-indent~ is enabled, including support for "bulk-indented" blocks nested within plain lists:
+
+#+html: <img width="716" alt="image" src="https://github.com/user-attachments/assets/7ca42ce7-dcfb-4c66-b5f4-1798a4fd4df5" />
+
+~org-modern-indent~ is enabled by ~org-modern~ by default if you use ~org-indent~; configure ~org-modern-indent-block=nil~ to disable this behavior. To activate ~org-indent-mode~ in all org files, set ~org-startup-indented=t~.  
+
+*Note*: Non-nil ~line-spacing~ is not recommended with ~org-modern-indent~, as it leads to gaps in the vertical bars drawn to indicate blocks.  
+
 * Configuration
 
 The package is available on GNU ELPA and MELPA. You can install the package with
@@ -120,16 +130,6 @@ An alternative setup, using ~use-package~ and modifying some of the display enti
     (org-agenda-finalize . org-modern-agenda))
 #+end_src
 
-
-* Indent
-
-Since version 2.0, this package incorporates ~org-modern-indent~, which provides block bracket styling when ~org-indent~ is enabled, including support for "bulk-indented" blocks nested within plain lists:
-
-#+html: <img width="716" alt="image" src="https://github.com/user-attachments/assets/7ca42ce7-dcfb-4c66-b5f4-1798a4fd4df5" />
-
-~org-modern-indent~ is enabled by ~org-modern~ by default if you use ~org-indent~; configure ~org-modern-indent-block=nil~ to disable this behavior. To activate ~org-indent-mode~ in all org files, set ~org-startup-indented=t~.  
-
-*Note*: Non-nil ~line-spacing~ is not recommended with ~org-modern-indent~, as it leads to gaps in the vertical bars drawn to indicate blocks.  
 
 * Incompatibilities
 
