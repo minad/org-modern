@@ -9,7 +9,7 @@ This small package reproduces the block styling of `org-modern` when using `org-
 <img width="716" alt="image" src="https://github.com/user-attachments/assets/7ca42ce7-dcfb-4c66-b5f4-1798a4fd4df5" />
 
 >[!NOTE]
-> Non-nil `line-spacing` is not recommended with this extension, as it leads to gap in the vertical bars drawn alongside blocks.
+> Non-nil `line-spacing` is not recommended with this extension, as it leads to gaps in the vertical bars drawn to indicate blocks.
 
 ## Updates
 - **v0.6**: Merged as an `org-modern` extension.
