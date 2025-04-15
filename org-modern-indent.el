@@ -1,9 +1,10 @@
 ;;; org-modern-indent.el --- Style indented blocks -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022-2025  J.D. Smith
+;; Copyright (C) 2022-2025 Free Software Foundation, Inc.
 
-;; Author: J.D. Smith
-;; Created 2022
+;; Author: J.D. Smith <jdtsmith+elpa@gmail.com>
+;; Maintainer: J.D. Smith <jdtsmith+elpa@gmail.com>
+;; Created: 2022
 ;; Keywords: convenience, text
 
 ;; This file is part of GNU Emacs.

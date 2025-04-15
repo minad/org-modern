@@ -3,7 +3,7 @@
 ;; Copyright (C) 2022-2025 Free Software Foundation, Inc.
 
 ;; Author: Daniel Mendler <mail@daniel-mendler.de>
-;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
+;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>, J.D. Smith <jdtsmith+elpa@gmail.com>
 ;; Created: 2022
 ;; Version: 1.7
 ;; Package-Requires: ((emacs "28.1") (org "9.5") (compat "30"))
