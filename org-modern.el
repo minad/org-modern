@@ -225,7 +225,7 @@ which specifies the offset of the block border from the edge of
 the window."
   :type '(choice boolean natnum))
 
-(defcustom org-modern-block-indent t
+(defcustom org-modern-block-indent nil
   "Whether to style indented blocks when using `org-indent-mode'.
 See `org-modern-indent-mode'."
   :type 'boolean)
