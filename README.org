@@ -98,6 +98,7 @@ An alternative setup, using ~use-package~ and modifying some of the display enti
 #+begin_src emacs-lisp
   (use-package org-modern
     :custom
+    (org-modern-block-indent t)  ; to enable org-modern-indent when org-indent is active
     (org-modern-hide-stars nil)
     (org-modern-todo-faces
      '(("STARTED" :foreground "yellow")
@@ -224,7 +225,7 @@ table and block styling from =org-modern=. If you are interested in further
 tweaks, Emacs comes with the builtin =prettify-symbols-mode= which can be used for
 individual styling of custom keywords.
 
-Alternatives are the older [[https://github.com/integral-dw/org-superstar-mode][=org-superstar=]] and [[https://github.com/sabof/org-bullets][=org-bullets=]] packages, which are
+Alternatives are the older [[https://github.com/integral-dw/org-superstar-mode][org-superstar]] and [[https://github.com/sabof/org-bullets][org-bullets]] packages, which are
 more limited and mainly adjust headlines and lists. =org-superstar= relies on
 character composition, while =org-modern= uses text properties, which are
 considered more future-proof. Note that =org-modern= is a full replacement for
