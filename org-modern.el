@@ -382,7 +382,6 @@ the font.")
 (defconst org-modern--table-overline '(:overline t))
 (defconst org-modern--table-sp '((space :width (org-modern--table-sp-width))
                                  (space :width (org-modern--table-sp-width))))
-(defvar org-indent-mode)
 (declare-function org-modern-indent-mode "ext:org-modern-indent")
 
 (defun org-modern--checkbox ()
@@ -870,7 +869,7 @@ whole buffer; otherwise, for the line at point."
       (add-hook 'org-cycle-hook #'org-modern--cycle nil 'local))
     (org-modern--update-faces)
     (org-modern--update-bitmaps)
-    (when (and org-indent-mode org-modern-block-indent)
+    (when (and (bound-and-true-p org-indent-mode) org-modern-block-indent)
       (org-modern-indent-mode 1)))
    (t
     (remove-from-invisibility-spec 'org-modern)
