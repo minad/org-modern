@@ -134,8 +134,8 @@ support for "bulk-indented" blocks nested within plain lists:
 ~org-modern-block-indent=t~ to enable. To activate ~org-indent-mode~ in all org
 files, set ~org-startup-indented=t~.
 
-*Note*: Currently =org-modern-indent= still requires zero ~line-spacing~, as it leads
-to gaps in the vertical bars drawn to indicate blocks, but hopefully this can be
+*Note*: Currently =org-modern-indent= requires zero ~line-spacing~, as it leads to
+gaps in the vertical bars drawn to indicate blocks, but hopefully this can be
 improved in the future.
 
 ** Bulk-indented blocks (e.g. within plain lists):
@@ -151,7 +151,7 @@ text in your org documents, not even indentation. It just styles what is there.
 To help achieve proper block bulk-indented alignment, here are a few ways to
 alter blocks indentation using org and other commands:
 
-- **Start things right**: Hit return after your last line of text (e.g in a list
+- *Start things right*: Hit return after your last line of text (e.g in a list
   item), then immediately hit =C-c C,= to create the desired block. It will be
   indented at the right level:
 
