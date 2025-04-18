@@ -209,6 +209,7 @@ the ~org-modern-indent-bracket-line~ face.
 - =org-num-mode= interferes with the =org-modern= prettification of TODO keywords.
 - =visual-wrap-prefix-mode= relies on the =wrap-prefix= text property which is also
   used by =org-modern=.
+- =org-modern-indent-mode= is incompatible with non-zero =line-spacing=.
 
 * Alternatives
 
