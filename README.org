@@ -128,7 +128,7 @@ Since version 2.0, this package also incorporates ~org-modern-indent~, which
 provides block bracket styling when ~org-indent-mode~ is enabled, including
 support for "bulk-indented" blocks nested within plain lists:
 
-#+html: <img width="716" alt="image" src="https://github.com/user-attachments/assets/7ca42ce7-dcfb-4c66-b5f4-1798a4fd4df5" />
+[[https://github.com/minad/org-modern/blob/screenshots/indent.png?raw=true]]
 
 ~org-modern-indent~ is disabled by ~org-modern~ by default. Configure
 ~org-modern-block-indent=t~ to enable. To activate ~org-indent-mode~ in all org
