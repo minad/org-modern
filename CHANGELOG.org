@@ -4,8 +4,9 @@
 
 * Development
 
-- Merged [[https://github.com/jdtsmith/org-modern-indent][org-modern-indent]] as a new extension: Provides code block bracket
-  styling when ~org-indent-mode~ is enabled.
+- Merged [[https://github.com/jdtsmith/org-modern-indent][org-modern-indent]] as a new extension.
+- Automatically provide code block bracket styling when ~org-indent~ is enabled using ~org-modern-indent-mode~.
+- Extend block face to cover brackets with ~org-modern-indent~.
 - Add ~org-modern-habit~ face to improve habit progress fontification.
 
 * Version 1.7 (2025-03-11)
