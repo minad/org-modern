@@ -5,7 +5,6 @@
 ;; Author: J.D. Smith <jdtsmith+elpa@gmail.com>
 ;; Maintainer: J.D. Smith <jdtsmith+elpa@gmail.com>
 ;; Created: 2022
-;; Keywords: convenience, text
 
 ;; This file is part of GNU Emacs.
 
@@ -25,8 +24,9 @@
 ;;; Commentary:
 
 ;; `org-modern-indent' is an `org-modern' extension which approximates
-;; the block highlighting style of `org-modern'.  By default, it is
-;; activated when `org-indent' is is active in the buffer.  It was
+;; the block highlighting style of `org-modern'.  If
+;; `org-modern-block-indent' is non-nil, it is activated when
+;; `org-indent' is is active in the buffer.  `org-modern-indent' was
 ;; merged into `org-modern' as of v2.0.
 
 ;;; Code:
