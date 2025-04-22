@@ -95,8 +95,9 @@ screenshot above after the installation of =org-modern=.
 
 * Incompatibilities
 
-- =org-indent-mode= is not compatible with the block prettification in the fringe.
-  If =org-indent-mode= is enabled, =org-modern= will disable the block prettification.
+- If =org-indent-mode= is enabled, =org-modern= will disable the block
+  prettification in the fringe. See the package [[https://github.com/jdtsmith/org-modern-indent][org-modern-indent]] which provides
+  a different mechanism for block styling, than using the fringe.
 - =org-num-mode= interferes with the =org-modern= prettification of TODO keywords.
 - =visual-wrap-prefix-mode= relies on the =wrap-prefix= text property which is also
   used by =org-modern=.
@@ -123,6 +124,10 @@ considered more future-proof. Note that =org-modern= is a full replacement for
 both =org-superstar= and =org-bullets=. You can disable styling of certain elements,
 e.g., =org-modern-timestamp=, if you only want to use the subset of =org-modern=
 equivalent to =org-superstar=.
+
+For an alternative source block styling technique, please take a look at the
+[[https://github.com/jdtsmith/org-modern-indent][org-modern-indent]] package. Org-modern-indent can even style source blocks when
+=org-indent-mode= is enabled.
 
 * Contributions
 
