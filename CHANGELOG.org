@@ -1,11 +1,9 @@
 #+title: org-modern.el - Changelog
-#+author: Daniel Mendler & J.D. Smith
+#+author: Daniel Mendler
 #+language: en
 
 * Development
 
-- Merged [[https://github.com/jdtsmith/org-modern-indent][org-modern-indent]] as a new extension: Provides code block bracket
-  styling when ~org-indent-mode~ is enabled.
 - Add ~org-modern-habit~ face to improve habit progress fontification.
 
 * Version 1.7 (2025-03-11)
@@ -69,32 +67,3 @@
 * Version 0.8 (2023-02-15)
 
 - Start of changelog.
-
-* org-modern-indent change history
-
-~org-modern-indent~ was incorporated as an extension to ~org-modern~ in v2.0.  The prior change history for ~org-modern-indent~ is as follows, based on its release versions as a separate package:
-
-- **v0.6**: Merged as an ~org-modern~ extension.
-- **v0.5.1**: Small simplifications for block drawing.
-- **v0.5**: Another complete rewrite which substantially improves
-  performance and accuracy.  Now block detection uses ~org-element~
-  and the block styling is implemented in
-  ~before/after-change-functions~. Benefits include:
-  1. Higher performance and more reliable fontification.
-  2. Ability to detect and correctly treat _damaged_ blocks
-     (header/footer line altered or removed) as well as _merged_ blocks.
-  2. Caches all prefix strings for lower memory usage/GC churn.
-  3. No more "runaway" formatting when partial blocks are created:
-     only _real_ blocks (according to ~org-element~) are
-
-  Note that v0.5 implements indented block styling using display
-  properties on the indentation text, so navigation will "skip over"
-  it.
-- **v0.1**: features a complete re-write to use font-lock directly.  This
-  has a few benefits:
-  1. No longer relies on org-mode face names for recognizing
-     blocks, so ~org-src-block-faces~ can have arbitrary faces
-     applied, e.g. for different ~src~ languages, as in the screenshot.
-  2. Eliminates the "race" between font-locking and applying the prefix text properties.
-  3. Enables in-text bracket decorations for "bulk-indented" blocks, for example blocks situated
-     in an arbitrarily-nested plain list item.
