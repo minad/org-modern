@@ -1,6 +1,6 @@
 blank_issues_enabled: false
 contact_links:
-  - name: "🙏 Please support my work on my many Emacs projects"
+  - name: "🙏 Please support my work on Org-modern and my other Emacs packages"
     url: https://github.com/sponsors/minad
     about: Thanks! Your support helps dedicating time to project maintenance and development.
   - name: "💡 Suggest a feature ➞ Please create a discussion"
