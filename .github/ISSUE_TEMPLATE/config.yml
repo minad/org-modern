@@ -1,0 +1,23 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "🙏 Please support my work on my many Emacs projects"
+    url: https://github.com/sponsors/minad
+    about: Thanks! Your support helps dedicating time to project maintenance and development.
+  - name: "💡 Suggest a feature ➞ Please create a discussion"
+    url: https://github.com/minad/org-modern/discussions/categories/ideas
+    about: Start a new discussion suggesting an improvement or a feature.
+  - name: "🧑‍🤝‍🧑 Ask the community for support"
+    url: https://www.reddit.com/r/emacs
+    about: Please be kind and support others.
+  - name: "🤓 Ask the maintainer for support ➞ Please create a discussion"
+    url: https://github.com/minad/org-modern/discussions/categories/q-a
+    about: Please keep in mind that my bandwidth is limited.
+  - name: "🔍 Search through old issues or discussions"
+    url: https://github.com/search?q=repo%3Aminad%2Forg-modern&type=issues
+    about: The same question may have been asked before.
+#  - name: "📝 Org-Modern wiki"
+#    url: https://github.com/minad/org-modern/wiki
+#    about: Additional configuration tips are covered there. Feel free to edit!
+  - name: "📖 Org-Modern manual"
+    url: https://github.com/minad/org-modern/blob/main/README.org
+    about: The manual covers the basic setup and workflow.
