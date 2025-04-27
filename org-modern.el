@@ -75,8 +75,9 @@ tree is folded or expanded."
 
 (defcustom org-modern-hide-stars 'leading
   "Changes the displays of the stars.
-Can be leading, t, or a string/character replacement for each
-leading star.  Set to nil to disable."
+Can be leading, t, or a string/character replacement for each leading
+star.  Set to nil to disable.  This feature is automatically disabled if
+`org-indent-mode' is enabled."
   :type '(choice
           (string :tag "Replacement string for leading stars")
           (character :tag "Replacement character for leading stars")
@@ -220,9 +221,10 @@ all other blocks."
 
 (defcustom org-modern-block-fringe 2
   "Add a border to the blocks in the fringe.
-This variable can also be set to an integer between 0 and 16,
-which specifies the offset of the block border from the edge of
-the window."
+This variable can also be set to an integer between 0 and 16, which
+specifies the offset of the block border from the edge of the
+window.  This feature is automatically disabled if `org-indent-mode' is
+enabled."
   :type '(choice boolean natnum))
 
 (defcustom org-modern-keyword t
@@ -531,17 +533,19 @@ the font.")
   "Prettify headline stars."
   (let* ((beg (match-beginning 1))
          (end (match-end 1))
-         (level (- end beg)))
+         (level (- end beg))
+         (hide-leading (and (eq org-modern-hide-stars 'leading)
+                            (not (bound-and-true-p org-indent-mode)))))
     (when (and org-modern--hide-stars-cache (not (eq beg end)))
       (cl-loop for i from beg below end do
                (put-text-property i (1+ i) 'display
                                   (nth (logand i 1)
                                        org-modern--hide-stars-cache))))
     (when org-modern-star
-      (when (and (eq org-modern-hide-stars 'leading) org-hide-leading-stars)
+      (when (and hide-leading org-hide-leading-stars)
         (put-text-property beg (1+ end) 'face (get-text-property end 'face)))
       (put-text-property
-       (if (eq org-modern-hide-stars 'leading) beg end)
+       (if hide-leading beg end)
        (1+ end) 'display
        (let ((cache (if (and org-modern--folded-star-cache
                              (org-invisible-p (pos-eol)))
@@ -727,9 +731,11 @@ whole buffer; otherwise, for the line at point."
    (when org-modern-checkbox
      `((,org-list-full-item-re
         (3 (org-modern--checkbox) nil t))))
-   (when (or org-modern-star org-modern-hide-stars)
+   (when (or org-modern-star (and org-modern-hide-stars
+                                  (not (bound-and-true-p org-indent-mode))))
      `(("^\\(\\**\\)\\* "
-        (0 ,(if (eq org-modern-hide-stars t)
+        (0 ,(if (and (eq org-modern-hide-stars t)
+                     (not (bound-and-true-p org-indent-mode)))
                 ''(face nil invisible org-modern)
               '(org-modern--star))))))
    (when org-modern-horizontal-rule
@@ -842,7 +848,8 @@ whole buffer; otherwise, for the line at point."
                                                     (mapcar #'cdr org-modern-fold-stars)
                                                   org-modern-replace-stars))))
      org-modern--hide-stars-cache
-     (and (char-or-string-p org-modern-hide-stars)
+     (and (and (char-or-string-p org-modern-hide-stars)
+               (not (bound-and-true-p org-indent-mode)))
           (list (org-modern--symbol org-modern-hide-stars)
                 (org-modern--symbol org-modern-hide-stars)))
      org-modern--checkbox-cache

@@ -4,7 +4,8 @@
 
 * Development
 
-- Add ~org-modern-habit~ face to improve habit progress fontification.
+- ~org-modern-habit~: New face to improve habit progress fontification.
+- ~org-modern-hide-stars~: Automatically disable if ~org-indent-mode~ is enabled.
 
 * Version 1.7 (2025-03-11)
 
