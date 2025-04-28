@@ -1,7 +1,7 @@
 ---
 title:
 name: 🐞 Bug report
-about: Report a bug. Do not use this for support requests and feature suggestions.
+about: Report a bug. Do not use this for questions, support or feature requests.
 ---
 
 Please provide precise information and the exact steps to reproduce the issue.
