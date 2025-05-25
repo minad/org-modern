@@ -685,8 +685,9 @@ whole buffer; otherwise, for the line at point."
                            ((floatp line-spacing)
                             (ceiling (* line-spacing (frame-char-height))))
                            (t (/ (frame-char-height) 10))))))
-         (box (list :color (face-attribute 'default :background nil t)
-                    :line-width (cons -1 (- border)))))
+	 (col (face-attribute 'default :background nil t))
+         (box `(,@(and col (list :color col))
+                :line-width (-1 . ,(- border)))))
     (set-face-attribute 'org-modern-label nil :box box)
     (set-face-attribute 'org-modern-habit nil :box box)))
 
