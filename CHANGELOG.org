@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.8 (2025-05-26)
 
 - ~org-modern-habit~: New face to improve habit progress fontification.
 - ~org-modern-hide-stars~: Automatically disable if ~org-indent-mode~ is enabled.
