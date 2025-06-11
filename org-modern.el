@@ -593,7 +593,7 @@ whole buffer; otherwise, for the line at point."
       (when separator
         (when (numberp org-modern-table-horizontal)
           (add-face-text-property tbeg tend org-modern--table-overline 'append)
-          (add-face-text-property beg (1+ end) `(:height ,org-modern-table-horizontal) 'append))
+          (add-face-text-property beg (min (1+ end) (point-max)) `(:height ,org-modern-table-horizontal) 'append))
         (while (re-search-forward "[^|+]+" tend 'noerror)
           (let ((a (match-beginning 0))
                 (b (match-end 0)))
