@@ -2,6 +2,10 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- Fix table fontification out-of-range bug. Thanks, Steven Allen!
+
 * Version 1.8 (2025-05-26)
 
 - ~org-modern-habit~: New face to improve habit progress fontification.
