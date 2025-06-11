@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.9 (2025-06-12)
 
 - Fix table fontification out-of-range bug. Thanks, Steven Allen!
 
