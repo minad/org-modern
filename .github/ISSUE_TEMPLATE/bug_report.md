@@ -14,9 +14,9 @@ also reinstall and recompile the involved packages, ideally remove all and
 reinstall all packages, to exclude compilation issues due to outdated
 dependencies.
 
-Please provide precise information and the exact steps to reproduce the issue.
-This is important to ensure that your problem can be reproduced on a different
-machine.
+Please provide precise information, stack traces and the exact steps to
+reproduce the issue. This is important to ensure that your problem can be
+reproduced on a different machine.
 
 If you are not really sure if your issue is a bug, please open a discussion
 instead.
