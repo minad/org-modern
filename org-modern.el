@@ -742,7 +742,7 @@ whole buffer; otherwise, for the line at point."
      `(("^[ \t]*-\\{5,\\}$" 0
         '(face org-modern-horizontal-rule display
                ,(if (eq org-modern-horizontal-rule t)
-                    '(space :width text)
+                    '(space :width (- text 1))
                   org-modern-horizontal-rule)))))
    (when org-modern-table
      '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
