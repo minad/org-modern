@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.11 (2025-12-19)
 
 - Bugfixes
 
