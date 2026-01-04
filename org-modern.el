@@ -407,15 +407,15 @@ the font.")
   (let* ((beg (match-beginning 1))
          (end (match-end 1))
          (prio (char-before (1- end))))
-    (if-let ((rep (and (consp org-modern-priority)
-                       (cdr (assq prio org-modern-priority)))))
+    (if-let* ((rep (and (consp org-modern-priority)
+                        (cdr (assq prio org-modern-priority)))))
         (put-text-property beg end 'display rep)
       (put-text-property beg (1+ beg) 'display " ")
       (put-text-property (1- end) end 'display " ")
       (put-text-property
        beg end 'face
-       (if-let ((face (or (cdr (assq prio org-modern-priority-faces))
-                          (cdr (assq t org-modern-priority-faces)))))
+       (if-let* ((face (or (cdr (assq prio org-modern-priority-faces))
+                           (cdr (assq t org-modern-priority-faces)))))
            `(,face org-modern-label)
          'org-modern-priority)))))
 
@@ -465,9 +465,9 @@ the font.")
                                (string (char-before cbeg) ?\s))
             (put-text-property
              colon-end cbeg 'face
-             (if-let ((faces org-modern-tag-faces)
-                      (face (or (cdr (assoc (buffer-substring-no-properties colon-end cbeg) faces))
-                                (cdr (assq t faces)))))
+             (if-let* ((faces org-modern-tag-faces)
+                       (face (or (cdr (assoc (buffer-substring-no-properties colon-end cbeg) faces))
+                                 (cdr (assq t faces)))))
                  `(,face org-modern-tag)
                'org-modern-tag)))
           (add-text-properties cbeg cend colon-props)
@@ -483,8 +483,8 @@ the font.")
     (put-text-property (1- end) end 'display (string (char-before end) ?\s))
     (put-text-property
      beg end 'face
-     (if-let ((face (or (cdr (assoc todo org-modern-todo-faces))
-                        (cdr (assq t org-modern-todo-faces)))))
+     (if-let* ((face (or (cdr (assoc todo org-modern-todo-faces))
+                         (cdr (assq t org-modern-todo-faces)))))
          `(,face org-modern-label)
        (if (string-match-p org-not-done-regexp todo)
            'org-modern-todo 'org-modern-done)))))
@@ -662,8 +662,8 @@ whole buffer; otherwise, for the line at point."
 
 (defun org-modern--pre-redisplay (_)
   "Compute font parameters before redisplay."
-  (when-let ((box (and org-modern-label-border
-                       (face-attribute 'org-modern-label :box nil t))))
+  (when-let* ((box (and org-modern-label-border
+                        (face-attribute 'org-modern-label :box nil t))))
     (unless (equal (and (listp box) (plist-get box :color))
                    (face-attribute 'default :background nil t))
       (org-modern--update-faces)))
@@ -716,11 +716,11 @@ whole buffer; otherwise, for the line at point."
 (defun org-modern--make-font-lock-keywords ()
   "Compute font-lock keywords."
   (append
-   (when-let ((bullet (alist-get ?+ org-modern-list)))
+   (when-let* ((bullet (alist-get ?+ org-modern-list)))
      `(("^[ \t]*\\(+\\)[ \t]" 1 '(face nil display ,bullet))))
-   (when-let ((bullet (alist-get ?- org-modern-list)))
+   (when-let* ((bullet (alist-get ?- org-modern-list)))
      `(("^[ \t]*\\(-\\)[ \t]" 1 '(face nil display ,bullet))))
-   (when-let ((bullet (alist-get ?* org-modern-list)))
+   (when-let* ((bullet (alist-get ?* org-modern-list)))
      `(("^[ \t]+\\(*\\)[ \t]" 1 '(face nil display ,bullet))))
    (when org-modern-priority
      `(("^\\*+.*? \\(\\(\\[\\)#.\\(\\]\\)\\) "
@@ -748,12 +748,12 @@ whole buffer; otherwise, for the line at point."
      '(("^[ \t]*\\(|.*|\\)[ \t]*$" (0 (org-modern--table)))))
    (when org-modern-footnote
      `(("^\\(\\[fn:\\)[[:word:]-_]+\\]" ;; Definition
-        ,@(if-let ((x (car org-modern-footnote)))
+        ,@(if-let* ((x (car org-modern-footnote)))
               `((0 '(face nil display ,x))
                 (1 '(face nil display ,(propertize "[" 'display x))))
             '((1 '(face nil display "[")))))
        ("[^\n]\\(\\(\\[fn:\\)[[:word:]-_]+\\]\\)" ;; Reference
-        ,@(if-let ((x (cdr org-modern-footnote)))
+        ,@(if-let* ((x (cdr org-modern-footnote)))
               `((1 '(face nil display ,x))
                 (2 '(face nil display ,(propertize "[" 'display x))))
             '((2 '(face nil display "[")))))))
@@ -918,10 +918,10 @@ whole buffer; otherwise, for the line at point."
         (when org-modern-todo
           (goto-char (point-min))
           (while (< (point) (point-max))
-            (when-let ((org-not-done-regexp (get-text-property (point) 'org-not-done-regexp))
-                       (re (get-text-property (point) 'org-todo-regexp))
-                       (re (concat "[: ]" re " "))
-                       ((re-search-forward re (pos-eol) 'noerror)))
+            (when-let* ((org-not-done-regexp (get-text-property (point) 'org-not-done-regexp))
+                        (re (get-text-property (point) 'org-todo-regexp))
+                        (re (concat "[: ]" re " "))
+                        ((re-search-forward re (pos-eol) 'noerror)))
               (org-modern--todo))
             (goto-char (min (1+ (pos-eol)) (point-max)))))
         (when org-modern-tag
@@ -933,7 +933,7 @@ whole buffer; otherwise, for the line at point."
           (goto-char (point-min))
           (while (re-search-forward "\\(\\[#.\\]\\)" nil 'noerror)
             ;; For some reason the org-agenda-fontify-priorities adds overlays?!
-            (when-let ((ov (overlays-at (match-beginning 0))))
+            (when-let* ((ov (overlays-at (match-beginning 0))))
               (overlay-put (car ov) 'face nil))
             (org-modern--priority)))))))
 
