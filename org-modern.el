@@ -47,11 +47,11 @@
   :group 'org
   :prefix "org-modern-")
 
-(defcustom org-modern-label-border 'auto
+(defcustom org-modern-label-border 0.1
   "Line width used for tag label borders.
-If set to `auto' the border width is computed based on the `line-spacing'.
-A value between 0.1 and 0.4 of `line-spacing' is recommended."
-  :type '(choice (const nil) (const auto) integer))
+Integers are interpreted as pixels and floats as fraction of the
+character height."
+  :type '(choice (const nil) function number))
 
 (defcustom org-modern-star 'fold
   "Style heading stars.
@@ -677,14 +677,14 @@ whole buffer; otherwise, for the line at point."
 
 (defun org-modern--update-faces ()
   "Update border of the `org-modern-label' face."
-  (let* ((border (if (integerp org-modern-label-border)
-                     org-modern-label-border
-                   (max 2 (cond
-                           ((integerp line-spacing)
-                            line-spacing)
-                           ((floatp line-spacing)
-                            (ceiling (* line-spacing (frame-char-height))))
-                           (t (/ (frame-char-height) 10))))))
+  (let* ((border (pcase org-modern-label-border
+                   ((pred integerp)
+                    org-modern-label-border)
+                   ((pred floatp)
+                    (ceiling (* (frame-char-height) org-modern-label-border)))
+                   ((pred functionp)
+                    (funcall org-modern-label-border))
+                   (_ 2)))
          (box (list :color (face-attribute 'default :background nil t)
                     :line-width (cons -1 (- border)))))
     (set-face-attribute 'org-modern-label nil :box box)
