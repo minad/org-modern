@@ -2,6 +2,10 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- =org-modern-label-border=: Support functions to compute border width.
+
 * Version 1.11 (2025-12-19)
 
 - Bugfixes
