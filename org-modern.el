@@ -787,7 +787,7 @@ whole buffer; otherwise, for the line at point."
                  org-tag-re ":\\)+\\)[ \t]*$")
         (0 (org-modern--tag)))))
    (when org-modern-keyword
-     `(("^[ \t]*\\(#\\+\\)\\([^: \t\n]+\\):"
+     `(("^[ \t]*\\(#\\+\\)\\([^:[ \t\n]+\\)[[:]"
         ,@(pcase org-modern-keyword
             ('t '(1 '(face nil invisible org-modern)))
             ((pred stringp) `(1 '(face nil display ,org-modern-keyword)))
