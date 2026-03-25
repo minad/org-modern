@@ -61,6 +61,12 @@ Can be nil, fold or replace.  See `org-modern-fold-stars' and
                  (const :tag "Folding indicators" fold)
                  (const :tag "Replace" replace)))
 
+(defcustom org-modern-cycle-stars nil
+  "For deeply nested headlines use cycling.
+If set to nil, the last star is used for all deep headlines.  See
+`org-modern-fold-stars' and `org-modern-replace-stars'."
+  :type 'boolean)
+
 (defcustom org-modern-replace-stars "◉○◈◇✳"
   "Replacement strings for headline stars for each level."
   :type '(choice string (repeat string)))
@@ -550,7 +556,10 @@ the font.")
                              (org-invisible-p (pos-eol)))
                         org-modern--folded-star-cache
                       org-modern--expanded-star-cache)))
-         (aref cache (min (1- (length cache)) level)))))))
+         (aref cache
+               (if org-modern-cycle-stars
+                   (mod level (length cache))
+                 (min (1- (length cache)) level))))))))
 
 (defun org-modern--cycle (state)
   "Flush font-lock for buffer or line at point for `org-cycle-hook'.

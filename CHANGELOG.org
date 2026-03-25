@@ -2,6 +2,10 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- Add new customization option ~org-modern-cycle-stars~.
+
 * Version 1.13 (2026-03-09)
 
 - Prettify ~#+caption[short caption]: ...~
