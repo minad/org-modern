@@ -7,8 +7,6 @@
 #+texinfo_dir_desc: Modern Org Style
 
 #+html: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true"/></a>
-#+html: <a href="https://elpa.gnu.org/packages/org-modern.html"><img alt="GNU ELPA" src="https://elpa.gnu.org/packages/org-modern.svg"/></a>
-#+html: <a href="https://elpa.gnu.org/devel/org-modern.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/org-modern.svg"/></a>
 #+html: <a href="https://melpa.org/#/org-modern"><img alt="MELPA" src="https://melpa.org/packages/org-modern-badge.svg"/></a>
 #+html: <a href="https://stable.melpa.org/#/org-modern"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/org-modern-badge.svg"/></a>
 
@@ -32,7 +30,7 @@ recommend variants of the [[https://github.com/be5invis/Iosevka][Iosevka]] font,
 
 * Configuration
 
-The package is available on GNU ELPA and MELPA. You can install the package with
+The package is available from MELPA. You can install the package with
 =package-install=. Then =org-modern= can be enabled manually in an Org buffer by
 invoking =M-x org-modern-mode=. In order to enable =org-modern= for all your Org
 buffers, add =org-modern-mode= to the Org mode hooks.
@@ -129,8 +127,3 @@ equivalent to =org-superstar=.
 For an alternative source block styling technique, please take a look at the
 [[https://github.com/jdtsmith/org-modern-indent][org-modern-indent]] package. Org-modern-indent can even style source blocks when
 =org-indent-mode= is enabled.
-
-* Contributions
-
-Since this package is part of [[https://elpa.gnu.org/packages/org-modern.html][GNU ELPA]] contributions require a copyright
-assignment to the FSF.
