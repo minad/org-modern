@@ -914,12 +914,17 @@ whole buffer; otherwise, for the line at point."
   (remove-from-invisibility-spec 'org-modern)
   (add-to-invisibility-spec 'org-modern) ;; Not idempotent?!
   (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
-  (setq-local face-remapping-alist (copy-tree face-remapping-alist))
-  (maphash (lambda (face _spec)
-             (when (string-prefix-p "org-habit-" (symbol-name face))
-               (setf (alist-get face face-remapping-alist nil 'remove)
-                     (and org-modern-label-border `(org-modern-habit ,face)))))
-           face--new-frame-defaults)
+  (make-local-variable 'face-remapping-alist)
+  (setq face-remapping-alist
+        (cl-remove-if (lambda (e)
+                        (and (symbolp (car e))
+                             (string-prefix-p "org-habit-" (symbol-name (car e)))))
+                      face-remapping-alist))
+  (when org-modern-label-border
+    (maphash (lambda (face _spec)
+               (when (string-prefix-p "org-habit-" (symbol-name face))
+                 (push `(,face org-modern-habit ,face) face-remapping-alist)))
+             face--new-frame-defaults))
   (save-excursion
     (save-match-data
       (let (case-fold-search)
