@@ -32,7 +32,7 @@ recommend variants of the [[https://github.com/be5invis/Iosevka][Iosevka]] font,
 
 * Configuration
 
-The package is available from [[https://elpa.gnu.org/devel/org-modern.html][ELPA]] or [[https://melpa.org/#/org-modern][MELPA]]. You can install the package with
+The package is available from [[https://elpa.gnu.org/packages/org-modern.html][ELPA]] or [[https://melpa.org/#/org-modern][MELPA]]. You can install the package with
 =package-install=. Then =org-modern= can be enabled manually in an Org buffer by
 invoking =M-x org-modern-mode=. In order to enable =org-modern= for all your Org
 buffers, add =org-modern-mode= to the Org mode hooks.
