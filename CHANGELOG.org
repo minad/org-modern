@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.14 (2026-05-19)
 
 - Add new customization option ~org-modern-cycle-stars~.
 - Require Compat 31.
