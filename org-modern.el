@@ -456,7 +456,11 @@ the font.")
   "Prettify headline tags."
   (save-excursion
     (let* ((default-face (get-text-property (match-beginning 1) 'face))
-           (colon-props `(display " " face ,default-face))
+           ;; Render the colons as stretch glyphs and pad the tag labels
+           ;; with no-break spaces, since plain spaces in display strings
+           ;; are word wrapping break points, which break the tags apart
+           ;; under `visual-line-mode'.
+           (colon-props `(display (space :width 1) face ,default-face))
            (beg (match-beginning 2))
            (end (match-end 2))
            colon-beg colon-end)
@@ -466,9 +470,9 @@ the font.")
               (cend (match-end 0)))
           (when colon-beg
             (put-text-property colon-end (1+ colon-end) 'display
-                               (format #(" %c" 1 3 (cursor t)) (char-after colon-end)))
+                               (format #("\u00a0%c" 1 3 (cursor t)) (char-after colon-end)))
             (put-text-property (1- cbeg) cbeg 'display
-                               (string (char-before cbeg) ?\s))
+                               (string (char-before cbeg) ?\N{NO-BREAK SPACE}))
             (put-text-property
              colon-end cbeg 'face
              (if-let* ((faces org-modern-tag-faces)
@@ -847,6 +851,9 @@ whole buffer; otherwise, for the line at point."
   (cond
    (org-modern-mode
     (add-to-invisibility-spec 'org-modern)
+    ;; The tag labels are padded with no-break spaces.  Disable their
+    ;; highlighting in order to avoid artifacts.
+    (setq-local nobreak-char-display nil)
     (setq
      org-modern--folded-star-cache
      (and (eq org-modern-star 'fold)
@@ -881,6 +888,7 @@ whole buffer; otherwise, for the line at point."
     (org-modern--update-bitmaps))
    (t
     (remove-from-invisibility-spec 'org-modern)
+    (kill-local-variable 'nobreak-char-display)
     (font-lock-remove-keywords nil org-modern--font-lock-keywords)
     (font-lock-add-keywords nil org-font-lock-keywords)
     (setq-local font-lock-unfontify-region-function #'org-unfontify-region)
@@ -914,6 +922,7 @@ whole buffer; otherwise, for the line at point."
   "Finalize Org agenda highlighting."
   (remove-from-invisibility-spec 'org-modern)
   (add-to-invisibility-spec 'org-modern) ;; Not idempotent?!
+  (setq-local nobreak-char-display nil)
   (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
   (setq-local face-remapping-alist (copy-tree face-remapping-alist))
   (maphash (lambda (face _spec)
