@@ -457,9 +457,11 @@ the font.")
   (save-excursion
     (let* ((default-face (get-text-property (match-beginning 1) 'face))
            ;; Render the colons as stretch glyphs and pad the tag labels
-           ;; with no-break spaces, since plain spaces in display strings
-           ;; are word wrapping break points, which break the tags apart
-           ;; under `visual-line-mode'.
+           ;; by composing the first and last label characters with
+           ;; no-break spaces, since plain spaces in display strings are
+           ;; word wrapping break points, which break the tags apart
+           ;; under `visual-line-mode'.  Compositions are exempt both
+           ;; from word wrapping and from `nobreak-char-display'.
            (colon-props `(display (space :width 1) face ,default-face))
            (beg (match-beginning 2))
            (end (match-end 2))
@@ -469,10 +471,10 @@ the font.")
         (let ((cbeg (match-beginning 0))
               (cend (match-end 0)))
           (when colon-beg
-            (put-text-property colon-end (1+ colon-end) 'display
-                               (format #("\u00a0%c" 1 3 (cursor t)) (char-after colon-end)))
-            (put-text-property (1- cbeg) cbeg 'display
-                               (string (char-before cbeg) ?\N{NO-BREAK SPACE}))
+            (compose-region colon-end (1+ colon-end)
+                            (list ?\N{NO-BREAK SPACE} '(Br . Bl) (char-after colon-end)))
+            (compose-region (1- cbeg) cbeg
+                            (list (char-before cbeg) '(Br . Bl) ?\N{NO-BREAK SPACE}))
             (put-text-property
              colon-end cbeg 'face
              (if-let* ((faces org-modern-tag-faces)
@@ -851,9 +853,6 @@ whole buffer; otherwise, for the line at point."
   (cond
    (org-modern-mode
     (add-to-invisibility-spec 'org-modern)
-    ;; The tag labels are padded with no-break spaces.  Disable their
-    ;; highlighting in order to avoid artifacts.
-    (setq-local nobreak-char-display nil)
     (setq
      org-modern--folded-star-cache
      (and (eq org-modern-star 'fold)
@@ -888,7 +887,6 @@ whole buffer; otherwise, for the line at point."
     (org-modern--update-bitmaps))
    (t
     (remove-from-invisibility-spec 'org-modern)
-    (kill-local-variable 'nobreak-char-display)
     (font-lock-remove-keywords nil org-modern--font-lock-keywords)
     (font-lock-add-keywords nil org-font-lock-keywords)
     (setq-local font-lock-unfontify-region-function #'org-unfontify-region)
@@ -912,8 +910,8 @@ whole buffer; otherwise, for the line at point."
          (append
           ;; Only remove line/wrap-prefix if block fringes are used
           (if (and org-modern-block-fringe (not (bound-and-true-p org-indent-mode)))
-              '(wrap-prefix line-prefix display invisible)
-            '(display invisible))
+              '(wrap-prefix line-prefix display invisible composition)
+            '(display invisible composition))
           font-lock-extra-managed-props)))
     (org-unfontify-region beg end)))
 
@@ -922,7 +920,6 @@ whole buffer; otherwise, for the line at point."
   "Finalize Org agenda highlighting."
   (remove-from-invisibility-spec 'org-modern)
   (add-to-invisibility-spec 'org-modern) ;; Not idempotent?!
-  (setq-local nobreak-char-display nil)
   (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
   (setq-local face-remapping-alist (copy-tree face-remapping-alist))
   (maphash (lambda (face _spec)
