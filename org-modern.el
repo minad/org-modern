@@ -471,6 +471,11 @@ the font.")
            (beg (match-beginning 2))
            (end (match-end 2))
            colon-beg colon-end)
+      ;; Display the space before the tags as two spaces, such that the
+      ;; leading padding stretch on the first colon does not reduce the
+      ;; gap before the first label.  Only the last space of the
+      ;; matched whitespace is affected.
+      (put-text-property (1- beg) beg 'display "  ")
       (goto-char beg)
       (while (re-search-forward "::?" end 'noerror)
         (let ((cbeg (match-beginning 0))
@@ -482,7 +487,7 @@ the font.")
                             `(,face org-modern-tag)
                           'org-modern-tag)))
               (add-text-properties colon-beg colon-end
-                                   `(display (space :width 1) face ,face))
+                                   `(display (space :relative-width 1) face ,face))
               (put-text-property (1- cbeg) cbeg 'display
                                  (concat (string (char-before cbeg) ?\s)
                                          ;; The face of the underlying label
@@ -494,7 +499,12 @@ the font.")
                                                        'default))))
               (put-text-property colon-end cbeg 'face face)))
           (add-text-properties cbeg cend colon-props)
-          (setq colon-beg cbeg colon-end cend))))))
+          (setq colon-beg cbeg colon-end cend)))
+      ;; The final colon provides the trailing gap, drop the gap space
+      ;; from the display string of the last label.
+      (when colon-beg
+        (put-text-property (1- colon-beg) colon-beg 'display
+                           (string (char-before colon-beg) ?\s))))))
 
 (defun org-modern--todo ()
   "Prettify headline todo keywords."
