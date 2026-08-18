@@ -312,7 +312,10 @@ the font.")
   "Face used for incomplete section of progress bars (colors only).")
 
 (defface org-modern-tag
-  '((default :inherit (secondary-selection org-modern-label))
+  ;; The explicit :extend nil overrides the inherited :extend of
+  ;; `secondary-selection', such that the face does not bleed to the
+  ;; end of the line when a headline wraps at one of the tag spaces.
+  '((default :inherit (secondary-selection org-modern-label) :extend nil)
     (((background light)) :foreground "black")
     (t :foreground "white"))
   "Face used for tag labels.")
@@ -456,12 +459,14 @@ the font.")
   "Prettify headline tags."
   (save-excursion
     (let* ((default-face (get-text-property (match-beginning 1) 'face))
-           ;; Render the colons as stretch glyphs and pad the tag labels
-           ;; by composing the first and last label characters with
-           ;; no-break spaces, since plain spaces in display strings are
-           ;; word wrapping break points, which break the tags apart
-           ;; under `visual-line-mode'.  Compositions are exempt both
-           ;; from word wrapping and from `nobreak-char-display'.
+           ;; Plain spaces in display strings are word wrapping break
+           ;; points, which can break the tags apart under
+           ;; `visual-line-mode', stranding the leading label padding at
+           ;; the end of a line.  Thus render the colons as stretch
+           ;; glyphs, which are not break points: the colon before each
+           ;; label provides the leading padding.  The trailing padding
+           ;; and the gap after the label are ordinary spaces, where a
+           ;; break is harmless, since the label before them is complete.
            (colon-props `(display (space :width 1) face ,default-face))
            (beg (match-beginning 2))
            (end (match-end 2))
@@ -471,17 +476,23 @@ the font.")
         (let ((cbeg (match-beginning 0))
               (cend (match-end 0)))
           (when colon-beg
-            (compose-region colon-end (1+ colon-end)
-                            (list ?\N{NO-BREAK SPACE} '(Br . Bl) (char-after colon-end)))
-            (compose-region (1- cbeg) cbeg
-                            (list (char-before cbeg) '(Br . Bl) ?\N{NO-BREAK SPACE}))
-            (put-text-property
-             colon-end cbeg 'face
-             (if-let* ((faces org-modern-tag-faces)
-                       (face (or (cdr (assoc (buffer-substring-no-properties colon-end cbeg) faces))
-                                 (cdr (assq t faces)))))
-                 `(,face org-modern-tag)
-               'org-modern-tag)))
+            (let ((face (if-let* ((faces org-modern-tag-faces)
+                                  (face (or (cdr (assoc (buffer-substring-no-properties colon-end cbeg) faces))
+                                            (cdr (assq t faces)))))
+                            `(,face org-modern-tag)
+                          'org-modern-tag)))
+              (add-text-properties colon-beg colon-end
+                                   `(display (space :width 1) face ,face))
+              (put-text-property (1- cbeg) cbeg 'display
+                                 (concat (string (char-before cbeg) ?\s)
+                                         ;; The face of the underlying label
+                                         ;; character shines through, so
+                                         ;; explicitly reset the background.
+                                         (propertize " " 'face
+                                                     (if default-face
+                                                         (list default-face 'default)
+                                                       'default))))
+              (put-text-property colon-end cbeg 'face face)))
           (add-text-properties cbeg cend colon-props)
           (setq colon-beg cbeg colon-end cend))))))
 
@@ -910,8 +921,8 @@ whole buffer; otherwise, for the line at point."
          (append
           ;; Only remove line/wrap-prefix if block fringes are used
           (if (and org-modern-block-fringe (not (bound-and-true-p org-indent-mode)))
-              '(wrap-prefix line-prefix display invisible composition)
-            '(display invisible composition))
+              '(wrap-prefix line-prefix display invisible)
+            '(display invisible))
           font-lock-extra-managed-props)))
     (org-unfontify-region beg end)))
 
