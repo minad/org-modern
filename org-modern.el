@@ -942,8 +942,9 @@ whole buffer; otherwise, for the line at point."
           (goto-char (point-min))
           (while (re-search-forward "\\(\\[#.\\]\\)" nil 'noerror)
             ;; For some reason the org-agenda-fontify-priorities adds overlays?!
-            (when-let* ((ov (overlays-at (match-beginning 0))))
-              (overlay-put (car ov) 'face nil))
+            (dolist (ov (overlays-at (match-beginning 0)))
+              (when (eq (overlay-get ov 'org-type) 'org-priority)
+                (overlay-put ov 'face nil)))
             (org-modern--priority)))))))
 
 ;;;###autoload
